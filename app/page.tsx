@@ -10,11 +10,13 @@ type ApiResponse = {
   success: boolean;
   users?: UserResult[];
   error?: string;
+  rateLimitReset?: string | null;
 };
 
 export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isRateLimit, setIsRateLimit] = useState(false);
   const [data, setData] = useState<{
     user1: UserResult;
     user2: UserResult;
@@ -23,6 +25,7 @@ export default function HomePage() {
   const handleCompare = async (u1: string, u2: string) => {
     setLoading(true);
     setError(null);
+    setIsRateLimit(false);
     setData(null);
     try {
       const params = new URLSearchParams();
@@ -30,6 +33,10 @@ export default function HomePage() {
       params.append("username", u2);
       const res = await fetch(`/api/compare?${params.toString()}`);
       const body: ApiResponse = await res.json();
+      if (res.status === 429 || body.rateLimitReset !== undefined) {
+        setIsRateLimit(true);
+        throw new Error(body.error || "GitHub API rate limit exceeded. Please try again later.");
+      }
       if (!body.success || !body.users || body.users.length < 2) {
         throw new Error(body.error || "Comparison failed");
       }
@@ -58,6 +65,7 @@ export default function HomePage() {
   const reset = () => {
     setData(null);
     setError(null);
+    setIsRateLimit(false);
   };
   const swapUsers = () => {
     if (!data) return;
@@ -88,7 +96,8 @@ export default function HomePage() {
 
         {loading && skeleton}
         {error && (
-          <div className="card p-4 text-sm text-red-600 bg-red-50 border border-red-100">
+          <div className={`card p-4 text-sm border ${isRateLimit ? "text-amber-700 bg-amber-50 border-amber-200" : "text-red-600 bg-red-50 border-red-100"}`}>
+            {isRateLimit && <span className="font-semibold">⏳ Rate limit reached — </span>}
             {error}
           </div>
         )}

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { fetchGitHubUserData } from "../../../lib/github";
+import { fetchGitHubUserData, RateLimitError } from "../../../lib/github";
 import { calculateUserScore } from "../../../lib/score";
 
 export const runtime = "nodejs";
@@ -36,6 +36,21 @@ export async function GET(request: Request) {
     return NextResponse.json({ success: true, users: results });
   } catch (error: any) {
     console.error("GitHub score error:", error);
+
+    if (error instanceof RateLimitError) {
+      const resetMsg = error.resetAt
+        ? ` Try again after ${error.resetAt.toLocaleTimeString()}.`
+        : " Please try again later.";
+      return NextResponse.json(
+        {
+          success: false,
+          error: `GitHub API rate limit exceeded.${resetMsg}`,
+          rateLimitReset: error.resetAt?.toISOString() ?? null,
+        },
+        { status: 429 }
+      );
+    }
+
     const message =
       error?.message === "User not found"
         ? "GitHub user not found"
