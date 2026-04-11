@@ -93,6 +93,30 @@ export default function HomePage() {
           </div>
         )}
         {data && <ResultDashboard user1={data.user1} user2={data.user2} />}
+        {!loading && !error && !data && (
+          <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground gap-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="64"
+              height="64"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="opacity-30"
+            >
+              <circle cx="9" cy="7" r="4" />
+              <circle cx="15" cy="7" r="4" />
+              <path d="M3 21v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2" />
+            </svg>
+            <p className="text-lg font-medium">Enter two usernames to compare</p>
+            <p className="text-sm opacity-70">
+              Compare GitHub developer metrics side by side
+            </p>
+          </div>
+        )}
       </div>
     </main>
   );
