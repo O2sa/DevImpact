@@ -17,6 +17,12 @@ export function getCached<T>(key: string): T | undefined {
   return entry.data as T;
 }
 
+export function getStale<T>(key: string): T | undefined {
+  const entry = store.get(key);
+  if (!entry) return undefined;
+  return entry.data as T;
+}
+
 export function setCached<T>(key: string, data: T, ttlMs = DEFAULT_TTL_MS) {
   store.set(key, { data, expiresAt: Date.now() + ttlMs });
 }

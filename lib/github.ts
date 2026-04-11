@@ -1,6 +1,6 @@
 import { ContributionTotals, GitHubUserData, PullRequestNode, RepoNode } from "@/types/github";
 import { graphql } from "@octokit/graphql";
-import { getCached, setCached } from "./cache";
+import { getCached, getStale, setCached } from "./cache";
 
 if (!process.env.GITHUB_TOKEN) {
   throw new Error("Missing GITHUB_TOKEN");
@@ -58,6 +58,20 @@ const QUERY = /* GraphQL */ `
   }
 `;
 
+export class RateLimitError extends Error {
+  retryAfter: number;
+  constructor(retryAfter: number) {
+    super("GitHub API rate limit exceeded");
+    this.name = "RateLimitError";
+    this.retryAfter = retryAfter;
+  }
+}
+
+function isRateLimitError(error: any): boolean {
+  const status = error?.status ?? error?.response?.status;
+  return status === 403 || status === 429;
+}
+
 export async function fetchGitHubUserData(
   username: string
 ): Promise<GitHubUserData> {
@@ -65,18 +79,32 @@ export async function fetchGitHubUserData(
   const cached = getCached<GitHubUserData>(cacheKey);
   if (cached) return cached;
 
-  const { user } = await client<{ user: any }>(QUERY, { login: username });
+  try {
+    const { user } = await client<{ user: any }>(QUERY, { login: username });
 
-  if (!user) {
-    throw new Error("User not found");
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const data: GitHubUserData = {
+      repos: user.repositories.nodes as RepoNode[],
+      pullRequests: user.pullRequests.nodes as PullRequestNode[],
+      contributions: user.contributionsCollection as ContributionTotals,
+    };
+
+    setCached(cacheKey, data);
+    return data;
+  } catch (error: any) {
+    if (isRateLimitError(error)) {
+      const stale = getStale<GitHubUserData>(cacheKey);
+      if (stale) return stale;
+
+      const resetAt = error.response?.headers?.["x-ratelimit-reset"];
+      const retryAfter = resetAt
+        ? Math.max(0, Number(resetAt) - Math.floor(Date.now() / 1000))
+        : 60;
+      throw new RateLimitError(retryAfter);
+    }
+    throw error;
   }
-
-  const data: GitHubUserData = {
-    repos: user.repositories.nodes as RepoNode[],
-    pullRequests: user.pullRequests.nodes as PullRequestNode[],
-    contributions: user.contributionsCollection as ContributionTotals,
-  };
-
-  setCached(cacheKey, data);
-  return data;
 }
