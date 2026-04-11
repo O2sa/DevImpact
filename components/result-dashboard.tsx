@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { ComparisonTable } from "./comparison-table";
 import { ComparisonChart } from "./comparison-chart";
 import { BreakdownBars } from "./breakdown-bars";
@@ -5,7 +8,7 @@ import { TopList } from "./top-list";
 import { InsightsList } from "./insights-list";
 import { ScoreCard } from "./score-card";
 import { Card, CardContent } from "./ui/card";
-import { Trophy } from "lucide-react";
+import { Trophy, Copy, Check } from "lucide-react";
 import { UserResult } from "@/types/user-result";
 
 type Props = {
@@ -14,12 +17,39 @@ type Props = {
 };
 
 export function ResultDashboard({ user1, user2 }: Props) {
+  const [copied, setCopied] = useState(false);
+
   const winner =
     user1.finalScore === user2.finalScore
       ? null
       : user1.finalScore > user2.finalScore
         ? user1
         : user2;
+
+  const handleCopy = async () => {
+    const summary = {
+      winner: winner?.username ?? "Tie",
+      users: [
+        {
+          username: user1.username,
+          finalScore: user1.finalScore,
+          repoScore: user1.repoScore,
+          prScore: user1.prScore,
+          contributionScore: user1.contributionScore,
+        },
+        {
+          username: user2.username,
+          finalScore: user2.finalScore,
+          repoScore: user2.repoScore,
+          prScore: user2.prScore,
+          contributionScore: user2.contributionScore,
+        },
+      ],
+    };
+    await navigator.clipboard.writeText(JSON.stringify(summary, null, 2));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
   const loser = winner === user1 ? user2 : user1;
   const diffPct = winner
     ? Math.round(
@@ -128,6 +158,25 @@ export function ResultDashboard({ user1, user2 }: Props) {
       <TopList userResults={[user1, user2]} />
 
       <InsightsList insights={getInsights()} />
+
+      <div className="flex justify-center">
+        <button
+          onClick={handleCopy}
+          className="inline-flex items-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+        >
+          {copied ? (
+            <>
+              <Check className="h-4 w-4 text-green-500" />
+              Copied!
+            </>
+          ) : (
+            <>
+              <Copy className="h-4 w-4" />
+              Copy Result
+            </>
+          )}
+        </button>
+      </div>
     </div>
   );
 }
