@@ -40,22 +40,30 @@ export async function GET(request: Request) {
     let message = "Something went wrong. Please try again later.";
     let status = 500;
 
-    const msg = error?.message ?? "";
-    if (msg === "User not found") {
+    const msg = (error?.message ?? "").toLowerCase();
+    const isNotFound =
+      msg === "user not found" ||
+      msg.includes("could not resolve to a user") ||
+      msg.includes("user not found") ||
+      error?.errors?.some((e: any) =>
+        e?.type === "NOT_FOUND" || e?.message?.toLowerCase().includes("user")
+      );
+
+    if (isNotFound) {
       message =
         "One or more GitHub users could not be found. Please check the usernames and try again.";
       status = 404;
     } else if (
       msg.includes("rate limit") ||
-      msg.includes("API rate limit") ||
+      msg.includes("api rate limit") ||
       error?.status === 403
     ) {
       message =
         "GitHub API rate limit exceeded. Please wait a few minutes and try again.";
       status = 429;
     } else if (
-      msg.includes("ENOTFOUND") ||
-      msg.includes("ECONNREFUSED") ||
+      msg.includes("enotfound") ||
+      msg.includes("econnrefused") ||
       msg.includes("fetch failed")
     ) {
       message =

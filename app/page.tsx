@@ -5,8 +5,6 @@ import { CompareForm } from "../components/compare-form";
 import { ResultDashboard } from "../components/result-dashboard";
 import { DashboardSkeleton } from "../components/skeletons";
 import { UserResult } from "@/types/user-result";
-import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type ApiResponse = {
   success: boolean;
@@ -76,7 +74,7 @@ export default function HomePage() {
               DevImpact
             </span>
           </div>
-       
+
         </div>
       </header>
       <div className="max-w-6xl mx-auto px-4 py-10 space-y-6">
@@ -90,13 +88,6 @@ export default function HomePage() {
         />
 
         {loading && skeleton}
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Comparison Failed</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
         {data && <ResultDashboard user1={data.user1} user2={data.user2} />}
         {!loading && !error && !data && (
           <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground gap-4">
