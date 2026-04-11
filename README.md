@@ -171,6 +171,59 @@ pnpm run dev
 
 ---
 
+## 📡 API Examples
+
+### Compare two developers
+
+**Request:**
+```bash
+GET /api/compare?username=torvalds&username=gvanrossum
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "users": [
+    {
+      "username": "torvalds",
+      "repoScore": 9850,
+      "prScore": 120,
+      "contributionScore": 45,
+      "finalScore": 4552,
+      "topRepos": [
+        { "name": "linux", "stars": 180000, "forks": 52000 }
+      ],
+      "topPullRequests": []
+    },
+    {
+      "username": "gvanrossum",
+      "repoScore": 4200,
+      "prScore": 980,
+      "contributionScore": 310,
+      "finalScore": 2370,
+      "topRepos": [
+        { "name": "cpython", "stars": 61000, "forks": 29000 }
+      ],
+      "topPullRequests": [
+        { "title": "bpo-12345: fix typing module", "repo": "python/cpython" }
+      ]
+    }
+  ]
+}
+```
+
+### Error response (user not found)
+
+```json
+{
+  "success": false,
+  "error": "GitHub user not found"
+}
+```
+
+---
+
 ## 🌍 Localization
 
 * Supported languages: English 🇺🇸, Arabic 🇸🇦
