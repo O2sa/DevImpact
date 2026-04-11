@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { ArrowLeftRight, RefreshCw } from "lucide-react";
 import {
@@ -29,6 +29,11 @@ export function CompareForm({
 }: CompareFormProps) {
   const [username1, setUsername1] = useState("pbiggar");
   const [username2, setUsername2] = useState("CoralineAda");
+  const firstInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    firstInputRef.current?.focus();
+  }, []);
 
   const canSubmit = Boolean(username1.trim() && username2.trim() && !loading);
 
@@ -62,6 +67,7 @@ export function CompareForm({
         <CardContent>
           <div className="grid gap-3 md:grid-cols-2">
             <input
+              ref={firstInputRef}
               className="h-11 rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-transparent bg-white"
               placeholder={"Username 1 (e.g., torvalds)"}
               value={username1}
