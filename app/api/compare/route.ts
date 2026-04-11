@@ -33,7 +33,10 @@ export async function GET(request: Request) {
       })
     );
 
-    return NextResponse.json({ success: true, users: results });
+    return NextResponse.json(
+      { success: true, users: results },
+      { headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60" } }
+    );
   } catch (error: any) {
     console.error("GitHub score error:", error);
     const message =
