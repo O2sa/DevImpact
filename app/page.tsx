@@ -5,6 +5,8 @@ import { CompareForm } from "../components/compare-form";
 import { ResultDashboard } from "../components/result-dashboard";
 import { DashboardSkeleton } from "../components/skeletons";
 import { UserResult } from "@/types/user-result";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type ApiResponse = {
   success: boolean;
@@ -84,13 +86,16 @@ export default function HomePage() {
           reset={reset}
           swapUsers={swapUsers}
           data={data}
+          error={error}
         />
 
         {loading && skeleton}
         {error && (
-          <div className="card p-4 text-sm text-red-600 bg-red-50 border border-red-100">
-            {error}
-          </div>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Comparison Failed</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
         {data && <ResultDashboard user1={data.user1} user2={data.user2} />}
         {!loading && !error && !data && (
