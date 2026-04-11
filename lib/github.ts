@@ -1,5 +1,6 @@
 import { ContributionTotals, GitHubUserData, PullRequestNode, RepoNode } from "@/types/github";
 import { graphql } from "@octokit/graphql";
+import { cache, CACHE_TTL } from "./cache";
 
 if (!process.env.GITHUB_TOKEN) {
   throw new Error("Missing GITHUB_TOKEN");
@@ -60,15 +61,26 @@ const QUERY = /* GraphQL */ `
 export async function fetchGitHubUserData(
   username: string
 ): Promise<GitHubUserData> {
+  const cacheKey = `github:user:${username.toLowerCase()}`;
+
+  const cached = cache.get<GitHubUserData>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   const { user } = await client<{ user: any }>(QUERY, { login: username });
 
   if (!user) {
     throw new Error("User not found");
   }
 
-  return {
+  const data: GitHubUserData = {
     repos: user.repositories.nodes as RepoNode[],
     pullRequests: user.pullRequests.nodes as PullRequestNode[],
     contributions: user.contributionsCollection as ContributionTotals,
   };
+
+  cache.set(cacheKey, data, CACHE_TTL.ONE_DAY);
+
+  return data;
 }
