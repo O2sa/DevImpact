@@ -47,7 +47,7 @@ export default function HomePage() {
         setData({ user1: body.users[0], user2: body.users[1] });
       }
     } catch (err: any) {
-      setError(err.message || "Failed to fetch");
+      setError(err.message || "An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -84,14 +84,10 @@ export default function HomePage() {
           reset={reset}
           swapUsers={swapUsers}
           data={data}
+          error={error}
         />
 
         {loading && skeleton}
-        {error && (
-          <div className="card p-4 text-sm text-red-600 bg-red-50 border border-red-100">
-            {error}
-          </div>
-        )}
         {data && <ResultDashboard user1={data.user1} user2={data.user2} />}
       </div>
     </main>
