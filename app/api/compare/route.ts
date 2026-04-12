@@ -36,10 +36,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ success: true, users: results });
   } catch (error: any) {
     console.error("GitHub score error:", error);
-    const message =
-      error?.message === "User not found"
-        ? "GitHub user not found"
-        : "Failed to calculate score";
+    let message = "Failed to calculate score";
+    if (error?.message === "User not found") {
+      message = "User not found";
+    } else if (
+      error?.message?.toLowerCase().includes("rate limit") ||
+      error?.status === 403
+    ) {
+      message = "GitHub API rate limit exceeded. Please try again later.";
+    }
     return NextResponse.json(
       { success: false, error: message },
       { status: 500 }

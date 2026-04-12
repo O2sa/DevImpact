@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { CompareForm } from "../components/compare-form";
+import { ErrorMessage } from "../components/error-message";
 import { ResultDashboard } from "../components/result-dashboard";
 import { DashboardSkeleton } from "../components/skeletons";
 import { UserResult } from "@/types/user-result";
@@ -65,7 +66,7 @@ export default function HomePage() {
     console.log("Swapped users", data);
   };
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen flex flex-col">
       {" "}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 max-w-7xl items-center justify-between m-auto px-4">
@@ -74,10 +75,10 @@ export default function HomePage() {
               DevImpact
             </span>
           </div>
-       
+
         </div>
       </header>
-      <div className="max-w-6xl mx-auto px-4 py-10 space-y-6">
+      <div className="flex-1 max-w-6xl mx-auto px-4 py-10 space-y-6 w-full">
         <CompareForm
           onSubmit={handleCompare}
           loading={loading}
@@ -88,9 +89,7 @@ export default function HomePage() {
 
         {loading && skeleton}
         {error && (
-          <div className="card p-4 text-sm text-red-600 bg-red-50 border border-red-100">
-            {error}
-          </div>
+          <ErrorMessage error={error} onRetry={() => setError(null)} />
         )}
         {data && <ResultDashboard user1={data.user1} user2={data.user2} />}
         {!loading && !error && !data && (
