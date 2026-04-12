@@ -1,6 +1,7 @@
 import js from "@eslint/js";
 import typescript from "@typescript-eslint/eslint-plugin";
 import typescriptParser from "@typescript-eslint/parser";
+import prettierConfig from "eslint-config-prettier";
 
 export default [
   js.configs.recommended,
@@ -11,8 +12,8 @@ export default [
       "out/**",
       ".git/**",
       "dist/**",
-      "build/**"
-    ]
+      "build/**",
+    ],
   },
   {
     files: ["**/*.{ts,tsx,js,jsx}"],
@@ -22,8 +23,8 @@ export default [
         ecmaVersion: 2021,
         sourceType: "module",
         ecmaFeatures: {
-          jsx: true
-        }
+          jsx: true,
+        },
       },
       globals: {
         React: "readonly",
@@ -42,11 +43,11 @@ export default [
         URLSearchParams: "readonly",
         fetch: "readonly",
         Request: "readonly",
-        Response: "readonly"
-      }
+        Response: "readonly",
+      },
     },
     plugins: {
-      "@typescript-eslint": typescript
+      "@typescript-eslint": typescript,
     },
     rules: {
       ...typescript.configs.recommended.rules,
@@ -54,12 +55,13 @@ export default [
         "warn",
         {
           argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_"
-        }
+          varsIgnorePattern: "^_",
+        },
       ],
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/explicit-module-boundary-types": "off",
-      "no-undef": "off"
-    }
-  }
+      "no-undef": "off",
+    },
+  },
+  prettierConfig,
 ];

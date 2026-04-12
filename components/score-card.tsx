@@ -7,7 +7,12 @@ type ScoreCardProps = {
   subtitle?: string;
 };
 
-export function ScoreCard({ title, value, highlight, subtitle }: ScoreCardProps) {
+export function ScoreCard({
+  title,
+  value,
+  highlight,
+  subtitle,
+}: ScoreCardProps) {
   return (
     <div
       className={cn(
@@ -21,7 +26,9 @@ export function ScoreCard({ title, value, highlight, subtitle }: ScoreCardProps)
           {value.toFixed(2)}
         </span>
         {subtitle && (
-          <span className="text-xs text-slate-500 leading-tight">{subtitle}</span>
+          <span className="text-xs text-slate-500 leading-tight">
+            {subtitle}
+          </span>
         )}
       </div>
     </div>

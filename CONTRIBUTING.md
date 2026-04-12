@@ -37,16 +37,19 @@ Thank you for your interest in contributing to DevImpact! This guide will help y
 ### Installation
 
 1. Install dependencies:
+
    ```bash
    pnpm install
    ```
 
 2. Create a `.env` file in the project root (see `.env.example`):
+
    ```
    GITHUB_TOKEN=your_github_token_here
    ```
 
 3. Start the development server:
+
    ```bash
    pnpm dev
    ```
@@ -79,6 +82,7 @@ DevImpact/
 ## Making Changes
 
 1. **Sync your fork** with the latest upstream changes:
+
    ```bash
    git fetch upstream
    git checkout main
@@ -86,6 +90,7 @@ DevImpact/
    ```
 
 2. **Create a feature branch** from `main`:
+
    ```bash
    git checkout -b feat/your-feature-name
    ```
@@ -93,11 +98,13 @@ DevImpact/
 3. **Make your changes** and test them locally.
 
 4. **Run the linter** before committing:
+
    ```bash
    pnpm lint
    ```
 
 5. **Commit your changes** with a clear message:
+
    ```bash
    git commit -m "feat: add your feature description"
    ```

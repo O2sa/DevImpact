@@ -7,16 +7,15 @@ import { PullRequestScoreDetail, RepoScoreDetail } from "@/types/score";
 
 const LOG = Math.log;
 
-
-
-function calculateRepoScore(
-  repos: RepoNode[]
-): { total: number; details: RepoScoreDetail[] } {
+function calculateRepoScore(repos: RepoNode[]): {
+  total: number;
+  details: RepoScoreDetail[];
+} {
   const details = repos.map((repo) => {
-
-    const score = LOG(repo.stargazerCount + 1) * 5 +
+    const score =
+      LOG(repo.stargazerCount + 1) * 5 +
       LOG(repo.forkCount + 1) * 3 +
-      LOG(repo.watchers.totalCount + 1) * 2
+      LOG(repo.watchers.totalCount + 1) * 2;
     return { repo, score: Math.round(score) };
   });
 
@@ -94,8 +93,10 @@ export function calculateUserScore(
   const repoScore = calculateRepoScore(data.repos);
   const prScore = calculatePRScore(data.pullRequests, username);
   let contributionScore = calculateContributionScore(data.contributions);
-  contributionScore = Math.min(contributionScore, 0.3 * (repoScore.total + prScore.total))
-
+  contributionScore = Math.min(
+    contributionScore,
+    0.3 * (repoScore.total + prScore.total)
+  );
 
   const finalScore =
     repoScore.total * 0.4 + prScore.total * 0.4 + contributionScore * 0.2;

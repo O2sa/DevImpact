@@ -30,7 +30,6 @@ const metrics = [
 ];
 
 export function ComparisonChart({ user1, user2 }: Props) {
-
   const data = metrics.map((m) => ({
     name: m.label,
     [user1.username]: user1[m.key as keyof UserResult] ?? 0,

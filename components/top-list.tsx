@@ -1,11 +1,4 @@
-import {
-  Eye,
-  GitFork,
-  GitPullRequest,
-  Minus,
-  Plus,
-  Star,
-} from "lucide-react";
+import { Eye, GitFork, GitPullRequest, Minus, Plus, Star } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -106,7 +99,7 @@ export function TopList({ userResults }: Props) {
                         tooltip: `${repo.watchers} watchers`,
                       },
                     ],
-                  }),
+                  })
                 )}
                 {user.topRepos.length === 0 && (
                   <p className="text-sm text-muted-foreground">
@@ -133,7 +126,7 @@ export function TopList({ userResults }: Props) {
                         label: pr.stars,
                         tooltip: `${pr.stars} stars on the PR's repository`,
                       },
-        
+
                       {
                         icon: <Plus className="text-emerald-500" />,
                         label: pr.additions || "0",
@@ -145,7 +138,7 @@ export function TopList({ userResults }: Props) {
                         tooltip: `-${pr.deletions || 0} deletions`,
                       },
                     ],
-                  }),
+                  })
                 )}
                 {user.topPullRequests.length === 0 && (
                   <p className="text-sm text-muted-foreground">

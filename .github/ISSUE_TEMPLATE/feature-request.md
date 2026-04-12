@@ -1,10 +1,9 @@
 ---
 name: Feature Request
 about: Suggest a new feature for this project
-title: ''
+title: ""
 labels: feature, good first issue
-assignees: ''
-
+assignees: ""
 ---
 
 ## Description of the feature

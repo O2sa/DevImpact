@@ -76,7 +76,7 @@ export function CompareForm({
             />
             <input
               className="h-11 rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-transparent bg-white"
-              placeholder={"Username 2 (e.g., torvalds)"} 
+              placeholder={"Username 2 (e.g., torvalds)"}
               value={username2}
               onChange={(e) => setUsername2(e.target.value)}
             />

@@ -1,10 +1,9 @@
 ---
 name: Documentation
 about: Report issues or additions to Documentation
-title: ''
+title: ""
 labels: documentation, good first issue
-assignees: ''
-
+assignees: ""
 ---
 
 ## Description of what to add

@@ -1,4 +1,9 @@
-import { ContributionTotals, GitHubUserData, PullRequestNode, RepoNode } from "@/types/github";
+import {
+  ContributionTotals,
+  GitHubUserData,
+  PullRequestNode,
+  RepoNode,
+} from "@/types/github";
 import { graphql } from "@octokit/graphql";
 
 if (!process.env.GITHUB_TOKEN) {
@@ -11,9 +16,12 @@ const client = graphql.defaults({
   },
 });
 
-
 const QUERY = /* GraphQL */ `
-  query FetchUserData($login: String!, $repoCount: Int = 100, $prCount: Int = 100) {
+  query FetchUserData(
+    $login: String!
+    $repoCount: Int = 100
+    $prCount: Int = 100
+  ) {
     user(login: $login) {
       repositories(
         first: $repoCount

@@ -1,4 +1,5 @@
 # 🚀 DevImpact
+
 ![License](https://img.shields.io/github/license/o2sa/devimpact)
 ![Stars](https://img.shields.io/github/stars/o2sa/devimpact)
 ![Forks](https://img.shields.io/github/forks/o2sa/devimpact)
@@ -11,14 +12,13 @@
 ![Node.js](https://img.shields.io/badge/Node.js-green?logo=node.js)
 ![GraphQL](https://img.shields.io/badge/GraphQL-pink?logo=graphql)
 
-
 **DevImpact** is an open-source platform that compares software developers based on their real impact in the open-source ecosystem — not just raw numbers.
 
 It evaluates developers using a smart scoring system that considers:
 
-* Repository quality 📦
-* Pull request impact 🔀
-* Community contributions 💬
+- Repository quality 📦
+- Pull request impact 🔀
+- Community contributions 💬
 
 ---
 
@@ -28,9 +28,9 @@ Traditional metrics (followers, stars, commit counts) are often misleading.
 
 DevImpact focuses on:
 
-* ✅ Quality over quantity
-* ✅ Real contributions to valuable projects
-* ✅ Fair comparison between developers
+- ✅ Quality over quantity
+- ✅ Real contributions to valuable projects
+- ✅ Fair comparison between developers
 
 ---
 
@@ -44,9 +44,9 @@ Measures the quality and impact of repositories owned by the user.
 
 Factors include:
 
-* Stars ⭐
-* Forks 🍴
-* Watchers
+- Stars ⭐
+- Forks 🍴
+- Watchers
 
 ---
 
@@ -59,10 +59,10 @@ Measures contributions to **other developers' repositories**.
 
 Factors include:
 
-* Target repository quality
-* PR size (additions/deletions)
-* Repository popularity
-* Contribution diversity
+- Target repository quality
+- PR size (additions/deletions)
+- Repository popularity
+- Contribution diversity
 
 ---
 
@@ -72,8 +72,8 @@ Measures community engagement.
 
 Includes:
 
-* Issues opened in external repositories
-* Discussions participation
+- Issues opened in external repositories
+- Discussions participation
 
 ⚠️ Does NOT include commits or PRs (to avoid duplication)
 
@@ -96,21 +96,21 @@ Final Score =
 
 ## ⚖️ Key Design Principles
 
-* ❌ No self-inflation (own PRs excluded)
-* 📉 Diminishing returns to prevent spam
-* 🎯 External impact is prioritized
-* ⚖️ Balanced scoring between builders and contributors
+- ❌ No self-inflation (own PRs excluded)
+- 📉 Diminishing returns to prevent spam
+- 🎯 External impact is prioritized
+- ⚖️ Balanced scoring between builders and contributors
 
 ---
 
 ## 🖥️ Features
 
-* 🔍 Compare two GitHub users side-by-side
-* 📊 Visual score breakdown (charts & insights)
-* 🧠 Smart ranking system
-* 🌍 Localization support (EN / AR)
-* ⚡ Fast API powered by GitHub GraphQL
-* 🧩 Extensible scoring system
+- 🔍 Compare two GitHub users side-by-side
+- 📊 Visual score breakdown (charts & insights)
+- 🧠 Smart ranking system
+- 🌍 Localization support (EN / AR)
+- ⚡ Fast API powered by GitHub GraphQL
+- 🧩 Extensible scoring system
 
 ---
 
@@ -118,21 +118,18 @@ Final Score =
 
 ### Frontend
 
-* Next.js (App Router)
-* TypeScript
-* Tailwind CSS
-* Recharts
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- Recharts
 
 ### API
 
-* Node.js + Express
-* GitHub GraphQL API
-* Octokit
+- Node.js + Express
+- GitHub GraphQL API
+- Octokit
 
 ---
-
-
-
 
 ## 🚀 Getting Started
 
@@ -173,13 +170,12 @@ pnpm run dev
 
 ## 🌍 Localization
 
-* Supported languages: English 🇺🇸, Arabic 🇸🇦
-* Automatically detects user language
-* Allows manual switching
-* Easy to add new languages via `/locales`
+- Supported languages: English 🇺🇸, Arabic 🇸🇦
+- Automatically detects user language
+- Allows manual switching
+- Easy to add new languages via `/locales`
 
 ---
-
 
 ## 🤝 Contributing
 
@@ -196,21 +192,20 @@ Contributions are welcome!
 
 ### Contribution ideas:
 
-* Improve scoring algorithm
-* Add new metrics
-* Enhance UI/UX
-* Add new languages 🌍
+- Improve scoring algorithm
+- Add new metrics
+- Enhance UI/UX
+- Add new languages 🌍
 
 ---
 
 ## ⚠️ Limitations
 
-* GitHub API rate limits
-* Some private contributions are not accessible
-* Scoring system is heuristic (not perfect)
+- GitHub API rate limits
+- Some private contributions are not accessible
+- Scoring system is heuristic (not perfect)
 
 ---
-
 
 ## 💡 Inspiration
 
@@ -224,7 +219,6 @@ DevImpact was created to answer a simple question:
 
 If you like this project:
 
-* ⭐ Star the repo
-* 🐛 Report issues
-* 💡 Suggest features
-
+- ⭐ Star the repo
+- 🐛 Report issues
+- 💡 Suggest features

@@ -1,4 +1,3 @@
-
 export type RepoNode = {
   name: string;
   stargazerCount: number;

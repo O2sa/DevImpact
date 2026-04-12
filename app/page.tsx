@@ -74,7 +74,6 @@ export default function HomePage() {
               DevImpact
             </span>
           </div>
-
         </div>
       </header>
       <div className="flex-1 max-w-6xl mx-auto px-4 py-10 space-y-6 w-full">
@@ -111,7 +110,9 @@ export default function HomePage() {
               <circle cx="15" cy="7" r="4" />
               <path d="M3 21v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2" />
             </svg>
-            <p className="text-lg font-medium">Enter two usernames to compare</p>
+            <p className="text-lg font-medium">
+              Enter two usernames to compare
+            </p>
             <p className="text-sm opacity-70">
               Compare GitHub developer metrics side by side
             </p>
@@ -120,7 +121,8 @@ export default function HomePage() {
       </div>
       <footer className="border-t py-6 text-center text-sm text-muted-foreground">
         <div className="container max-w-7xl mx-auto px-4">
-          <span className="font-medium">DevImpact</span> — Compare GitHub developer metrics
+          <span className="font-medium">DevImpact</span> — Compare GitHub
+          developer metrics
         </div>
       </footer>
     </main>

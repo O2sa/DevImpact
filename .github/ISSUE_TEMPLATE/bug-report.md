@@ -1,10 +1,9 @@
 ---
 name: Bug Report
 about: Reporting bugs in existing code
-title: ''
+title: ""
 labels: bug, good first issue
-assignees: ''
-
+assignees: ""
 ---
 
 ## The Problem

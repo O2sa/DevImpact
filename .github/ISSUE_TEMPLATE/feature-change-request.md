@@ -1,10 +1,9 @@
 ---
 name: Feature-Change Request
 about: Suggest a change in an existing feature
-title: ''
+title: ""
 labels: change, good first issue
-assignees: ''
-
+assignees: ""
 ---
 
 ## What needs to change

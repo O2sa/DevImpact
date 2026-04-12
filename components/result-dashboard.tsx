@@ -28,7 +28,7 @@ export function ResultDashboard({ user1, user2 }: Props) {
   const loser = winner === user1 ? user2 : user1;
   const diffPct = winner
     ? Math.round(
-        ((winner.finalScore - loser.finalScore) / loser.finalScore) * 100,
+        ((winner.finalScore - loser.finalScore) / loser.finalScore) * 100
       )
     : 0;
 
@@ -36,11 +36,11 @@ export function ResultDashboard({ user1, user2 }: Props) {
     const insights = [];
     if (user1.repoScore > user2.repoScore) {
       insights.push(
-        `${user1.username} has stronger repository portfolio with ${user1.repoScore} vs ${user2.repoScore}`,
+        `${user1.username} has stronger repository portfolio with ${user1.repoScore} vs ${user2.repoScore}`
       );
     } else if (user2.repoScore > user1.repoScore) {
       insights.push(
-        `${user2.username} has stronger repository portfolio with ${user2.repoScore} vs ${user1.repoScore}`,
+        `${user2.username} has stronger repository portfolio with ${user2.repoScore} vs ${user1.repoScore}`
       );
     } else {
       insights.push(`Both developers have equal repository strength`);
@@ -48,11 +48,11 @@ export function ResultDashboard({ user1, user2 }: Props) {
 
     if (user1.prScore > user2.prScore) {
       insights.push(
-        `${user1.username} leads in pull request impact (${user1.prScore} vs ${user2.prScore})`,
+        `${user1.username} leads in pull request impact (${user1.prScore} vs ${user2.prScore})`
       );
     } else if (user2.prScore > user1.prScore) {
       insights.push(
-        `${user2.username} leads in pull request impact (${user2.prScore} vs ${user1.prScore})`,
+        `${user2.username} leads in pull request impact (${user2.prScore} vs ${user1.prScore})`
       );
     } else {
       insights.push(`Both developers have equal pull request impact`);
@@ -123,9 +123,7 @@ export function ResultDashboard({ user1, user2 }: Props) {
             </>
           ) : (
             <>
-              <p className="text-sm text-white/80">
-                Metric
-              </p>
+              <p className="text-sm text-white/80">Metric</p>
               <h2 className="text-xl font-semibold">
                 It's a tie — both developers are evenly matched.
               </h2>

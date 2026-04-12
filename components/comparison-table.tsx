@@ -19,16 +19,26 @@ type ComparisonTableProps = {
 };
 
 export function ComparisonTable({ user1, user2 }: ComparisonTableProps) {
-
   return (
     <div className="grid md:grid-cols-2 gap-6">
       {[user1, user2].map((user, idx) => (
-        <Card key={user.username} className="overflow-hidden transition-all hover:shadow-lg">
-          <CardHeader className={user.isWinner ? "border-b-2 border-primary/30" : "border-b-2 border-muted"}>
+        <Card
+          key={user.username}
+          className="overflow-hidden transition-all hover:shadow-lg"
+        >
+          <CardHeader
+            className={
+              user.isWinner
+                ? "border-b-2 border-primary/30"
+                : "border-b-2 border-muted"
+            }
+          >
             <CardTitle className="flex items-center justify-between">
               <span>{user.username}</span>
               {user.isWinner && (
-                <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">Winner</span>
+                <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">
+                  Winner
+                </span>
               )}
             </CardTitle>
           </CardHeader>
@@ -39,19 +49,25 @@ export function ComparisonTable({ user1, user2 }: ComparisonTableProps) {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Repo Score</span>
-              <span className={`font-semibold ${user.repoScore > (idx === 0 ? user2.repoScore : user1.repoScore) ? "text-primary" : ""}`}>
+              <span
+                className={`font-semibold ${user.repoScore > (idx === 0 ? user2.repoScore : user1.repoScore) ? "text-primary" : ""}`}
+              >
                 {user.repoScore}
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">PR Score</span>
-              <span className={`font-semibold ${user.prScore > (idx === 0 ? user2.prScore : user1.prScore) ? "text-primary" : ""}`}>
+              <span
+                className={`font-semibold ${user.prScore > (idx === 0 ? user2.prScore : user1.prScore) ? "text-primary" : ""}`}
+              >
                 {user.prScore}
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Contribution Score</span>
-              <span className={`font-semibold ${user.contributionScore > (idx === 0 ? user2.contributionScore : user1.contributionScore) ? "text-primary" : ""}`}>
+              <span
+                className={`font-semibold ${user.contributionScore > (idx === 0 ? user2.contributionScore : user1.contributionScore) ? "text-primary" : ""}`}
+              >
                 {user.contributionScore}
               </span>
             </div>
