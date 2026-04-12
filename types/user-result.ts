@@ -16,6 +16,7 @@ export type UserResult = {
     stars?: number;
     score?: number;
     title?: string;
+    url?: string;
     deletions?: number;
     additions?: number;
   }[];

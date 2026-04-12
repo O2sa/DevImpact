@@ -36,6 +36,8 @@ const QUERY = /* GraphQL */ `
         orderBy: { field: CREATED_AT, direction: DESC }
       ) {
         nodes {
+          title
+          url
           merged
           additions
           deletions

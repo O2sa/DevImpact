@@ -89,7 +89,7 @@ export function calculateUserScore(
   contributionScore: number;
   finalScore: number;
   topRepos: { name: string; stars: number; forks: number; score: number }[];
-  topPullRequests: { repo: string; stars: number; score: number }[];
+  topPullRequests: { repo: string; title: string; url: string; stars: number; score: number }[];
 } {
   const repoScore = calculateRepoScore(data.repos);
   const prScore = calculatePRScore(data.pullRequests, username);
@@ -114,7 +114,8 @@ export function calculateUserScore(
     })),
     topPullRequests: prScore.details.slice(0, 3).map((item) => ({
       repo: item.pr.repository.nameWithOwner,
-      title: item.pr.repository.nameWithOwner,
+      title: item.pr.title,
+      url: item.pr.url,
       stars: item.pr.repository.stargazerCount,
       score: item.score,
       additions: item.pr.additions,

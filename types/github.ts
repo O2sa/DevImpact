@@ -7,6 +7,8 @@ export type RepoNode = {
 };
 
 export type PullRequestNode = {
+  title: string;
+  url: string;
   merged: boolean;
   additions: number;
   deletions: number;
