@@ -39,6 +39,8 @@ const QUERY = /* GraphQL */ `
           merged
           additions
           deletions
+          title
+          url
           repository {
             nameWithOwner
             stargazerCount

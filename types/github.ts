@@ -10,6 +10,8 @@ export type PullRequestNode = {
   merged: boolean;
   additions: number;
   deletions: number;
+  title: string;
+  url: string;
   repository: {
     nameWithOwner: string;
     stargazerCount: number;
