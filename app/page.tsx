@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { CompareForm } from "../components/compare-form";
 import { ResultDashboard } from "../components/result-dashboard";
 import { DashboardSkeleton } from "../components/skeletons";
@@ -12,7 +13,9 @@ type ApiResponse = {
   error?: string;
 };
 
-export default function HomePage() {
+function HomePageContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<{
@@ -20,7 +23,15 @@ export default function HomePage() {
     user2: UserResult;
   } | null>(null);
 
+  const initialUsername1 = searchParams.get("u1") ?? "";
+  const initialUsername2 = searchParams.get("u2") ?? "";
+
   const handleCompare = async (u1: string, u2: string) => {
+    const urlParams = new URLSearchParams();
+    if (u1) urlParams.set("u1", u1);
+    if (u2) urlParams.set("u2", u2);
+    router.replace(`?${urlParams.toString()}`, { scroll: false });
+
     setLoading(true);
     setError(null);
     setData(null);
@@ -53,20 +64,87 @@ export default function HomePage() {
     }
   };
 
+  useEffect(() => {
+    if (initialUsername1 && initialUsername2) {
+      handleCompare(initialUsername1, initialUsername2);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const skeleton = useMemo(() => <DashboardSkeleton />, []);
 
   const reset = () => {
     setData(null);
     setError(null);
+    router.replace("/", { scroll: false });
   };
+
   const swapUsers = () => {
     if (!data) return;
     setData((d) => ({ user1: d!.user2, user2: d!.user1 }));
-    console.log("Swapped users", data);
+    const u1 = searchParams.get("u2") ?? "";
+    const u2 = searchParams.get("u1") ?? "";
+    if (u1 && u2) {
+      const params = new URLSearchParams();
+      params.set("u1", u1);
+      params.set("u2", u2);
+      router.replace(`?${params.toString()}`, { scroll: false });
+    }
   };
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-10 space-y-6">
+      <CompareForm
+        onSubmit={handleCompare}
+        loading={loading}
+        reset={reset}
+        swapUsers={swapUsers}
+        data={data}
+        initialUsername1={initialUsername1}
+        initialUsername2={initialUsername2}
+      />
+
+      {loading && skeleton}
+      {error && (
+        <div className="card p-4 text-sm text-red-600 bg-red-50 border border-red-100">
+          {error}
+        </div>
+      )}
+      {data && <ResultDashboard user1={data.user1} user2={data.user2} />}
+      {!loading && !error && !data && (
+        <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground gap-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="opacity-30"
+          >
+            <circle cx="9" cy="7" r="4" />
+            <circle cx="15" cy="7" r="4" />
+            <path d="M3 21v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2" />
+          </svg>
+          <p className="text-lg font-medium">
+            Enter two usernames to compare
+          </p>
+          <p className="text-sm opacity-70">
+            Compare GitHub developer metrics side by side.
+            Share the URL to save your comparison.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function HomePage() {
   return (
     <main className="min-h-screen">
-      {" "}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 max-w-7xl items-center justify-between m-auto px-4">
           <div className="flex items-center gap-2 font-bold text-xl">
@@ -74,50 +152,17 @@ export default function HomePage() {
               DevImpact
             </span>
           </div>
-       
         </div>
       </header>
-      <div className="max-w-6xl mx-auto px-4 py-10 space-y-6">
-        <CompareForm
-          onSubmit={handleCompare}
-          loading={loading}
-          reset={reset}
-          swapUsers={swapUsers}
-          data={data}
-        />
-
-        {loading && skeleton}
-        {error && (
-          <div className="card p-4 text-sm text-red-600 bg-red-50 border border-red-100">
-            {error}
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center py-20">
+            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
           </div>
-        )}
-        {data && <ResultDashboard user1={data.user1} user2={data.user2} />}
-        {!loading && !error && !data && (
-          <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground gap-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="64"
-              height="64"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="opacity-30"
-            >
-              <circle cx="9" cy="7" r="4" />
-              <circle cx="15" cy="7" r="4" />
-              <path d="M3 21v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2" />
-            </svg>
-            <p className="text-lg font-medium">Enter two usernames to compare</p>
-            <p className="text-sm opacity-70">
-              Compare GitHub developer metrics side by side
-            </p>
-          </div>
-        )}
-      </div>
+        }
+      >
+        <HomePageContent />
+      </Suspense>
       <footer className="border-t py-6 text-center text-sm text-muted-foreground">
         <div className="container max-w-7xl mx-auto px-4">
           <span className="font-medium">DevImpact</span> — Compare GitHub developer metrics

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { ArrowLeftRight, RefreshCw } from "lucide-react";
 import {
@@ -17,6 +17,8 @@ type CompareFormProps = {
   reset?: () => void;
   swapUsers?: () => void;
   error?: string | null;
+  initialUsername1?: string;
+  initialUsername2?: string;
 };
 
 export function CompareForm({
@@ -26,9 +28,23 @@ export function CompareForm({
   swapUsers,
   reset,
   error,
+  initialUsername1 = "pbiggar",
+  initialUsername2 = "CoralineAda",
 }: CompareFormProps) {
-  const [username1, setUsername1] = useState("pbiggar");
-  const [username2, setUsername2] = useState("CoralineAda");
+  const [username1, setUsername1] = useState(initialUsername1 || "pbiggar");
+  const [username2, setUsername2] = useState(initialUsername2 || "CoralineAda");
+  const firstInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (initialUsername1) setUsername1(initialUsername1);
+    if (initialUsername2) setUsername2(initialUsername2);
+  }, [initialUsername1, initialUsername2]);
+
+  useEffect(() => {
+    if (!initialUsername1) {
+      firstInputRef.current?.focus();
+    }
+  }, [initialUsername1]);
 
   const canSubmit = Boolean(username1.trim() && username2.trim() && !loading);
 
@@ -56,20 +72,22 @@ export function CompareForm({
         <CardHeader>
           <CardTitle>Compare GitHub Developers</CardTitle>
           <CardDescription>
-            Enter two GitHub usernames to compare their developer metrics
+            Enter two GitHub usernames to compare their developer metrics.
+            Shareable URL updates automatically when you compare.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 md:grid-cols-2">
             <input
               className="h-11 rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-transparent bg-white"
+              ref={firstInputRef}
               placeholder={"Username 1 (e.g., torvalds)"}
               value={username1}
               onChange={(e) => setUsername1(e.target.value)}
             />
             <input
               className="h-11 rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-transparent bg-white"
-              placeholder={"Username 2 (e.g., torvalds)"} 
+              placeholder={"Username 2 (e.g., torvalds)"}
               value={username2}
               onChange={(e) => setUsername2(e.target.value)}
             />
