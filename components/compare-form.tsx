@@ -72,8 +72,7 @@ export function CompareForm({
         <CardHeader>
           <CardTitle>Compare GitHub Developers</CardTitle>
           <CardDescription>
-            Enter two GitHub usernames to compare their developer metrics.
-            Shareable URL updates automatically when you compare.
+            Enter two GitHub usernames to compare their developer metrics
           </CardDescription>
         </CardHeader>
         <CardContent>
