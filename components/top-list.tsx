@@ -1,3 +1,4 @@
+import { type ReactNode } from "react";
 import {
   Eye,
   GitFork,
@@ -29,7 +30,7 @@ export function TopList({ userResults }: Props) {
     title: string;
     subtitle?: string;
     score?: number;
-    badges: { tooltip?: string; label?: any; icon: any }[];
+    badges: { tooltip?: string; label?: ReactNode; icon: ReactNode }[];
     key: string | number;
   }) => (
     <div

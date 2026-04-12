@@ -2,18 +2,6 @@ import Image from "next/image";
 import { UserResult } from "@/types/user-result";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
-type ScoreRow = {
-  label: string;
-  key: "finalScore" | "repoScore" | "prScore" | "contributionScore";
-};
-
-const rows: ScoreRow[] = [
-  { label: "result.table.final", key: "finalScore" },
-  { label: "result.table.repo", key: "repoScore" },
-  { label: "result.table.pr", key: "prScore" },
-  { label: "result.table.contribution", key: "contributionScore" },
-];
-
 type ComparisonTableProps = {
   user1: UserResult;
   user2: UserResult;

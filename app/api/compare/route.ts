@@ -36,10 +36,10 @@ export async function GET(request: Request) {
     );
 
     return NextResponse.json({ success: true, users: results });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("GitHub score error:", error);
     const message =
-      error?.message === "User not found"
+      error instanceof Error && error.message === "User not found"
         ? "GitHub user not found"
         : "Failed to calculate score";
     return NextResponse.json(

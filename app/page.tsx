@@ -46,8 +46,8 @@ export default function HomePage() {
       } else {
         setData({ user1: body.users[0], user2: body.users[1] });
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to fetch");
     } finally {
       setLoading(false);
     }

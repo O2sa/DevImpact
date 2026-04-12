@@ -1,4 +1,12 @@
 import { ContributionTotals, GitHubUserData, PullRequestNode, RepoNode } from "@/types/github";
+
+type GitHubRawUser = {
+  name: string | null;
+  avatarUrl: string;
+  repositories: { nodes: RepoNode[] };
+  pullRequests: { nodes: PullRequestNode[] };
+  contributionsCollection: ContributionTotals;
+};
 import { graphql } from "@octokit/graphql";
 
 if (!process.env.GITHUB_TOKEN) {
@@ -62,7 +70,7 @@ const QUERY = /* GraphQL */ `
 export async function fetchGitHubUserData(
   username: string
 ): Promise<GitHubUserData> {
-  const { user } = await client<{ user: any }>(QUERY, { login: username });
+  const { user } = await client<{ user: GitHubRawUser | null }>(QUERY, { login: username });
 
   if (!user) {
     throw new Error("User not found");

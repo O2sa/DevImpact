@@ -127,7 +127,7 @@ export function ResultDashboard({ user1, user2 }: Props) {
                 Metric
               </p>
               <h2 className="text-xl font-semibold">
-                It's a tie — both developers are evenly matched.
+                It&apos;s a tie — both developers are evenly matched.
               </h2>
             </>
           )}
