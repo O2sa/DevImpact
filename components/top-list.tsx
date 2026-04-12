@@ -31,13 +31,25 @@ export function TopList({ userResults }: Props) {
     score?: number;
     badges: { tooltip?: string; label?: any; icon: any }[];
     key: string | number;
+    link?: string;
   }) => (
     <div
       className="rounded-lg border p-3 transition-all hover:bg-muted/50 flex items-center justify-between"
       key={data.key}
     >
-      <div>
-        <div className="font-medium text-slate-900">{data.title}</div>
+      <div className="flex-1 min-w-0">
+        {data.link ? (
+          <a
+            href={data.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-slate-900 hover:text-primary hover:underline block truncate"
+          >
+            {data.title}
+          </a>
+        ) : (
+          <div className="font-medium text-slate-900 block truncate">{data.title}</div>
+        )}
         <div className="text-xs text-muted-foreground mt-1">
           {data.subtitle}
         </div>
@@ -56,7 +68,7 @@ export function TopList({ userResults }: Props) {
           ))}
         </div>
       </div>
-      <div className="text-right">
+      <div className="text-right ml-4">
         <p className="text-sm font-semibold text-slate-900">
           {(data.score ?? 0).toFixed(2)}
         </p>
@@ -127,13 +139,13 @@ export function TopList({ userResults }: Props) {
                     title: pr.title || "Untitled Pull Request",
                     subtitle: `in ${pr.repo}`,
                     score: pr.score,
+                    link: pr.url,
                     badges: [
                       {
                         icon: <Star className="h-4 w-4" />,
                         label: pr.stars,
                         tooltip: `${pr.stars} stars on the PR's repository`,
                       },
-        
                       {
                         icon: <Plus className="text-emerald-500" />,
                         label: pr.additions || "0",

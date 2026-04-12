@@ -15,6 +15,9 @@ const client = graphql.defaults({
 const QUERY = /* GraphQL */ `
   query FetchUserData($login: String!, $repoCount: Int = 100, $prCount: Int = 100) {
     user(login: $login) {
+      name
+      avatarUrl
+      login
       repositories(
         first: $repoCount
         privacy: PUBLIC
@@ -39,6 +42,7 @@ const QUERY = /* GraphQL */ `
           merged
           additions
           deletions
+          url
           repository {
             nameWithOwner
             stargazerCount
@@ -59,7 +63,7 @@ const QUERY = /* GraphQL */ `
 
 export async function fetchGitHubUserData(
   username: string
-): Promise<GitHubUserData> {
+): Promise<GitHubUserData & { name?: string; avatarUrl?: string }> {
   const { user } = await client<{ user: any }>(QUERY, { login: username });
 
   if (!user) {
@@ -67,6 +71,8 @@ export async function fetchGitHubUserData(
   }
 
   return {
+    name: user.name,
+    avatarUrl: user.avatarUrl,
     repos: user.repositories.nodes as RepoNode[],
     pullRequests: user.pullRequests.nodes as PullRequestNode[],
     contributions: user.contributionsCollection as ContributionTotals,
