@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { CompareForm } from "../components/compare-form";
+import { ThemeToggle } from "../components/theme-toggle";
 import { ResultDashboard } from "../components/result-dashboard";
 import { DashboardSkeleton } from "../components/skeletons";
 import { UserResult } from "@/types/user-result";
@@ -74,7 +75,7 @@ export default function HomePage() {
               DevImpact
             </span>
           </div>
-       
+          <ThemeToggle />
         </div>
       </header>
       <div className="max-w-6xl mx-auto px-4 py-10 space-y-6">
