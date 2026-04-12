@@ -15,6 +15,8 @@ const client = graphql.defaults({
 const QUERY = /* GraphQL */ `
   query FetchUserData($login: String!, $repoCount: Int = 100, $prCount: Int = 100) {
     user(login: $login) {
+      name
+      avatarUrl
       repositories(
         first: $repoCount
         privacy: PUBLIC
@@ -67,6 +69,8 @@ export async function fetchGitHubUserData(
   }
 
   return {
+    name: user.name as string | null,
+    avatarUrl: user.avatarUrl as string,
     repos: user.repositories.nodes as RepoNode[],
     pullRequests: user.pullRequests.nodes as PullRequestNode[],
     contributions: user.contributionsCollection as ContributionTotals,

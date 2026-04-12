@@ -23,6 +23,8 @@ export async function GET(request: Request) {
 
         return {
           username,
+          name: data.name,
+          avatarUrl: data.avatarUrl,
           repoScore: Math.round(score.repoScore),
           prScore: Math.round(score.prScore),
           contributionScore: Math.round(score.contributionScore),

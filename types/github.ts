@@ -24,6 +24,8 @@ export type ContributionTotals = {
 };
 
 export type GitHubUserData = {
+  name: string | null;
+  avatarUrl: string;
   repos: RepoNode[];
   pullRequests: PullRequestNode[];
   contributions: ContributionTotals;
