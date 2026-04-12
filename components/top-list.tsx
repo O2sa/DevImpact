@@ -27,6 +27,7 @@ type Props = {
 export function TopList({ userResults }: Props) {
   const cardDetails = (data: {
     title: string;
+    titleHref?: string;
     subtitle?: string;
     score?: number;
     badges: { tooltip?: string; label?: any; icon: any }[];
@@ -37,7 +38,20 @@ export function TopList({ userResults }: Props) {
       key={data.key}
     >
       <div>
-        <div className="font-medium text-slate-900">{data.title}</div>
+        <div className="font-medium text-slate-900">
+          {data.titleHref ? (
+            <a
+              href={data.titleHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              {data.title}
+            </a>
+          ) : (
+            data.title
+          )}
+        </div>
         <div className="text-xs text-muted-foreground mt-1">
           {data.subtitle}
         </div>
@@ -88,6 +102,9 @@ export function TopList({ userResults }: Props) {
                   cardDetails({
                     key: `repo-${i}`,
                     title: repo.name || "Unknown Repository",
+                    titleHref: repo.name
+                      ? `https://github.com/${user.username}/${repo.name}`
+                      : undefined,
                     score: repo.score,
                     badges: [
                       {
