@@ -23,6 +23,8 @@ export async function GET(request: Request) {
 
         return {
           username,
+          name: data.name || undefined,
+          avatarUrl: data.avatarUrl || undefined,
           repoScore: Math.round(score.repoScore),
           prScore: Math.round(score.prScore),
           contributionScore: Math.round(score.contributionScore),

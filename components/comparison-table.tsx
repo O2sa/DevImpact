@@ -25,10 +25,22 @@ export function ComparisonTable({ user1, user2 }: ComparisonTableProps) {
       {[user1, user2].map((user, idx) => (
         <Card key={user.username} className="overflow-hidden transition-all hover:shadow-lg">
           <CardHeader className={user.isWinner ? "border-b-2 border-primary/30" : "border-b-2 border-muted"}>
-            <CardTitle className="flex items-center justify-between">
-              <span>{user.username}</span>
+            <CardTitle className="flex items-center gap-3">
+              {user.avatarUrl && (
+                <img
+                  src={user.avatarUrl}
+                  alt={`${user.name || user.username}'s avatar`}
+                  className="w-10 h-10 rounded-full"
+                />
+              )}
+              <div className="flex flex-col">
+                <span className="text-lg font-semibold">{user.name || user.username}</span>
+                <span className="text-sm text-muted-foreground font-normal">@{user.username}</span>
+              </div>
               {user.isWinner && (
-                <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">Winner</span>
+                <span className="ml-auto text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">
+                  Winner
+                </span>
               )}
             </CardTitle>
           </CardHeader>
