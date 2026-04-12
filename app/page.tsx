@@ -65,7 +65,7 @@ export default function HomePage() {
     console.log("Swapped users", data);
   };
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen flex flex-col">
       {" "}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 max-w-7xl items-center justify-between m-auto px-4">
@@ -74,10 +74,10 @@ export default function HomePage() {
               DevImpact
             </span>
           </div>
-       
+
         </div>
       </header>
-      <div className="max-w-6xl mx-auto px-4 py-10 space-y-6">
+      <div className="flex-1 max-w-6xl mx-auto px-4 py-10 space-y-6 w-full">
         <CompareForm
           onSubmit={handleCompare}
           loading={loading}
