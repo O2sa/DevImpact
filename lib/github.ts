@@ -1,4 +1,5 @@
 import { ContributionTotals, GitHubUserData, PullRequestNode, RepoNode } from "@/types/github";
+import { graphql } from "@octokit/graphql";
 
 type GitHubRawUser = {
   name: string | null;
@@ -7,7 +8,6 @@ type GitHubRawUser = {
   pullRequests: { nodes: PullRequestNode[] };
   contributionsCollection: ContributionTotals;
 };
-import { graphql } from "@octokit/graphql";
 
 if (!process.env.GITHUB_TOKEN) {
   throw new Error("Missing GITHUB_TOKEN");
@@ -24,7 +24,7 @@ const QUERY = /* GraphQL */ `
   query FetchUserData($login: String!, $repoCount: Int = 100, $prCount: Int = 100) {
     user(login: $login) {
       name
-      avatarUrl
+      avatarUrl(size: 80)
       repositories(
         first: $repoCount
         privacy: PUBLIC
@@ -77,10 +77,10 @@ export async function fetchGitHubUserData(
   }
 
   return {
-    name: user.name as string | null,
-    avatarUrl: user.avatarUrl as string,
-    repos: user.repositories.nodes as RepoNode[],
-    pullRequests: user.pullRequests.nodes as PullRequestNode[],
-    contributions: user.contributionsCollection as ContributionTotals,
+    name: user.name,
+    avatarUrl: user.avatarUrl,
+    repos: user.repositories.nodes,
+    pullRequests: user.pullRequests.nodes,
+    contributions: user.contributionsCollection,
   };
 }

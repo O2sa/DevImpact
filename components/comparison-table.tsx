@@ -12,13 +12,13 @@ export function ComparisonTable({ user1, user2 }: ComparisonTableProps) {
   return (
     <div className="grid md:grid-cols-2 gap-6">
       {[user1, user2].map((user, idx) => (
-        <Card key={user.username} className="overflow-hidden transition-all hover:shadow-lg">
+        <Card key={`${user.username}-${idx}`} className="overflow-hidden transition-all hover:shadow-lg">
           <CardHeader className={`pb-4 ${user.isWinner ? "border-b-2 border-primary/30" : "border-b-2 border-muted"}`}>
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Image
                   src={user.avatarUrl}
-                  alt={user.username}
+                  alt={`${user.name || user.username}'s avatar`}
                   width={40}
                   height={40}
                   className="rounded-full ring-2 ring-border"
