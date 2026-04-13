@@ -11,7 +11,7 @@ import {
 import { Alert, AlertDescription } from "./ui/alert";
 
 type CompareFormProps = {
-  data?: unknown;
+  data?: boolean;
   onSubmit: (u1: string, u2: string) => void;
   loading?: boolean;
   reset?: () => void;

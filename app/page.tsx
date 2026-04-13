@@ -83,7 +83,7 @@ export default function HomePage() {
           loading={loading}
           reset={reset}
           swapUsers={swapUsers}
-          data={data}
+          data={Boolean(data)}
         />
 
         {loading && skeleton}
