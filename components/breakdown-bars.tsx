@@ -8,12 +8,6 @@ type Props = {
   user2: UserResult;
 };
 
-const items = [
-  { key: "repoScore", label: "Repos", color: "bg-blue-500" },
-  { key: "prScore", label: "Pull Requests", color: "bg-purple-500" },
-  { key: "contributionScore", label: "Activity", color: "bg-emerald-500" },
-];
-
 export function BreakdownBars({ user1, user2 }: Props) {
   const getMaxScore = (score1: number, score2: number) => Math.max(score1, score2, 1)
 

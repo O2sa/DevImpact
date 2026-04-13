@@ -171,16 +171,6 @@ pnpm run dev
 
 ---
 
-## 🌍 Localization
-
-* Supported languages: English 🇺🇸, Arabic 🇸🇦
-* Automatically detects user language
-* Allows manual switching
-* Easy to add new languages via `/locales`
-
----
-
-
 ## 🤝 Contributing
 
 Contributions are welcome!

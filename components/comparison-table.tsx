@@ -1,17 +1,6 @@
+import Image from "next/image";
 import { UserResult } from "@/types/user-result";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-
-type ScoreRow = {
-  label: string;
-  key: "finalScore" | "repoScore" | "prScore" | "contributionScore";
-};
-
-const rows: ScoreRow[] = [
-  { label: "result.table.final", key: "finalScore" },
-  { label: "result.table.repo", key: "repoScore" },
-  { label: "result.table.pr", key: "prScore" },
-  { label: "result.table.contribution", key: "contributionScore" },
-];
 
 type ComparisonTableProps = {
   user1: UserResult;
@@ -23,10 +12,19 @@ export function ComparisonTable({ user1, user2 }: ComparisonTableProps) {
   return (
     <div className="grid md:grid-cols-2 gap-6">
       {[user1, user2].map((user, idx) => (
-        <Card key={user.username} className="overflow-hidden transition-all hover:shadow-lg">
-          <CardHeader className={user.isWinner ? "border-b-2 border-primary/30" : "border-b-2 border-muted"}>
+        <Card key={`${user.username}-${idx}`} className="overflow-hidden transition-all hover:shadow-lg">
+          <CardHeader className={`pb-4 ${user.isWinner ? "border-b-2 border-primary/30" : "border-b-2 border-muted"}`}>
             <CardTitle className="flex items-center justify-between">
-              <span>{user.username}</span>
+              <div className="flex items-center gap-3">
+                <Image
+                  src={user.avatarUrl}
+                  alt={`${user.name || user.username}'s avatar`}
+                  width={40}
+                  height={40}
+                  className="rounded-full ring-2 ring-border"
+                />
+                <span>{user.name || user.username}</span>
+              </div>
               {user.isWinner && (
                 <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">Winner</span>
               )}

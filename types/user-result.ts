@@ -1,5 +1,7 @@
 export type UserResult = {
   username: string;
+  name: string | null;
+  avatarUrl: string;
   repoScore: number;
   prScore: number;
   contributionScore: number;
@@ -16,6 +18,7 @@ export type UserResult = {
     stars?: number;
     score?: number;
     title?: string;
+    url?: string;
     deletions?: number;
     additions?: number;
   }[];

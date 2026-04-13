@@ -1,3 +1,4 @@
+import { type ReactNode } from "react";
 import {
   Eye,
   GitFork,
@@ -27,10 +28,10 @@ type Props = {
 export function TopList({ userResults }: Props) {
   const cardDetails = (data: {
     title: string;
-    titleHref?: string;
+    titleUrl?: string;
     subtitle?: string;
     score?: number;
-    badges: { tooltip?: string; label?: any; icon: any }[];
+    badges: { tooltip?: string; label?: ReactNode; icon: ReactNode }[];
     key: string | number;
   }) => (
     <div
@@ -39,12 +40,12 @@ export function TopList({ userResults }: Props) {
     >
       <div>
         <div className="font-medium text-slate-900">
-          {data.titleHref ? (
+          {data.titleUrl ? (
             <a
-              href={data.titleHref}
+              href={data.titleUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:underline"
+              className="hover:underline text-primary"
             >
               {data.title}
             </a>
@@ -92,7 +93,6 @@ export function TopList({ userResults }: Props) {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Top Repos */}
             <div>
               <h4 className="font-semibold flex items-center gap-2 mb-3 text-sm">
                 <Star className="h-4 w-4" /> Top Repositories
@@ -102,7 +102,7 @@ export function TopList({ userResults }: Props) {
                   cardDetails({
                     key: `repo-${i}`,
                     title: repo.name || "Unknown Repository",
-                    titleHref: repo.name
+                    titleUrl: repo.name
                       ? `https://github.com/${user.username}/${repo.name}`
                       : undefined,
                     score: repo.score,
@@ -142,6 +142,7 @@ export function TopList({ userResults }: Props) {
                   cardDetails({
                     key: `pr-${i}`,
                     title: pr.title || "Untitled Pull Request",
+                    titleUrl: pr.url,
                     subtitle: `in ${pr.repo}`,
                     score: pr.score,
                     badges: [
