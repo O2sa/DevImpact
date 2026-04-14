@@ -17,6 +17,7 @@ import {
 } from "./ui/card";
 import { BarChart3 } from "lucide-react";
 import { UserResult } from "@/types/user-result";
+import { useTranslation } from "./language-provider";
 
 type Props = {
   user1: UserResult;
@@ -24,27 +25,30 @@ type Props = {
 };
 
 const metrics = [
-  { key: "repoScore", label: "Repos" },
-  { key: "prScore", label: "PRs" },
-  { key: "contributionScore", label: "Activity" },
+  { key: "repoScore", label: "comparsion.repo.score" },
+  { key: "prScore", label: "comparsion.pr.score" },
+  { key: "contributionScore", label: "comparsion.activity.score" },
 ];
 
 export function ComparisonChart({ user1, user2 }: Props) {
+  const {t} = useTranslation();
 
   const data = metrics.map((m) => ({
-    name: m.label,
+    name: t(m.label),
     [user1.username]: user1[m.key as keyof UserResult] ?? 0,
     [user2.username]: user2[m.key as keyof UserResult] ?? 0,
   }));
-
+ const renderLegendText = (value: string) => {
+  return <span className="ms-2">{value}</span>;
+};
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <BarChart3 className="h-5 w-5" />
-          Score Comparison
+          {t('barchart.title')}
         </CardTitle>
-        <CardDescription>Visual breakdown of key metrics</CardDescription>
+        <CardDescription>{t('barchart.desc')}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-80">
@@ -59,7 +63,7 @@ export function ComparisonChart({ user1, user2 }: Props) {
               <Tooltip
                 contentStyle={{ borderRadius: 12, border: "1px solid #e2e8f0" }}
               />
-              <Legend />
+              <Legend formatter={renderLegendText} />
               <Bar
                 dataKey={user1.username}
                 fill={user1.isWinner ? "#3b82f6" : "#22D3EE"}
