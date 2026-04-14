@@ -113,7 +113,7 @@ export function ResultDashboard({ user1, user2 }: Props) {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Winner</p>
-                  <p className="text-3xl font-bold">{winner.username}</p>
+                  <p className="text-3xl font-bold">{winner.name || winner.username}</p>
                 </div>
               </div>
               <div className="text-right">
