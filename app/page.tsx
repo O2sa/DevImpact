@@ -5,6 +5,7 @@ import { CompareForm } from "../components/compare-form";
 import { ResultDashboard } from "../components/result-dashboard";
 import { DashboardSkeleton } from "../components/skeletons";
 import { UserResult } from "@/types/user-result";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 type ApiResponse = {
   success: boolean;
@@ -75,6 +76,9 @@ export default function HomePage() {
             </span>
           </div>
 
+          <div className="flex gap-4">
+            <LanguageSwitcher />
+          </div>
         </div>
       </header>
       <div className="flex-1 max-w-6xl mx-auto px-4 py-10 space-y-6 w-full">

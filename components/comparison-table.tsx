@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { UserResult } from "@/types/user-result";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { useTranslation } from "./language-provider";
 
 type ComparisonTableProps = {
   user1: UserResult;
@@ -8,7 +9,7 @@ type ComparisonTableProps = {
 };
 
 export function ComparisonTable({ user1, user2 }: ComparisonTableProps) {
-
+const {t} = useTranslation();
   return (
     <div className="grid md:grid-cols-2 gap-6">
       {[user1, user2].map((user, idx) => (
@@ -32,23 +33,23 @@ export function ComparisonTable({ user1, user2 }: ComparisonTableProps) {
           </CardHeader>
           <CardContent className="pt-6 space-y-4">
             <div className="flex justify-between items-center border-b pb-2">
-              <span className="text-muted-foreground">Final Score</span>
+              <span className="text-muted-foreground">{t("comparsion.final.score")}</span>
               <span className="text-2xl font-bold">{user.finalScore}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">Repo Score</span>
+              <span className="text-muted-foreground">{t("comparsion.repo.score")}</span>
               <span className={`font-semibold ${user.repoScore > (idx === 0 ? user2.repoScore : user1.repoScore) ? "text-primary" : ""}`}>
                 {user.repoScore}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">PR Score</span>
+              <span className="text-muted-foreground">{t("comparsion.pr.score")}</span>
               <span className={`font-semibold ${user.prScore > (idx === 0 ? user2.prScore : user1.prScore) ? "text-primary" : ""}`}>
                 {user.prScore}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">Contribution Score</span>
+              <span className="text-muted-foreground">{t("comparsion.contribution.score")}</span>
               <span className={`font-semibold ${user.contributionScore > (idx === 0 ? user2.contributionScore : user1.contributionScore) ? "text-primary" : ""}`}>
                 {user.contributionScore}
               </span>
