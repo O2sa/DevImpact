@@ -1,11 +1,15 @@
+"use client";
+
+import { useState } from "react";
 import { ComparisonTable } from "./comparison-table";
 import { ComparisonChart } from "./comparison-chart";
 import { BreakdownBars } from "./breakdown-bars";
 import { TopList } from "./top-list";
 import { InsightsList } from "./insights-list";
 import { ScoreCard } from "./score-card";
+import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { Trophy } from "lucide-react";
+import { Check, Copy, Trophy } from "lucide-react";
 import { UserResult } from "@/types/user-result";
 import { useTranslation } from "./language-provider";
 
@@ -16,6 +20,7 @@ type Props = {
 
 export function ResultDashboard({ user1, user2 }: Props) {
   const { t } = useTranslation();
+  const [copied, setCopied] = useState(false);
   const winner =
     user1.finalScore === user2.finalScore
       ? null
@@ -71,7 +76,30 @@ export function ResultDashboard({ user1, user2 }: Props) {
     return insights;
   };
 
-
+  const handleCopy = async () => {
+    const summary = {
+      comparison: {
+        [user1.username]: {
+          finalScore: user1.finalScore,
+          repoScore: user1.repoScore,
+          prScore: user1.prScore,
+          contributionScore: user1.contributionScore,
+        },
+        [user2.username]: {
+          finalScore: user2.finalScore,
+          repoScore: user2.repoScore,
+          prScore: user2.prScore,
+          contributionScore: user2.contributionScore,
+        },
+        winner: winner?.username ?? "tie",
+        leadBy: winner ? `${diffPct}%` : "0%",
+        insights: getInsights(),
+      },
+    };
+    await navigator.clipboard.writeText(JSON.stringify(summary, null, 2));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -87,7 +115,9 @@ export function ResultDashboard({ user1, user2 }: Props) {
                   <p className="text-sm text-muted-foreground">
                     {t("banner.winner")}
                   </p>
-                  <p className="text-3xl font-bold">{winner.username}</p>
+                  <p className="text-3xl font-bold">
+                    {winner.name || winner.username}
+                  </p>
                 </div>
               </div>
               <div className="text-right">
@@ -100,13 +130,33 @@ export function ResultDashboard({ user1, user2 }: Props) {
           ) : (
             <>
               <p className="text-sm text-white/80">{t("banner.metric")}</p>
-              <h2 className="text-xl font-semibold">
-                {t("banner.tie")}
-              </h2>
+              <h2 className="text-xl font-semibold">{t("banner.tie")}</h2>
             </>
           )}
         </CardContent>
       </Card>
+
+      <div className="flex justify-end">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={handleCopy}
+          className="flex items-center gap-2"
+          aria-label="Copy comparison results to clipboard"
+        >
+          {copied ? (
+            <>
+              <Check className="h-4 w-4 text-green-500" />
+              <span className="text-green-500">Copied!</span>
+            </>
+          ) : (
+            <>
+              <Copy className="h-4 w-4" />
+              Copy Result
+            </>
+          )}
+        </Button>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-4">
         <ScoreCard

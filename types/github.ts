@@ -10,6 +10,8 @@ export type PullRequestNode = {
   merged: boolean;
   additions: number;
   deletions: number;
+  title: string;
+  url: string;
   repository: {
     nameWithOwner: string;
     stargazerCount: number;
@@ -24,6 +26,8 @@ export type ContributionTotals = {
 };
 
 export type GitHubUserData = {
+  name: string | null;
+  avatarUrl: string;
   repos: RepoNode[];
   pullRequests: PullRequestNode[];
   contributions: ContributionTotals;

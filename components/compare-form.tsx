@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { ArrowLeftRight, RefreshCw } from "lucide-react";
 import {
@@ -12,7 +12,7 @@ import { Alert, AlertDescription } from "./ui/alert";
 import { useTranslation } from "./language-provider";
 
 type CompareFormProps = {
-  data?: any;
+  data?: boolean;
   onSubmit: (u1: string, u2: string) => void;
   loading?: boolean;
   reset?: () => void;
@@ -31,6 +31,12 @@ export function CompareForm({
   const { t } = useTranslation();
   const [username1, setUsername1] = useState("pbiggar");
   const [username2, setUsername2] = useState("CoralineAda");
+  const firstInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-focus first input on page load
+  useEffect(() => {
+    firstInputRef.current?.focus();
+  }, []);
 
   const canSubmit = Boolean(username1.trim() && username2.trim() && !loading);
 
@@ -63,6 +69,7 @@ export function CompareForm({
           <div className="grid gap-3 md:grid-cols-2">
             <input
               className="h-11 rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-transparent bg-white"
+              ref={firstInputRef}
               placeholder={t("form.username1") }
               value={username1}
               onChange={(e) => setUsername1(e.target.value)}

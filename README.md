@@ -55,7 +55,7 @@ Factors include:
 Measures contributions to **other developers' repositories**.
 
 ✔ Only merged PRs are counted
-✔ PRs to user's own repositories are excluded
+✔ PRs to the user's own repositories are excluded
 
 Factors include:
 
@@ -90,7 +90,7 @@ Final Score =
 0.10 × Contribution Score
 ```
 
-👉 ContributionScore is capped to prevent abuse.
+👉 The ContributionScore is capped to prevent abuse.
 
 ---
 
@@ -123,7 +123,7 @@ Final Score =
 * Tailwind CSS
 * Recharts
 
-### Api
+### API
 
 * Node.js + Express
 * GitHub GraphQL API
@@ -139,8 +139,8 @@ Final Score =
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-username/devimpact.git
-cd devimpact
+git clone https://github.com/O2sa/DevImpact.git
+cd DevImpact
 ```
 
 ---
@@ -153,7 +153,7 @@ pnpm install
 
 ---
 
-### 3. Setup environment variables
+### 3. Set up environment variables
 
 Create a `.env` file:
 
@@ -170,16 +170,6 @@ pnpm run dev
 ```
 
 ---
-
-## 🌍 Localization
-
-* Supported languages: English 🇺🇸, Arabic 🇸🇦
-* Automatically detects user language
-* Allows manual switching
-* Easy to add new languages via `/locales`
-
----
-
 
 ## 🤝 Contributing
 

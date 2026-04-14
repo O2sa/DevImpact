@@ -114,7 +114,8 @@ export function calculateUserScore(
     })),
     topPullRequests: prScore.details.slice(0, 3).map((item) => ({
       repo: item.pr.repository.nameWithOwner,
-      title: item.pr.repository.nameWithOwner,
+      title: item.pr.title,
+      url: item.pr.url,
       stars: item.pr.repository.stargazerCount,
       score: item.score,
       additions: item.pr.additions,

@@ -47,8 +47,8 @@ export default function HomePage() {
       } else {
         setData({ user1: body.users[0], user2: body.users[1] });
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to fetch");
     } finally {
       setLoading(false);
     }
@@ -66,7 +66,7 @@ export default function HomePage() {
     console.log("Swapped users", data);
   };
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen flex flex-col">
       {" "}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 max-w-7xl items-center justify-between m-auto px-4">
@@ -81,13 +81,13 @@ export default function HomePage() {
           </div>
         </div>
       </header>
-      <div className="max-w-6xl mx-auto px-4 py-10 space-y-6">
+      <div className="flex-1 max-w-6xl mx-auto px-4 py-10 space-y-6 w-full">
         <CompareForm
           onSubmit={handleCompare}
           loading={loading}
           reset={reset}
           swapUsers={swapUsers}
-          data={data}
+          data={Boolean(data)}
         />
 
         {loading && skeleton}
@@ -97,7 +97,36 @@ export default function HomePage() {
           </div>
         )}
         {data && <ResultDashboard user1={data.user1} user2={data.user2} />}
+        {!loading && !error && !data && (
+          <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground gap-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="64"
+              height="64"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="opacity-30"
+            >
+              <circle cx="9" cy="7" r="4" />
+              <circle cx="15" cy="7" r="4" />
+              <path d="M3 21v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2" />
+            </svg>
+            <p className="text-lg font-medium">Enter two usernames to compare</p>
+            <p className="text-sm opacity-70">
+              Compare GitHub developer metrics side by side
+            </p>
+          </div>
+        )}
       </div>
+      <footer className="border-t py-6 text-center text-sm text-muted-foreground">
+        <div className="container max-w-7xl mx-auto px-4">
+          <span className="font-medium">DevImpact</span> — Compare GitHub developer metrics
+        </div>
+      </footer>
     </main>
   );
 }

@@ -1,3 +1,4 @@
+import { type ReactNode } from "react";
 import { Eye, GitFork, GitPullRequest, Minus, Plus, Star } from "lucide-react";
 import {
   Card,
@@ -22,9 +23,10 @@ export function TopList({ userResults }: Props) {
   const { t } = useTranslation();
   const cardDetails = (data: {
     title: string;
+    titleUrl?: string;
     subtitle?: string;
     score?: number;
-    badges: { tooltip?: string; label?: any; icon: any }[];
+    badges: { tooltip?: string; label?: ReactNode; icon: ReactNode }[];
     key: string | number;
   }) => (
     <div
@@ -32,7 +34,20 @@ export function TopList({ userResults }: Props) {
       key={data.key}
     >
       <div>
-        <div className="font-medium text-slate-900">{data.title}</div>
+        <div className="font-medium text-slate-900">
+          {data.titleUrl ? (
+            <a
+              href={data.titleUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline text-primary"
+            >
+              {data.title}
+            </a>
+          ) : (
+            data.title
+          )}
+        </div>
         <div className="text-xs text-muted-foreground mt-1">
           {data.subtitle}
         </div>
@@ -73,7 +88,6 @@ export function TopList({ userResults }: Props) {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Top Repos */}
             <div>
               <h4 className="font-semibold flex items-center gap-2 mb-3 text-sm">
                 <Star className="h-4 w-4" /> {t('topwork.toprepos')}
@@ -83,6 +97,9 @@ export function TopList({ userResults }: Props) {
                   cardDetails({
                     key: `repo-${i}`,
                     title: repo.name || t('untitled'),
+                    titleUrl: repo.name
+                      ? `https://github.com/${user.username}/${repo.name}`
+                      : undefined,
                     score: repo.score,
                     badges: [
                       {
@@ -120,6 +137,7 @@ export function TopList({ userResults }: Props) {
                   cardDetails({
                     key: `pr-${i}`,
                     title: pr.title || t('untitled'),
+                    titleUrl: pr.url,
                     subtitle: `in ${pr.repo}`,
                     score: pr.score,
                     badges: [
