@@ -39,6 +39,42 @@ export function ResultDashboard({ user1, user2 }: Props) {
   const prDiff =
     Math.max(user1.prScore, user2.prScore) -
     Math.min(user1.prScore, user2.prScore);
+  const getInsights = () => {
+    const insights = [];
+    if (user1.repoScore > user2.repoScore) {
+      insights.push(
+        `${user1.username} ${t("insights.stronger.repo")} ${user1.repoScore} (vs) ${user2.repoScore}`,
+      );
+    } else if (user2.repoScore > user1.repoScore) {
+      insights.push(
+        `${user2.username} ${t("insights.stronger.repo")} ${user2.repoScore} (vs) ${user1.repoScore}`,
+      );
+    } else {
+      insights.push(t("insights.equal.repo"));
+    }
+
+    if (user1.prScore > user2.prScore) {
+      insights.push(
+        `${user1.username} ${t("insights.pull.leads")} ${user1.prScore} (vs) ${user2.prScore}`,
+      );
+    } else if (user2.prScore > user1.prScore) {
+      insights.push(
+        `${user2.username} ${t("insights.pull.leads")} ${user2.prScore} (vs) ${user1.prScore}`,
+      );
+    } else {
+      insights.push(t("insights.equal.pr"));
+    }
+
+    if (user1.contributionScore > user2.contributionScore) {
+      insights.push(`${user1.username} ${t("insights.higher.contribution")}`);
+    } else if (user2.contributionScore > user1.contributionScore) {
+      insights.push(`${user2.username} ${t("insights.higher.contribution")}`);
+    } else {
+      insights.push(t("insights.equal.contribution"));
+    }
+
+    return insights;
+  };
 
   const getInsights = () => {
     const insights: string[] = [];
