@@ -30,11 +30,11 @@ export function TopList({ userResults }: Props) {
     key: string | number;
   }) => (
     <div
-      className="rounded-lg border p-3 transition-all hover:bg-muted/50 flex items-center justify-between"
+      className="rounded-lg border border-border p-3 transition-all hover:bg-muted/50 flex items-center justify-between"
       key={data.key}
     >
       <div>
-        <div className="font-medium text-slate-900">
+        <div className="font-medium text-foreground">
           {data.titleUrl ? (
             <a
               href={data.titleUrl}
@@ -67,10 +67,10 @@ export function TopList({ userResults }: Props) {
         </div>
       </div>
       <div className="text-right">
-        <p className="text-sm font-semibold text-slate-900">
+        <p className="text-sm font-semibold text-foreground">
           {(data.score ?? 0).toFixed(2)}
         </p>
-        <p className="text-[11px] text-slate-500">{t('comparsion.score')}</p>
+        <p className="text-[11px] text-muted-foreground">{t('comparsion.score')}</p>
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ export function LanguageSwitcher() {
   return (
     <div className={cn("flex items-center gap-2 text-sm", dir === "rtl" && "flex-row-reverse")}>
       <select
-        className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60"
+        className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/60"
         value={locale}
         onChange={(e) => setLocale(e.target.value as any)}
       >

@@ -32,7 +32,7 @@ const {t} = useTranslation();
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-4">
-            <div className="flex justify-between items-center border-b pb-2">
+            <div className="flex justify-between items-center border-b border-border pb-2">
               <span className="text-muted-foreground">{t("comparsion.final.score")}</span>
               <span className="text-2xl font-bold">{user.finalScore}</span>
             </div>

@@ -6,6 +6,7 @@ import { ResultDashboard } from "../components/result-dashboard";
 import { DashboardSkeleton } from "../components/skeletons";
 import { UserResult } from "@/types/user-result";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 type ApiResponse = {
   success: boolean;
@@ -68,7 +69,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen flex flex-col">
       {" "}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 max-w-7xl items-center justify-between m-auto px-4">
           <div className="flex items-center gap-2 font-bold text-xl">
             <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
@@ -78,6 +79,7 @@ export default function HomePage() {
 
           <div className="flex gap-4">
             <LanguageSwitcher />
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -122,7 +124,7 @@ export default function HomePage() {
           </div>
         )}
       </div>
-      <footer className="border-t py-6 text-center text-sm text-muted-foreground">
+      <footer className="border-t border-border py-6 text-center text-sm text-muted-foreground">
         <div className="container max-w-7xl mx-auto px-4">
           <span className="font-medium">DevImpact</span> — Compare GitHub developer metrics
         </div>

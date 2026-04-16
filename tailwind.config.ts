@@ -10,34 +10,34 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        border: "hsl(210 24% 90%)",
-        input: "hsl(210 24% 90%)",
-        ring: "#3B82F6",
-        background: "hsl(0 0% 100%)",
-        foreground: "hsl(222 47% 11%)",
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         muted: {
-          DEFAULT: "hsl(210 20% 96%)",
-          foreground: "hsl(215 16% 47%)",
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         card: {
-          DEFAULT: "hsl(0 0% 100%)",
-          foreground: "hsl(222 47% 11%)",
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
         primary: {
-          DEFAULT: "#3B82F6",
-          foreground: "#F8FBFF",
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "#22D3EE",
-          foreground: "#F8FBFF",
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
         accent: {
-          DEFAULT: "#0EA5E9",
-          foreground: "#F8FBFF",
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
         destructive: {
-          DEFAULT: "hsl(0 84% 60%)",
-          foreground: "hsl(210 40% 98%)",
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
         },
       },
       boxShadow: {

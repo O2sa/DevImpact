@@ -68,14 +68,14 @@ export function CompareForm({
         <CardContent>
           <div className="grid gap-3 md:grid-cols-2">
             <input
-              className="h-11 rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-transparent bg-white"
+              className="h-11 rounded-lg border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-transparent"
               ref={firstInputRef}
               placeholder={t("form.username1") }
               value={username1}
               onChange={(e) => setUsername1(e.target.value)}
             />
             <input
-              className="h-11 rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-transparent bg-white"
+              className="h-11 rounded-lg border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-transparent"
               placeholder={t("form.username2") }
               value={username2}
               onChange={(e) => setUsername2(e.target.value)}

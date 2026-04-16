@@ -4,14 +4,53 @@
 
 :root {
   color-scheme: light;
+  --background: 210 40% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --muted: 210 20% 96%;
+  --muted-foreground: 215 16% 47%;
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 217 91% 60%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 191 91% 42%;
+  --secondary-foreground: 210 40% 98%;
+  --accent: 199 89% 48%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: 222 47% 8%;
+  --foreground: 210 40% 96%;
+  --card: 222 47% 11%;
+  --card-foreground: 210 40% 96%;
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  --border: 217 33% 20%;
+  --input: 217 33% 20%;
+  --ring: 217 91% 60%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 191 91% 42%;
+  --secondary-foreground: 210 40% 98%;
+  --accent: 199 89% 48%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62% 40%;
+  --destructive-foreground: 210 40% 98%;
 }
 
 * {
   @apply box-border;
+  border-color: hsl(var(--border));
 }
 
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  @apply bg-background text-foreground antialiased;
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   background-image:
     radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08), transparent 35%),
@@ -21,7 +60,7 @@ body {
 }
 
 .dark body {
-  @apply bg-slate-950 text-slate-100;
+  @apply bg-background text-foreground;
   background-image:
     radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08), transparent 35%),
     radial-gradient(circle at 80% 0%, rgba(124, 58, 237, 0.12), transparent 30%),
@@ -29,14 +68,31 @@ body {
 }
 
 .card {
-  @apply bg-white/90 shadow-card rounded-2xl border border-slate-100 backdrop-blur;
+  @apply bg-card/90 text-card-foreground shadow-card rounded-2xl border border-border backdrop-blur;
   transition: transform 180ms ease, box-shadow 180ms ease;
-    box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
-
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
 }
 
 
 .dark .card {
-  @apply bg-slate-900/80 border-slate-800;
+  @apply bg-card/80 border-border;
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+}
+
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: 460ms;
+  transition-timing-function: cubic-bezier(0.32, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-transition,
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
+    transition: none !important;
+  }
 }
