@@ -18,7 +18,6 @@ import {
 import { BarChart3 } from "lucide-react";
 import { UserResult } from "@/types/user-result";
 import { useTranslation } from "./language-provider";
-import { useTranslation } from "./language-provider";
 
 type Props = {
   user1: UserResult;
@@ -39,7 +38,6 @@ export function ComparisonChart({ user1, user2 }: Props) {
   const isRtl = dir === "rtl";
 
   const data = metrics.map((m) => ({
-    name: t(m.label),
     name: t(m.label),
     [user1.username]: user1[m.key as keyof UserResult] ?? 0,
     [user2.username]: user2[m.key as keyof UserResult] ?? 0,

@@ -1,6 +1,5 @@
 import { type ReactNode } from "react";
 import { Eye, GitFork, GitPullRequest, Minus, Plus, Star } from "lucide-react";
-import { Eye, GitFork, GitPullRequest, Minus, Plus, Star } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -14,7 +13,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useTranslation } from "./language-provider";
 import { useTranslation } from "./language-provider";
 
 type Props = {
@@ -37,7 +35,6 @@ export function TopList({ userResults }: Props) {
       key={data.key}
     >
       <div>
-        <div className="font-medium text-foreground">
         <div className="font-medium text-foreground">
           {data.titleUrl ? (
             <a
@@ -71,7 +68,6 @@ export function TopList({ userResults }: Props) {
         </div>
       </div>
       <div className="text-right">
-        <p className="text-sm font-semibold text-foreground">
         <p className="text-sm font-semibold text-foreground">
           {(data.score ?? 0).toFixed(2)}
         </p>

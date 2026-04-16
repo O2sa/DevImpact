@@ -2,7 +2,6 @@ import Image from "next/image";
 import { UserResult } from "@/types/user-result";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useTranslation } from "./language-provider";
-import { useTranslation } from "./language-provider";
 
 type ComparisonTableProps = {
   user1: UserResult;
