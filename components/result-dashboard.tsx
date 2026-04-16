@@ -39,15 +39,25 @@ export function ResultDashboard({ user1, user2 }: Props) {
   const prDiff =
     Math.max(user1.prScore, user2.prScore) -
     Math.min(user1.prScore, user2.prScore);
+
   const getInsights = () => {
-    const insights = [];
+    const insights: string[] = [];
+
     if (user1.repoScore > user2.repoScore) {
       insights.push(
-        `${user1.username} ${t("insights.stronger.repo")} ${user1.repoScore} (vs) ${user2.repoScore}`,
+        t("insights.repo.leader", {
+          username: user1.username,
+          score: user1.repoScore,
+          other: user2.repoScore,
+        })
       );
     } else if (user2.repoScore > user1.repoScore) {
       insights.push(
-        `${user2.username} ${t("insights.stronger.repo")} ${user2.repoScore} (vs) ${user1.repoScore}`,
+        t("insights.repo.leader", {
+          username: user2.username,
+          score: user2.repoScore,
+          other: user1.repoScore,
+        })
       );
     } else {
       insights.push(t("insights.equal.repo"));
@@ -55,20 +65,28 @@ export function ResultDashboard({ user1, user2 }: Props) {
 
     if (user1.prScore > user2.prScore) {
       insights.push(
-        `${user1.username} ${t("insights.pull.leads")} ${user1.prScore} (vs) ${user2.prScore}`,
+        t("insights.pr.leader", {
+          username: user1.username,
+          score: user1.prScore,
+          other: user2.prScore,
+        })
       );
     } else if (user2.prScore > user1.prScore) {
       insights.push(
-        `${user2.username} ${t("insights.pull.leads")} ${user2.prScore} (vs) ${user1.prScore}`,
+        t("insights.pr.leader", {
+          username: user2.username,
+          score: user2.prScore,
+          other: user1.prScore,
+        })
       );
     } else {
       insights.push(t("insights.equal.pr"));
     }
 
     if (user1.contributionScore > user2.contributionScore) {
-      insights.push(`${user1.username} ${t("insights.higher.contribution")}`);
+      insights.push(t("insights.contribution.leader", { username: user1.username }));
     } else if (user2.contributionScore > user1.contributionScore) {
-      insights.push(`${user2.username} ${t("insights.higher.contribution")}`);
+      insights.push(t("insights.contribution.leader", { username: user2.username }));
     } else {
       insights.push(t("insights.equal.contribution"));
     }
@@ -142,17 +160,17 @@ export function ResultDashboard({ user1, user2 }: Props) {
           size="sm"
           onClick={handleCopy}
           className="flex items-center gap-2"
-          aria-label="Copy comparison results to clipboard"
+          aria-label={t("results.copyAria")}
         >
           {copied ? (
             <>
               <Check className="h-4 w-4 text-green-500" />
-              <span className="text-green-500">Copied!</span>
+              <span className="text-green-500">{t("results.copied")}</span>
             </>
           ) : (
             <>
               <Copy className="h-4 w-4" />
-              Copy Result
+              {t("results.copy")}
             </>
           )}
         </Button>

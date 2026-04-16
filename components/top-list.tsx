@@ -3,9 +3,9 @@ import { Eye, GitFork, GitPullRequest, Minus, Plus, Star } from "lucide-react";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "./ui/card";
 import { UserResult } from "@/types/user-result";
 import {
@@ -21,6 +21,7 @@ type Props = {
 
 export function TopList({ userResults }: Props) {
   const { t } = useTranslation();
+
   const cardDetails = (data: {
     title: string;
     titleUrl?: string;
@@ -30,7 +31,7 @@ export function TopList({ userResults }: Props) {
     key: string | number;
   }) => (
     <div
-      className="rounded-lg border border-border p-3 transition-all hover:bg-muted/50 flex items-center justify-between"
+      className="flex items-center justify-between rounded-lg border border-border p-3 transition-all hover:bg-muted/50"
       key={data.key}
     >
       <div>
@@ -40,7 +41,7 @@ export function TopList({ userResults }: Props) {
               href={data.titleUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:underline text-primary"
+              className="text-primary hover:underline"
             >
               {data.title}
             </a>
@@ -48,10 +49,10 @@ export function TopList({ userResults }: Props) {
             data.title
           )}
         </div>
-        <div className="text-xs text-muted-foreground mt-1">
+        <div className="mt-1 text-xs text-muted-foreground">
           {data.subtitle}
         </div>
-        <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
+        <div className="mt-2 flex gap-4 text-xs text-muted-foreground">
           {data.badges.map((badge, i) => (
             <Tooltip key={i}>
               <TooltipTrigger asChild>
@@ -70,33 +71,33 @@ export function TopList({ userResults }: Props) {
         <p className="text-sm font-semibold text-foreground">
           {(data.score ?? 0).toFixed(2)}
         </p>
-        <p className="text-[11px] text-muted-foreground">{t('comparsion.score')}</p>
+        <p className="text-[11px] text-muted-foreground">
+          {t("comparsion.score")}
+        </p>
       </div>
     </div>
   );
 
   return (
-    <div className="grid md:grid-cols-2 gap-6">
+    <div className="grid gap-6 md:grid-cols-2">
       {userResults.map((user) => (
         <Card key={`top-${user.username}`}>
           <CardHeader>
             <CardTitle className="text-lg">
-              {t('topwork.title')} • {user.username}
+              {t("topwork.titleForUser", { username: user.username })}
             </CardTitle>
-            <CardDescription>
-              {t('topwork.desc')}
-            </CardDescription>
+            <CardDescription>{t("topwork.desc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h4 className="font-semibold flex items-center gap-2 mb-3 text-sm">
-                <Star className="h-4 w-4" /> {t('topwork.toprepos')}
+              <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+                <Star className="h-4 w-4" /> {t("topwork.toprepos")}
               </h4>
               <div className="space-y-3">
                 {user.topRepos.slice(0, 3).map((repo, i) =>
                   cardDetails({
                     key: `repo-${i}`,
-                    title: repo.name || t('untitled'),
+                    title: repo.name || t("untitled"),
                     titleUrl: repo.name
                       ? `https://github.com/${user.username}/${repo.name}`
                       : undefined,
@@ -105,64 +106,63 @@ export function TopList({ userResults }: Props) {
                       {
                         icon: <Star className="h-4 w-4" />,
                         label: repo.stars,
-                        tooltip: `${repo.stars} ${t('topwork.stars')}`,
+                        tooltip: `${repo.stars} ${t("topwork.stars")}`,
                       },
                       {
                         icon: <GitFork className="h-4 w-4" />,
                         label: repo.forks,
-                        tooltip: `${repo.forks} ${t('topwork.forks')}`,
+                        tooltip: `${repo.forks} ${t("topwork.forks")}`,
                       },
                       {
                         icon: <Eye className="h-4 w-4" />,
                         label: repo.watchers,
-                        tooltip: `${repo.watchers} ${t('topwork.watchers')}`,
+                        tooltip: `${repo.watchers} ${t("topwork.watchers")}`,
                       },
                     ],
                   }),
                 )}
                 {user.topRepos.length === 0 && (
                   <p className="text-sm text-muted-foreground">
-                    {t('topwork.norepos')}
+                    {t("topwork.noRepos")}
                   </p>
                 )}
               </div>
             </div>
 
             <div>
-              <h4 className="font-semibold flex items-center gap-2 mb-3 text-sm">
-                <GitPullRequest className="h-4 w-4" /> {t('topwork.topprs')}
+              <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+                <GitPullRequest className="h-4 w-4" /> {t("topwork.topprs")}
               </h4>
               <div className="space-y-3">
                 {user.topPullRequests.slice(0, 3).map((pr, i) =>
                   cardDetails({
                     key: `pr-${i}`,
-                    title: pr.title || t('untitled'),
+                    title: pr.title || t("untitled"),
                     titleUrl: pr.url,
-                    subtitle: `in ${pr.repo}`,
+                    subtitle: t("topwork.inRepo", { repo: pr.repo || "" }),
                     score: pr.score,
                     badges: [
                       {
                         icon: <Star className="h-4 w-4" />,
                         label: pr.stars,
-                        tooltip: `${pr.stars} ${t('topwork.pr.repo.stars')}`,
+                        tooltip: `${pr.stars} ${t("topwork.pr.repo.stars")}`,
                       },
-
                       {
                         icon: <Plus className="text-emerald-500" />,
                         label: pr.additions || "0",
-                        tooltip: `+${pr.additions || 0} ${t('topwork.pr.additions')}`,
+                        tooltip: `+${pr.additions || 0} ${t("topwork.pr.additions")}`,
                       },
                       {
                         icon: <Minus className="text-rose-500" />,
                         label: pr.deletions || "0",
-                        tooltip: `-${pr.deletions || 0} ${t('topwork.pr.deletions')}`,
+                        tooltip: `-${pr.deletions || 0} ${t("topwork.pr.deletions")}`,
                       },
                     ],
                   }),
                 )}
                 {user.topPullRequests.length === 0 && (
                   <p className="text-sm text-muted-foreground">
-                    {t('topwork.noPRs')}
+                    {t("topwork.noPRs")}
                   </p>
                 )}
               </div>

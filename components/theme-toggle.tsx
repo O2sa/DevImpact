@@ -3,12 +3,15 @@
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+import { useTranslation } from "./language-provider";
+
+const emptySubscribe = () => () => {};
 
 export function ThemeToggle() {
+  const { t } = useTranslation();
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const THEME_TRANSITION_MS = 520;
 
   const current = resolvedTheme || theme || "light";
@@ -35,7 +38,7 @@ export function ThemeToggle() {
       size="sm"
       onClick={handleToggle}
       className="flex items-center gap-2"
-      aria-label="Toggle color mode"
+      aria-label={t("theme.toggle")}
     >
       {mounted && current === "dark" ? <Sun size={16} /> : <Moon size={16} />}
     </Button>
