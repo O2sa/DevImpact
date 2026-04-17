@@ -28,9 +28,6 @@ const metrics = [
   { key: "repoScore", label: "comparsion.repo.score" },
   { key: "prScore", label: "comparsion.pr.score" },
   { key: "contributionScore", label: "comparsion.activity.score" },
-  { key: "repoScore", label: "comparsion.repo.score" },
-  { key: "prScore", label: "comparsion.pr.score" },
-  { key: "contributionScore", label: "comparsion.activity.score" },
 ];
 
 export function ComparisonChart({ user1, user2 }: Props) {
