@@ -1,0 +1,47 @@
+name: First PR Merged Welcome
+
+on:
+  pull_request_target:
+    types: [closed]
+
+jobs:
+  welcome-on-merge:
+    # Only run if the PR was actually merged, not just closed
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Thank contributor and ask for star
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const creator = context.payload.pull_request.user.login;
+
+            // Fetch all merged PRs by this user
+            const response = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'closed',
+              creator: creator
+            });
+
+            // Filter to ensure we only count merged PRs
+            const mergedPrs = response.data.filter(pr => pr.merged_at !== null);
+
+            // If this is their first successfully merged PR
+            if (mergedPrs.length === 1) {
+              const message = `
+              Congratulations @${creator}! 🎊 Your first contribution has been merged! 🚀
+              
+              Thank you for helping improve the project. If you find this tool useful, please consider giving us a ⭐ **star on GitHub**—it helps more developers find our work!
+              `;
+
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: context.payload.pull_request.number,
+                body: message
+              });
+            }
