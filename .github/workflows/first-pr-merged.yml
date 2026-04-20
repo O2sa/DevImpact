@@ -16,9 +16,12 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            // Sleep for 3 seconds to ensure the API reflects the PR merge
+            await new Promise(resolve => setTimeout(resolve, 3000));
+      
             const { owner, repo } = context.repo;
             const creator = context.payload.pull_request.user.login;
-
+      
             // Fetch all merged PRs by this user
             const response = await github.rest.pulls.list({
               owner,
@@ -26,18 +29,18 @@ jobs:
               state: 'closed',
               creator: creator
             });
-
+      
             // Filter to ensure we only count merged PRs
             const mergedPrs = response.data.filter(pr => pr.merged_at !== null);
-
+      
             // If this is their first successfully merged PR
             if (mergedPrs.length === 1) {
               const message = `
               Congratulations @${creator}! 🎊 Your first contribution has been merged! 🚀
-              
+      
               Thank you for helping improve the project. If you find this tool useful, please consider giving us a ⭐ **star on GitHub**—it helps more developers find our work!
               `;
-
+      
               await github.rest.issues.createComment({
                 owner,
                 repo,
@@ -45,3 +48,4 @@ jobs:
                 body: message
               });
             }
+                  }
