@@ -33,53 +33,31 @@ jobs:
             // Filter to ensure we only count merged PRs
             const mergedPrs = response.data.filter(pr => pr.merged_at !== null);
 
-            // Check if the user has starred the repo
-            let hasStarred = false;
-            try {
-              await github.rest.activity.checkRepoIsStarredByUser({
-                owner,
-                repo,
-                username: creator
-              });
-              hasStarred = true;
-            } catch (error) {
-              // 404 means the user hasn't starred the repo
-              hasStarred = false;
-            }
-
             // Determine the case and generate appropriate message
             let message;
 
-            // CASE 1: First merged PR + Already starred
-            if (mergedPrs.length === 1 && hasStarred) {
-              message = `
-              🎊 **Welcome, @${creator}!** Your first contribution has been merged! 🚀
-              
-              Thank you so much for your support and for giving us a ⭐ star! It truly means a lot and helps other developers discover our project. We're excited to have you as part of our community!
-              `;
-            }
-            // CASE 2: First merged PR + Hasn't starred
-            else if (mergedPrs.length === 1 && !hasStarred) {
+            if (mergedPrs.length === 1) {
               message = `
               🎊 **Welcome, @${creator}!** Your first contribution has been merged! 🚀
               
               Thank you for helping improve the project! If you find this tool useful, please consider giving us a ⭐ **star on GitHub**—it helps more developers find our work and motivates us to keep improving!
               `;
             }
-            // CASE 3: Multiple merged PRs + Already starred
-            else if (mergedPrs.length > 1 && hasStarred) {
+            // CASE 2: First merged PR + Hasn't starred
+            else if (mergedPrs.length <= 3) {
               message = `
               ✨ **Thank you, @${creator}!** Another great contribution merged! 🚀
               
-              We truly appreciate your continued support and the ⭐ star you gave us. Your contributions are making a real difference!
+              We truly appreciate your continued support! If you find this tool useful, please consider giving us a ⭐ **star on GitHub**—it helps more developers find our work and motivates us to keep improving!
               `;
             }
+
             // CASE 4: Multiple merged PRs + Hasn't starred
-            else if (mergedPrs.length > 1 && !hasStarred) {
+            else if (mergedPrs.length > 3) {
               message = `
               ✨ **Thank you, @${creator}!** Another great contribution merged! 🚀
               
-              You've been a fantastic contributor! If you haven't already, please consider giving us a ⭐ **star on GitHub**—it helps the project grow and lets other developers know about it!
+              You've been a fantastic contributor! We truly appreciate your continued support.
               `;
             }
 
