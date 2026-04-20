@@ -18,7 +18,7 @@ export function ScoreCard({ title, value, highlight, subtitle }: ScoreCardProps)
       <p className="text-xs uppercase tracking-wide text-muted-foreground">{title}</p>
       <div className="flex items-baseline gap-2">
         <span className="text-2xl font-semibold text-foreground">
-          {value.toFixed(2)}
+          {value}
         </span>
         {subtitle && (
           <span className="text-xs text-muted-foreground leading-tight">{subtitle}</span>
