@@ -39,6 +39,7 @@ export function TopList({ userResults }: Props) {
           {data.titleUrl ? (
             <a
               href={data.titleUrl}
+              title="Open on GitHub"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:underline"
