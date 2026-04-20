@@ -179,13 +179,13 @@ export function ResultDashboard({ user1, user2 }: Props) {
 
       <div className="grid gap-4 md:grid-cols-4">
         <ScoreCard
-          title={user1.username}
+          title={user1.name || user1.username}
           value={user1.finalScore}
           highlight={user1.isWinner}
           subtitle={t("comparsion.final.score")}
         />
         <ScoreCard
-          title={user2.username}
+          title={user2.name || user2.username}
           value={user2.finalScore}
           highlight={user2.isWinner}
           subtitle={t("comparsion.final.score")}
