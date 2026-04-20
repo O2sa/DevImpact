@@ -36,9 +36,10 @@ jobs:
             // Check if the user has starred the repo
             let hasStarred = false;
             try {
-              await github.rest.activity.checkRepoIsStarredByAuthenticatedUser({
+              await github.rest.activity.checkRepoIsStarredByUser({
                 owner,
-                repo
+                repo,
+                username: creator
               });
               hasStarred = true;
             } catch (error) {
