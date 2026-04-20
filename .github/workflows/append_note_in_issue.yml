@@ -1,0 +1,43 @@
+name: Add Custom Note to Issues Created By Maintainers
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  add-note:
+    if: github.event.issue.user.login == 'O2sa'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Append Note to Issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue_number = context.payload.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            // The custom note you want to append
+            const note = `
+                        ---
+                        
+                      > [!NOTE]
+                      > **CONTRIBUTIONS ARE WELCOME!**
+                      > If you want to get this issue assigned to you. Just comment `assign me`. You will be assigned to the issue instantly via GitHub-actions bot.
+                        `;
+
+            // Get the current issue body
+            const currentBody = context.payload.issue.body || '';
+
+            // Only edit if the note isn't already present
+            if (!currentBody.includes('CONTRIBUTIONS ARE WELCOME')) {
+              const newBody = currentBody + note;
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number,
+                body: newBody
+              });
+            }
