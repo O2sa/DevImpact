@@ -180,7 +180,7 @@ The compare endpoint accepts one or more `username` query parameters.
 ### Example request
 
 ```bash
-curl "http://localhost:3000/api/compare?username=octocat&username=torvalds"
+curl "api/compare?username=devimpact&username=octocat"
 ```
 
 ### Example response
