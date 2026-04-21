@@ -43,14 +43,14 @@ export function BreakdownBars({ user1, user2 }: Props) {
               <div className="flex justify-between text-sm">
                 <span>{t(metricLabel)}</span>
                 <span className="text-muted-foreground">
-                  {user1.username}: {user1Value} | {user2.username}:{" "}
+                  {user1.name}: {user1Value} | {user2.name}:{" "}
                   {user2Value}
                 </span>
               </div>
               <div className="space-y-1 ">
                 <div className="flex items-center gap-2">
                   <span className="text-xs w-24 truncate">
-                    {user1.username}
+                    {user1.name}
                   </span>
                   <Progress
                     value={(user1Value / maxVal) * 100}
@@ -60,7 +60,7 @@ export function BreakdownBars({ user1, user2 }: Props) {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs w-24 truncate">
-                    {user2.username}
+                    {user2.name}
                   </span>
                   <Progress
                     value={(user2Value / maxVal) * 100}
