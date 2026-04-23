@@ -2,6 +2,8 @@
 
 import { useTranslation } from "@/components/language-provider";
 import { cn } from "@/lib/utils";
+import { Icon } from "./ui/button";
+import { FaGithub } from "react-icons/fa";
 
 export function AppFooter() {
   const { t, dir } = useTranslation();
@@ -55,6 +57,19 @@ export function AppFooter() {
             >
               {t("footer.note")}
             </p>
+            <a href="https://github.com/O2sa/DevImpact"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub Repository">
+              <Icon
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <FaGithub className="text-black dark:text-white" />
+              </Icon>
+            </a>
           </div>
         </div>
 

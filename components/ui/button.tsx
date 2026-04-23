@@ -38,3 +38,12 @@ export function Button({ className, variant, size, ...props }: ButtonProps) {
     />
   );
 }
+
+export function Icon({ className, variant, size, ...props }: ButtonProps) {
+  return (
+    <button
+      className={cn(buttonVariants({ variant, size }), className)}
+      {...props}
+    />
+  );
+}
