@@ -70,13 +70,13 @@ export function CompareForm({
             <input
               className="h-11 rounded-lg border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-transparent"
               ref={firstInputRef}
-              placeholder={t("form.username1") }
+              placeholder={t("form.username1")}
               value={username1}
               onChange={(e) => setUsername1(e.target.value)}
             />
             <input
               className="h-11 rounded-lg border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-transparent"
-              placeholder={t("form.username2") }
+              placeholder={t("form.username2")}
               value={username2}
               onChange={(e) => setUsername2(e.target.value)}
             />
@@ -97,6 +97,7 @@ export function CompareForm({
                   disabled={loading}
                   type="button"
                   title={t("form.swap")}
+                  className="shadow-sm transition-transform hover:-translate-y-0.5"
                 >
                   <ArrowLeftRight className="h-4 w-4" />
                 </Button>
@@ -105,6 +106,7 @@ export function CompareForm({
                   disabled={loading}
                   title={t("form.reset")}
                   type="button"
+                  className="shadow-sm transition-transform hover:-translate-y-0.5"
                 >
                   <RefreshCw className="h-4 w-4" />
                 </Button>
