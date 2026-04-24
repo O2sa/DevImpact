@@ -39,6 +39,7 @@ export function CompareForm({
   }, []);
 
   const canSubmit = Boolean(username1.trim() && username2.trim() && !loading);
+  const isEmpty = !username1.trim() && !username2.trim();
 
   const handleSwap = () => {
     setUsername1(username2);
@@ -90,28 +91,24 @@ export function CompareForm({
             >
               {loading ? t("form.compare.ing") : t("form.compare")}
             </Button>
-            {data && (
-              <>
-                <Button
-                  onClick={handleSwap}
-                  disabled={loading}
-                  type="button"
-                  title={t("form.swap")}
-                  className="shadow-sm transition-transform hover:-translate-y-0.5"
-                >
-                  <ArrowLeftRight className="h-4 w-4" />
-                </Button>
-                <Button
-                  onClick={handleReset}
-                  disabled={loading}
-                  title={t("form.reset")}
-                  type="button"
-                  className="shadow-sm transition-transform hover:-translate-y-0.5"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                </Button>
-              </>
-            )}
+            <Button
+              onClick={handleSwap}
+              type="button"
+              disabled={isEmpty || loading}
+              title={t("form.swap")}
+              className="shadow-sm transition-transform hover:-translate-y-0.5"
+            >
+              <ArrowLeftRight className="h-4 w-4" />
+            </Button>
+            <Button
+              onClick={handleReset}
+              title={t("form.reset")}
+              disabled={isEmpty || loading}
+              type="button"
+              className="shadow-sm transition-transform hover:-translate-y-0.5"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
           </div>
           {error && (
             <Alert variant="destructive" className="mt-4">
