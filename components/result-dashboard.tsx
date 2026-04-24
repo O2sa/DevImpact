@@ -44,10 +44,13 @@ export function ResultDashboard({ user1, user2 }: Props) {
   const getInsights = () => {
     const insights: string[] = [];
 
+    const user1DisplayName = user1.name || user1.username;
+    const user2DisplayName = user2.name || user1.username;
+
     if (user1.repoScore > user2.repoScore) {
       insights.push(
         t("insights.repo.leader", {
-          username: user1.username,
+          username: user1DisplayName,
           score: user1.repoScore,
           other: user2.repoScore,
         })
@@ -55,7 +58,7 @@ export function ResultDashboard({ user1, user2 }: Props) {
     } else if (user2.repoScore > user1.repoScore) {
       insights.push(
         t("insights.repo.leader", {
-          username: user2.username,
+          username: user2DisplayName,
           score: user2.repoScore,
           other: user1.repoScore,
         })
@@ -67,7 +70,7 @@ export function ResultDashboard({ user1, user2 }: Props) {
     if (user1.prScore > user2.prScore) {
       insights.push(
         t("insights.pr.leader", {
-          username: user1.username,
+          username: user1DisplayName,
           score: user1.prScore,
           other: user2.prScore,
         })
@@ -75,7 +78,7 @@ export function ResultDashboard({ user1, user2 }: Props) {
     } else if (user2.prScore > user1.prScore) {
       insights.push(
         t("insights.pr.leader", {
-          username: user2.username,
+          username: user2DisplayName,
           score: user2.prScore,
           other: user1.prScore,
         })
@@ -85,9 +88,9 @@ export function ResultDashboard({ user1, user2 }: Props) {
     }
 
     if (user1.contributionScore > user2.contributionScore) {
-      insights.push(t("insights.contribution.leader", { username: user1.username }));
+      insights.push(t("insights.contribution.leader", { username: user1DisplayName }));
     } else if (user2.contributionScore > user1.contributionScore) {
-      insights.push(t("insights.contribution.leader", { username: user2.username }));
+      insights.push(t("insights.contribution.leader", { username: user2DisplayName }));
     } else {
       insights.push(t("insights.equal.contribution"));
     }
