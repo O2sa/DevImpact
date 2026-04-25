@@ -85,7 +85,7 @@ export function TopList({ userResults }: Props) {
         <Card key={`top-${user.username}`}>
           <CardHeader>
             <CardTitle className="text-lg">
-              {t("topwork.titleForUser", { username: user.name })}
+              {t("topwork.titleForUser", { username: user.name || user.username })}
             </CardTitle>
             <CardDescription>{t("topwork.desc")}</CardDescription>
           </CardHeader>
