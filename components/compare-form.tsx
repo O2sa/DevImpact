@@ -39,7 +39,7 @@ export function CompareForm({
   }, []);
 
   const canSubmit = Boolean(username1.trim() && username2.trim() && !loading);
-  const isEmpty = !username1.trim() && !username2.trim();
+  const isEmpty = (!username1.trim() && !username2.trim()) && !data;
 
   const handleSwap = () => {
     setUsername1(username2);
@@ -94,7 +94,7 @@ export function CompareForm({
             <Button
               onClick={handleSwap}
               type="button"
-              disabled={(!data && isEmpty) || loading}
+              disabled={isEmpty || loading}
               title={t("form.swap")}
               className="shadow-sm transition-transform hover:-translate-y-0.5"
             >
@@ -103,7 +103,7 @@ export function CompareForm({
             <Button
               onClick={handleReset}
               title={t("form.reset")}
-              disabled={(!data && isEmpty) || loading}
+              disabled={isEmpty || loading}
               type="button"
               className="shadow-sm transition-transform hover:-translate-y-0.5"
             >
