@@ -66,8 +66,8 @@ export function AppFooter() {
             dir === "rtl" ? "md:flex-row-reverse" : "md:flex-row"
           )}
         >
-          <span>{t("footer.summary")}</span>
-          <span>{t("footer.tagline")}</span>
+          <span> className="items-center text-center"{t("footer.summary")}</span>
+          <span> className="items-center text-center"{t("footer.tagline")}</span>
         </div>
       </div>
     </footer>
