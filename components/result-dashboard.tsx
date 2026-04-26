@@ -207,3 +207,5 @@ export function ResultDashboard({ user1, user2 }: Props) {
     </div>
   );
 }
+  /* Added by bounty-bot */
+}
