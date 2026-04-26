@@ -94,7 +94,7 @@ export function CompareForm({
             <Button
               onClick={handleSwap}
               type="button"
-              disabled={isEmpty || loading}
+              disabled={(!data && isEmpty) || loading}
               title={t("form.swap")}
               className="shadow-sm transition-transform hover:-translate-y-0.5"
             >
@@ -103,7 +103,7 @@ export function CompareForm({
             <Button
               onClick={handleReset}
               title={t("form.reset")}
-              disabled={isEmpty || loading}
+              disabled={(!data && isEmpty) || loading}
               type="button"
               className="shadow-sm transition-transform hover:-translate-y-0.5"
             >
