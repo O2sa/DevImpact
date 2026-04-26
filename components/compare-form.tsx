@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { ArrowLeftRight, RefreshCw } from "lucide-react";
 import {
@@ -12,6 +12,10 @@ import { Alert, AlertDescription } from "./ui/alert";
 import { useTranslation } from "./language-provider";
 
 type CompareFormProps = {
+  username1: string;
+  username2: string;
+  setUsername1: (value: string) => void;
+  setUsername2: (value: string) => void;
   data?: boolean;
   onSubmit: (u1: string, u2: string) => void;
   loading?: boolean;
@@ -21,16 +25,17 @@ type CompareFormProps = {
 };
 
 export function CompareForm({
+  username1,
+  username2,
+  setUsername1,
+  setUsername2,
   onSubmit,
-  data,
   loading,
   swapUsers,
   reset,
   error,
 }: CompareFormProps) {
   const { t } = useTranslation();
-  const [username1, setUsername1] = useState("pbiggar");
-  const [username2, setUsername2] = useState("CoralineAda");
   const firstInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-focus first input on page load
@@ -42,14 +47,10 @@ export function CompareForm({
   const isEmpty = !username1.trim() && !username2.trim();
 
   const handleSwap = () => {
-    setUsername1(username2);
-    setUsername2(username1);
     if (swapUsers) swapUsers();
   };
 
   const handleReset = () => {
-    setUsername1("");
-    setUsername2("");
     if (reset) reset();
   };
 
