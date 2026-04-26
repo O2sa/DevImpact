@@ -163,7 +163,7 @@ function HomePageInner() {
           loading={loading}
           reset={reset}
           swapUsers={swapUsers}
-          data={Boolean(data)}
+          hasData={Boolean(data)}
         />
 
         {loading && skeleton}

@@ -16,7 +16,7 @@ type CompareFormProps = {
   username2: string;
   setUsername1: (value: string) => void;
   setUsername2: (value: string) => void;
-  data?: boolean;
+  hasData?: boolean;
   onSubmit: (u1: string, u2: string) => void;
   loading?: boolean;
   reset?: () => void;
@@ -29,6 +29,7 @@ export function CompareForm({
   username2,
   setUsername1,
   setUsername2,
+  hasData,
   onSubmit,
   loading,
   swapUsers,
@@ -44,7 +45,7 @@ export function CompareForm({
   }, []);
 
   const canSubmit = Boolean(username1.trim() && username2.trim() && !loading);
-  const isEmpty = (!username1.trim() && !username2.trim()) && !data;
+  const isEmpty = (!username1.trim() && !username2.trim()) && !hasData;
 
   const handleSwap = () => {
     if (swapUsers) swapUsers();
