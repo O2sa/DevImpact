@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { GithubLink } from "./github-link";
 
 export function AppFooter() {
-  const { t, dir } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <footer className="relative mt-10 border-t border-border/80 py-10 text-sm text-muted-foreground">
@@ -60,16 +60,14 @@ export function AppFooter() {
           </div>
         </div>
 
+
         <div
           className={cn(
-            "mt-8 flex flex-col gap-3 border-t border-border/70 pt-4 text-[11px] font-medium uppercase tracking-[0.24em] text-muted-foreground/75 md:items-center md:justify-between",
-            dir === "rtl" ? "md:flex-row-reverse" : "md:flex-row"
+            "mt-8 flex flex-col gap-3 border-t border-border/70 pt-4 text-[11px] font-medium uppercase tracking-[0.24em] text-muted-foreground/75 items-center md:justify-between md:flex-row",
           )}
         >
-          <div className="items-center text-center sm:text-left">
             <span>{t("footer.summary")}</span>
             <span>{t("footer.tagline")}</span>
-          </div>
         </div>
       </div>
     </footer>
