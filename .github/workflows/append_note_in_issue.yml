@@ -21,12 +21,11 @@ jobs:
 
             // The custom note you want to append
             const note = [
-                  '> [!NOTE]',
-                  '> 🚀 **CONTRIBUTIONS ARE WELCOME!**',
-                  '> ',
-                  '> If you want to get this issue assigned to you, just comment **\'assign me\'**.',
-                  '> You will be assigned to the issue instantly via our GitHub Actions bot. Happy coding! ✨'
-                ].join('\n');
+              '',
+              '> [!TIP]',
+              '> 🚀 **Want to contribute?**',
+              '> Comment `assign me` to be automatically assigned to this issue via our GitHub Actions bot. Happy coding! ✨'
+            ].join('\n');
 
             // Get the current issue body
             const currentBody = context.payload.issue.body || '';
