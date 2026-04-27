@@ -19,14 +19,35 @@ export function parseAcceptLanguage<T extends string>(
 ): T {
   if (!header) return fallback;
 
+  // Parse "lang;q=0.5" entries, drop q=0 (explicit rejection), and pick
+  // the highest-q supported language. RFC 9110 §12.5.4: missing q
+  // defaults to 1.0. A header like "en;q=0.1, ar;q=1" must select ar.
+  const parsed: { tag: string; primary: string; q: number }[] = [];
   for (const part of header.split(",")) {
-    const tag = part.trim().split(";")[0]?.toLowerCase();
-    const primary = tag?.split("-")[0];
+    const segments = part.trim().split(";");
+    const tag = segments[0]?.toLowerCase().trim();
+    if (!tag) continue;
+
+    let q = 1;
+    for (const param of segments.slice(1)) {
+      const [key, value] = param.split("=").map((s) => s.trim().toLowerCase());
+      if (key === "q") {
+        const num = Number(value);
+        if (!Number.isNaN(num)) q = num;
+      }
+    }
+
+    if (q <= 0) continue;
+    parsed.push({ tag, primary: tag.split("-")[0], q });
+  }
+
+  parsed.sort((a, b) => b.q - a.q);
+
+  for (const entry of parsed) {
     const match = supported.find((locale) => {
       const normalized = locale.toLowerCase();
-      return normalized === tag || normalized === primary;
+      return normalized === entry.tag || normalized === entry.primary;
     });
-
     if (match) return match;
   }
 

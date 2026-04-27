@@ -24,3 +24,13 @@ export function middleware(request: NextRequest) {
 
   return response;
 }
+
+// Run only on routes that produce HTML or read the cookie. Skip Next.js
+// internals, the optimized image endpoint, public static assets, and API
+// routes — they don't need a locale cookie and we want their responses
+// to stay cacheable.
+export const config = {
+  matcher: [
+    "/((?!_next/static|_next/image|api|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|woff|woff2|ttf|otf)$).*)",
+  ],
+};
