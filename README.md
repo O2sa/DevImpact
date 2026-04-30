@@ -1,16 +1,39 @@
 # 🚀 DevImpact
 
-![License](https://img.shields.io/github/license/o2sa/devimpact)
-![Stars](https://img.shields.io/github/stars/o2sa/devimpact)
-![Forks](https://img.shields.io/github/forks/o2sa/devimpact)
-![Issues](https://img.shields.io/github/issues/o2sa/devimpact)
-![Pull Requests](https://img.shields.io/github/issues-pr/o2sa/devimpact)
-![Last Commit](https://img.shields.io/github/last-commit/o2sa/devimpact)
 
-![Next.js](https://img.shields.io/badge/Next.js-16+-black?logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-blue?logo=typescript)
-![Node.js](https://img.shields.io/badge/Node.js-green?logo=node.js)
-![GraphQL](https://img.shields.io/badge/GraphQL-pink?logo=graphql)
+<p align="center">
+  <a href="https://github.com/O2sa/DevImpact/blob/main/LICENSE">
+    <img src="https://www.shieldcn.dev/github/license/O2sa/DevImpact.svg?variant=branded&size=sm" alt="License">
+  </a>
+  <a href="https://github.com/O2sa/DevImpact/stargazers">
+    <img src="https://www.shieldcn.dev/github/stars/O2sa/DevImpact.svg?variant=branded&size=sm" alt="GitHub Stars">
+  </a>
+  <a href="https://github.com/O2sa/DevImpact/network/members">
+    <img src="https://www.shieldcn.dev/github/forks/O2sa/DevImpact.svg?variant=branded&size=sm" alt="GitHub Forks">
+  </a>
+  <a href="https://github.com/O2sa/DevImpact/graphs/contributors">
+    <img src="https://www.shieldcn.dev/github/contributors/O2sa/DevImpact.svg?variant=branded&size=sm&mode=dark" alt="Contributors">
+  </a>
+  <a href="https://github.com/O2sa/DevImpact/commits/main">
+    <img src="https://www.shieldcn.dev/github/last-commit/O2sa/DevImpact.svg?variant=branded&size=sm" alt="Last commit">
+  </a>
+  <a href="https://github.com/O2sa/DevImpact/commits/main">
+    <img src="https://www.shieldcn.dev/github/commits/O2sa/DevImpact.svg?variant=branded&size=sm" alt="Commits">
+  </a>
+  <a href="https://github.com/O2sa/DevImpact/issues">
+    <img src="https://www.shieldcn.dev/github/open-issues/O2sa/DevImpact.svg?variant=branded&size=sm" alt="Open issues">
+  </a>
+  <a href="https://github.com/O2sa/DevImpact/pulls?q=is%3Apr+is%3Amerged">
+    <img src="https://www.shieldcn.dev/github/merged-prs/O2sa/DevImpact.svg?variant=branded&size=sm" alt="Merged PRs">
+  </a>
+  <br />
+  <br />
+
+  <img src="https://www.shieldcn.dev/badge/Language-TypeScript-3178C6.svg?logo=typescript&variant=branded&size=sm&mode=dark" alt="Language · TypeScript">
+  <img src="https://www.shieldcn.dev/badge/Framework-Next.js-000000.svg?logo=nextdotjs&variant=branded&size=sm&mode=dark" alt="Framework · Next.js">
+  <img src="https://www.shieldcn.dev/badge/CSS-Tailwind-06B6D4.svg?logo=tailwindcss&variant=branded&size=sm&theme=blue" alt="CSS · Tailwind">
+</p>
+
 
 ## Preview
 
