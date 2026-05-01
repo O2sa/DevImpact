@@ -1,24 +1,53 @@
 # 🚀 DevImpact
-![License](https://img.shields.io/github/license/o2sa/devimpact)
-![Stars](https://img.shields.io/github/stars/o2sa/devimpact)
-![Forks](https://img.shields.io/github/forks/o2sa/devimpact)
-![Issues](https://img.shields.io/github/issues/o2sa/devimpact)
-![Pull Requests](https://img.shields.io/github/issues-pr/o2sa/devimpact)
-![Last Commit](https://img.shields.io/github/last-commit/o2sa/devimpact)
 
-![Next.js](https://img.shields.io/badge/Next.js-16+-black?logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-blue?logo=typescript)
-![Node.js](https://img.shields.io/badge/Node.js-green?logo=node.js)
-![GraphQL](https://img.shields.io/badge/GraphQL-pink?logo=graphql)
 
+<p align="center">
+  <a href="https://github.com/O2sa/DevImpact/blob/main/LICENSE">
+    <img src="https://www.shieldcn.dev/github/license/O2sa/DevImpact.svg?variant=branded&size=sm" alt="License">
+  </a>
+  <a href="https://github.com/O2sa/DevImpact/stargazers">
+    <img src="https://www.shieldcn.dev/github/stars/O2sa/DevImpact.svg?variant=branded&size=sm" alt="GitHub Stars">
+  </a>
+  <a href="https://github.com/O2sa/DevImpact/network/members">
+    <img src="https://www.shieldcn.dev/github/forks/O2sa/DevImpact.svg?variant=branded&size=sm" alt="GitHub Forks">
+  </a>
+  <a href="https://github.com/O2sa/DevImpact/graphs/contributors">
+    <img src="https://www.shieldcn.dev/github/contributors/O2sa/DevImpact.svg?variant=branded&size=sm&mode=dark" alt="Contributors">
+  </a>
+  <a href="https://github.com/O2sa/DevImpact/commits/main">
+    <img src="https://www.shieldcn.dev/github/last-commit/O2sa/DevImpact.svg?variant=branded&size=sm" alt="Last commit">
+  </a>
+  <a href="https://github.com/O2sa/DevImpact/commits/main">
+    <img src="https://www.shieldcn.dev/github/commits/O2sa/DevImpact.svg?variant=branded&size=sm" alt="Commits">
+  </a>
+  <a href="https://github.com/O2sa/DevImpact/issues">
+    <img src="https://www.shieldcn.dev/github/open-issues/O2sa/DevImpact.svg?variant=branded&size=sm" alt="Open issues">
+  </a>
+  <a href="https://github.com/O2sa/DevImpact/pulls?q=is%3Apr+is%3Amerged">
+    <img src="https://www.shieldcn.dev/github/merged-prs/O2sa/DevImpact.svg?variant=branded&size=sm" alt="Merged PRs">
+  </a>
+  <br />
+  <br />
+
+  <img src="https://www.shieldcn.dev/badge/Language-TypeScript-3178C6.svg?logo=typescript&variant=branded&size=sm&mode=dark" alt="Language · TypeScript">
+  <img src="https://www.shieldcn.dev/badge/Framework-Next.js-000000.svg?logo=nextdotjs&variant=branded&size=sm&mode=dark" alt="Framework · Next.js">
+  <img src="https://www.shieldcn.dev/badge/CSS-Tailwind-06B6D4.svg?logo=tailwindcss&variant=branded&size=sm&theme=blue" alt="CSS · Tailwind">
+</p>
+
+
+## Preview
+
+<p align="center">
+  <img src="./public/screenshots/screenshot.png" alt="DevImpact comparison tables and analytics chart" width="900">
+</p>
 
 **DevImpact** is an open-source platform that compares software developers based on their real impact in the open-source ecosystem — not just raw numbers.
 
 It evaluates developers using a smart scoring system that considers:
 
-* Repository quality 📦
-* Pull request impact 🔀
-* Community contributions 💬
+- Repository quality 📦
+- Pull request impact 🔀
+- Community contributions 💬
 
 ---
 
@@ -28,9 +57,9 @@ Traditional metrics (followers, stars, commit counts) are often misleading.
 
 DevImpact focuses on:
 
-* ✅ Quality over quantity
-* ✅ Real contributions to valuable projects
-* ✅ Fair comparison between developers
+- ✅ Quality over quantity
+- ✅ Real contributions to valuable projects
+- ✅ Fair comparison between developers
 
 ---
 
@@ -44,9 +73,9 @@ Measures the quality and impact of repositories owned by the user.
 
 Factors include:
 
-* Stars ⭐
-* Forks 🍴
-* Watchers
+- Stars ⭐
+- Forks 🍴
+- Watchers
 
 ---
 
@@ -59,10 +88,10 @@ Measures contributions to **other developers' repositories**.
 
 Factors include:
 
-* Target repository quality
-* PR size (additions/deletions)
-* Repository popularity
-* Contribution diversity
+- Target repository quality
+- PR size (additions/deletions)
+- Repository popularity
+- Contribution diversity
 
 ---
 
@@ -72,8 +101,8 @@ Measures community engagement.
 
 Includes:
 
-* Issues opened in external repositories
-* Discussions participation
+- Issues opened in external repositories
+- Discussions participation
 
 ⚠️ Does NOT include commits or PRs (to avoid duplication)
 
@@ -96,43 +125,41 @@ Final Score =
 
 ## ⚖️ Key Design Principles
 
-* ❌ No self-inflation (own PRs excluded)
-* 📉 Diminishing returns to prevent spam
-* 🎯 External impact is prioritized
-* ⚖️ Balanced scoring between builders and contributors
+- ❌ No self-inflation (own PRs excluded)
+- 📉 Diminishing returns to prevent spam
+- 🎯 External impact is prioritized
+- ⚖️ Balanced scoring between builders and contributors
 
 ---
 
 ## 🖥️ Features
 
-* 🔍 Compare two GitHub users side-by-side
-* 📊 Visual score breakdown (charts & insights)
-* 🧠 Smart ranking system
-* 🌍 Localization support (EN / AR)
-* ⚡ Fast API powered by GitHub GraphQL
-* 🧩 Extensible scoring system
+- 🔍 Compare two GitHub users side-by-side
+- 📊 Visual score breakdown (charts & insights)
+- 🧠 Smart ranking system
+- 🌍 Localization support (EN / AR)
+- ⚡ Fast API powered by GitHub GraphQL
+- 🧩 Extensible scoring system
 
 ---
+
 
 ## 🛠️ Tech Stack
 
 ### Frontend
 
-* Next.js (App Router)
-* TypeScript
-* Tailwind CSS
-* Recharts
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- Recharts
 
 ### API
 
-* Node.js + Express
-* GitHub GraphQL API
-* Octokit
+- Node.js + Express
+- GitHub GraphQL API
+- Octokit
 
 ---
-
-
-
 
 ## 🚀 Getting Started
 
@@ -171,14 +198,48 @@ pnpm run dev
 
 ---
 
+---
+
+## 📡 API Example
+
+The compare endpoint accepts one or more `username` query parameters.
+
+### Example request
+
+```bash
+curl "api/compare?username=devimpact&username=octocat"
+```
+
+### Example response
+
+```json
+{
+  "success": true,
+  "users": [
+    {
+      "username": "octocat",
+      "name": "The Octocat",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/583231?v=4",
+      "repoScore": 87,
+      "prScore": 64,
+      "contributionScore": 42,
+      "finalScore": 73,
+      "topRepos": [],
+      "topPullRequests": []
+    }
+  ]
+}
+```
+
 ## 🌍 Localization
 
-* Supported languages: English 🇺🇸, Arabic 🇸🇦
-* Automatically detects user language
-* Allows manual switching
-* Easy to add new languages via `/locales`
+- Supported languages: English 🇺🇸, Arabic 🇸🇦
+- Automatically detects user language
+- Allows manual switching
+- Easy to add new languages via `/locales`
 
 ---
+
 ## 🤝 Contributing
 
 Contributions are welcome!
@@ -194,21 +255,20 @@ Contributions are welcome!
 
 ### Contribution ideas:
 
-* Improve scoring algorithm
-* Add new metrics
-* Enhance UI/UX
-* Add new languages 🌍
+- Improve scoring algorithm
+- Add new metrics
+- Enhance UI/UX
+- Add new languages 🌍
 
 ---
 
 ## ⚠️ Limitations
 
-* GitHub API rate limits
-* Some private contributions are not accessible
-* Scoring system is heuristic (not perfect)
+- GitHub API rate limits
+- Some private contributions are not accessible
+- Scoring system is heuristic (not perfect)
 
 ---
-
 
 ## 💡 Inspiration
 
@@ -222,7 +282,6 @@ DevImpact was created to answer a simple question:
 
 If you like this project:
 
-* ⭐ Star the repo
-* 🐛 Report issues
-* 💡 Suggest features
-
+- ⭐ Star the repo
+- 🐛 Report issues
+- 💡 Suggest features

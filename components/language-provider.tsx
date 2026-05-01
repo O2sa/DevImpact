@@ -8,8 +8,14 @@ import { I18nContextValue } from "../types/i18n";
 
 const I18nContext = createContext<I18nContextValue | null>(null);
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const value = useI18nProvider();
+export function LanguageProvider({
+  children,
+  initialLocale,
+}: {
+  children: React.ReactNode;
+  initialLocale?: Locale;
+}) {
+  const value = useI18nProvider(initialLocale);
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 

@@ -2,9 +2,10 @@
 
 import { useTranslation } from "@/components/language-provider";
 import { cn } from "@/lib/utils";
+import { GithubLink } from "./github-link";
 
 export function AppFooter() {
-  const { t, dir } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <footer className="relative mt-10 border-t border-border/80 py-10 text-sm text-muted-foreground">
@@ -55,17 +56,18 @@ export function AppFooter() {
             >
               {t("footer.note")}
             </p>
+            <GithubLink />
           </div>
         </div>
 
+
         <div
           className={cn(
-            "mt-8 flex flex-col gap-3 border-t border-border/70 pt-4 text-[11px] font-medium uppercase tracking-[0.24em] text-muted-foreground/75 md:items-center md:justify-between",
-            dir === "rtl" ? "md:flex-row-reverse" : "md:flex-row"
+            "mt-8 flex flex-col gap-3 border-t border-border/70 pt-4 text-[11px] font-medium uppercase tracking-[0.24em] text-muted-foreground/75 items-center md:justify-between md:flex-row",
           )}
         >
-          <span>{t("footer.summary")}</span>
-          <span>{t("footer.tagline")}</span>
+            <span>{t("footer.summary")}</span>
+            <span>{t("footer.tagline")}</span>
         </div>
       </div>
     </footer>

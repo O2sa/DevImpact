@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { ArrowLeftRight, RefreshCw } from "lucide-react";
 import {
@@ -12,7 +12,11 @@ import { Alert, AlertDescription } from "./ui/alert";
 import { useTranslation } from "./language-provider";
 
 type CompareFormProps = {
-  data?: boolean;
+  username1: string;
+  username2: string;
+  setUsername1: (value: string) => void;
+  setUsername2: (value: string) => void;
+  hasData?: boolean;
   onSubmit: (u1: string, u2: string) => void;
   loading?: boolean;
   reset?: () => void;
@@ -21,16 +25,18 @@ type CompareFormProps = {
 };
 
 export function CompareForm({
+  username1,
+  username2,
+  setUsername1,
+  setUsername2,
+  hasData,
   onSubmit,
-  data,
   loading,
   swapUsers,
   reset,
   error,
 }: CompareFormProps) {
   const { t } = useTranslation();
-  const [username1, setUsername1] = useState("pbiggar");
-  const [username2, setUsername2] = useState("CoralineAda");
   const firstInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-focus first input on page load
@@ -39,16 +45,13 @@ export function CompareForm({
   }, []);
 
   const canSubmit = Boolean(username1.trim() && username2.trim() && !loading);
+  const isEmpty = (!username1.trim() && !username2.trim()) && !hasData;
 
   const handleSwap = () => {
-    setUsername1(username2);
-    setUsername2(username1);
     if (swapUsers) swapUsers();
   };
 
   const handleReset = () => {
-    setUsername1("");
-    setUsername2("");
     if (reset) reset();
   };
 
@@ -70,13 +73,13 @@ export function CompareForm({
             <input
               className="h-11 rounded-lg border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-transparent"
               ref={firstInputRef}
-              placeholder={t("form.username1") }
+              placeholder={t("form.username1")}
               value={username1}
               onChange={(e) => setUsername1(e.target.value)}
             />
             <input
               className="h-11 rounded-lg border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-transparent"
-              placeholder={t("form.username2") }
+              placeholder={t("form.username2")}
               value={username2}
               onChange={(e) => setUsername2(e.target.value)}
             />
@@ -90,26 +93,24 @@ export function CompareForm({
             >
               {loading ? t("form.compare.ing") : t("form.compare")}
             </Button>
-            {data && (
-              <>
-                <Button
-                  onClick={handleSwap}
-                  disabled={loading}
-                  type="button"
-                  title={t("form.swap")}
-                >
-                  <ArrowLeftRight className="h-4 w-4" />
-                </Button>
-                <Button
-                  onClick={handleReset}
-                  disabled={loading}
-                  title={t("form.reset")}
-                  type="button"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                </Button>
-              </>
-            )}
+            <Button
+              onClick={handleSwap}
+              type="button"
+              disabled={isEmpty || loading}
+              title={t("form.swap")}
+              className="shadow-sm transition-transform hover:-translate-y-0.5"
+            >
+              <ArrowLeftRight className="h-4 w-4" />
+            </Button>
+            <Button
+              onClick={handleReset}
+              title={t("form.reset")}
+              disabled={isEmpty || loading}
+              type="button"
+              className="shadow-sm transition-transform hover:-translate-y-0.5"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
           </div>
           {error && (
             <Alert variant="destructive" className="mt-4">

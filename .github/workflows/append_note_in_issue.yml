@@ -6,7 +6,7 @@ on:
 
 jobs:
   add-note:
-    if: github.event.issue.user.login == 'O2sa'
+    if: github.event.issue.user.login == 'o2sa'
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -20,13 +20,12 @@ jobs:
             const repo = context.repo.repo;
 
             // The custom note you want to append
-            const note = `
-                        ---
-                        
-                      > [!NOTE]
-                      > **CONTRIBUTIONS ARE WELCOME!**
-                      > If you want to get this issue assigned to you. Just comment `assign me`. You will be assigned to the issue instantly via GitHub-actions bot.
-                        `;
+            const note = [
+              '',
+              '> [!TIP]',
+              '> 🚀 **Want to contribute?**',
+              '> Comment `assign me` to be automatically assigned to this issue via our GitHub Actions bot. Happy coding! ✨'
+            ].join('\n');
 
             // Get the current issue body
             const currentBody = context.payload.issue.body || '';

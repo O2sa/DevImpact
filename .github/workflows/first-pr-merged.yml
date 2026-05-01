@@ -6,67 +6,60 @@ on:
 
 jobs:
   welcome-on-merge:
-    # Only run if the PR was actually merged, not just closed
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+      issues: write
+
     steps:
       - name: Thank contributor and ask for star
         uses: actions/github-script@v7
         with:
           script: |
-            // Sleep for 3 seconds to ensure the API reflects the PR merge
             await new Promise(resolve => setTimeout(resolve, 3000));
 
             const { owner, repo } = context.repo;
             const creator = context.payload.pull_request.user.login;
+            const currentPrNumber = context.payload.pull_request.number;
 
-            // Fetch all merged PRs by this user
-            const response = await github.rest.pulls.list({
+            const prs = await github.paginate(github.rest.pulls.list, {
               owner,
               repo,
               state: 'closed',
-              creator: creator
+              per_page: 100
             });
 
-            // Filter to ensure we only count merged PRs
-            const mergedPrs = response.data.filter(pr => pr.merged_at !== null);
+            const mergedPrsByUser = prs.filter(pr =>
+              pr.user.login === creator &&
+              pr.merged_at !== null
+            );
 
-            // Determine the case and generate appropriate message
             let message;
 
-            if (mergedPrs.length === 1) {
-              message = `
-              🎊 **Welcome, @${creator}!** Your first contribution has been merged! 🚀
-              
-              Thank you for helping improve the project! If you find this tool useful, please consider giving us a ⭐ **star on GitHub**—it helps more developers find our work and motivates us to keep improving!
-              `;
-            }
-            // CASE 2: First merged PR + Hasn't starred
-            else if (mergedPrs.length <= 3) {
-              message = `
-              ✨ **Thank you, @${creator}!** Another great contribution merged! 🚀
-              
-              We truly appreciate your continued support! If you find this tool useful, please consider giving us a ⭐ **star on GitHub**—it helps more developers find our work and motivates us to keep improving!
-              `;
-            }
-
-            // CASE 4: Multiple merged PRs + Hasn't starred
-            else if (mergedPrs.length > 3) {
-              message = `
-              ✨ **Thank you, @${creator}!** Another great contribution merged! 🚀
-              
-              You've been a fantastic contributor! We truly appreciate your continued support.
-              `;
+            if (mergedPrsByUser.length === 1) {
+              message = [
+                `🎊 **Welcome, @${creator}!** Your first contribution has been merged! 🚀`,
+                ``,
+                `Thank you for helping improve the project! If you find this tool useful, please consider giving us a ⭐ **star on GitHub**—it helps more developers find our work and motivates us to keep improving!`
+              ].join('\n');
+            } else if (mergedPrsByUser.length <= 3) {
+              message = [
+                `✨ **Thank you, @${creator}!** Another great contribution merged! 🚀`,
+                ``,
+                `We truly appreciate your continued support! If you find this tool useful, please consider giving us a ⭐ **star on GitHub**—it helps more developers find our work and motivates us to keep improving!`
+              ].join('\n');
+            } else {
+              message = [
+                `✨ **Thank you, @${creator}!** Another great contribution merged! 🚀`,
+                ``,
+                `You've been a fantastic contributor! We truly appreciate your continued support.`
+              ].join('\n');
             }
 
-            // Post the comment if a message was generated
-            if (message) {
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number: context.payload.pull_request.number,
-                body: message
-              });
-            }
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: currentPrNumber,
+              body: message
+            });
