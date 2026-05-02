@@ -1,4 +1,4 @@
-export type Locale = string;
+import { Locale } from "../lib/i18n";
 
 export type I18nContextValue = {
     locale: Locale;
