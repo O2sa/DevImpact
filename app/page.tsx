@@ -10,12 +10,7 @@ import { BrandLogo } from "@/components/brand-logo";
 import { AppHeader } from "@/components/app-header";
 import { AppFooter } from "@/components/app-footer";
 import { useTranslation } from "@/components/language-provider";
-
-type ApiResponse = {
-  success: boolean;
-  users?: UserResult[];
-  error?: string;
-};
+import { ApiResponse } from "@/types/api-response";
 
 function HomePageInner() {
   const { t } = useTranslation();

@@ -30,8 +30,8 @@ export function ResultDashboard({ user1, user2 }: Props) {
   const loser = winner === user1 ? user2 : user1;
   const diffPct = winner
     ? Math.round(
-        ((winner.finalScore - loser.finalScore) / loser.finalScore) * 100,
-      )
+      ((winner.finalScore - loser.finalScore) / loser.finalScore) * 100,
+    )
     : 0;
   const repoDiff =
     Math.max(user1.repoScore, user2.repoScore) -
@@ -99,28 +99,28 @@ export function ResultDashboard({ user1, user2 }: Props) {
   };
 
   const handleCopy = async () => {
-    const summary = {
-      comparison: {
-        [user1.username]: {
-          finalScore: user1.finalScore,
-          repoScore: user1.repoScore,
-          prScore: user1.prScore,
-          contributionScore: user1.contributionScore,
+    try {
+      const summary = {
+        comparison: {
+          user1,
+          user2,
+          winner: winner
+            ? {
+              username: winner.username,
+              name: winner.name || winner.username,
+              finalScore: winner.finalScore,
+            }
+            : "tie",
+          leadBy: winner ? `${diffPct}%` : "0%",
+          insights: getInsights(),
         },
-        [user2.username]: {
-          finalScore: user2.finalScore,
-          repoScore: user2.repoScore,
-          prScore: user2.prScore,
-          contributionScore: user2.contributionScore,
-        },
-        winner: winner?.username ?? "tie",
-        leadBy: winner ? `${diffPct}%` : "0%",
-        insights: getInsights(),
-      },
-    };
-    await navigator.clipboard.writeText(JSON.stringify(summary, null, 2));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+      };
+      await navigator.clipboard.writeText(JSON.stringify(summary, null, 2));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Copy failed:", error);
+    }
   };
 
   return (

@@ -1,45 +1,47 @@
-﻿import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import arMessages from "../locales/ar.json";
+import enMessages from "../locales/en.json";
+import {
+  DEFAULT_LOCALE,
+  LOCALE_COOKIE,
+  isSupportedLocale,
+  localeMeta,
+  supportedLocales,
+  type Locale,
+} from "./i18n-core";
+
+export {
+  DEFAULT_LOCALE,
+  LOCALE_COOKIE,
+  getLocaleDir,
+  isSupportedLocale,
+  parseAcceptLanguage,
+  supportedLocales,
+  type Locale,
+} from "./i18n-core";
 
 type Messages = Record<string, string>;
 
-export const supportedLocales = ["en", "ar"] as const;
-export type Locale = (typeof supportedLocales)[number];
-const storageKey = "app-locale";
-
-let enMessagesCache: Messages | null = null;
-
-const localeMeta: Record<Locale, { dir: "ltr" | "rtl"; label: string }> = {
-  en: { dir: "ltr", label: "English" },
-  ar: { dir: "rtl", label: "\u0627\u0644\u0639\u0631\u0628\u064a\u0629" },
+const cookieMaxAge = 60 * 60 * 24 * 365;
+const messagesByLocale: Record<Locale, Messages> = {
+  en: enMessages,
+  ar: arMessages,
 };
 
 async function loadMessages(locale: Locale): Promise<Messages> {
-  switch (locale) {
-    case "ar":
-      return (await import("../locales/ar.json")).default;
-    case "en":
-    default:
-      return (await import("../locales/en.json")).default;
-  }
+  return messagesByLocale[locale];
 }
 
-function detectLocale(): Locale {
-  if (typeof window === "undefined") return "en";
-  const stored = window.localStorage.getItem(storageKey) as Locale | null;
-  if (stored && supportedLocales.includes(stored)) return stored;
-  const nav = navigator.language?.split("-")?.[0]?.toLowerCase();
-  if (nav && supportedLocales.includes(nav as Locale)) return nav as Locale;
-  return "en";
+function persistLocale(locale: Locale) {
+  if (typeof window === "undefined") return;
+
+  window.localStorage.setItem(LOCALE_COOKIE, locale);
+  document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=${cookieMaxAge}; samesite=lax`;
 }
 
-export function useI18nProvider() {
-  const [locale, setLocaleState] = useState<Locale>("en");
-  const [messages, setMessages] = useState<Messages>(() => {
-    if (enMessagesCache) return enMessagesCache;
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    enMessagesCache = require("../locales/en.json");
-    return enMessagesCache as Messages;
-  });
+export function useI18nProvider(initialLocale: Locale = DEFAULT_LOCALE) {
+  const [locale, setLocaleState] = useState<Locale>(initialLocale);
+  const [messages, setMessages] = useState<Messages>(() => messagesByLocale[initialLocale]);
   const [ready, setReady] = useState<boolean>(true);
 
   const changeLocale = useCallback((next: Locale) => {
@@ -48,24 +50,25 @@ export function useI18nProvider() {
       .then((m) => {
         setMessages(m);
         setLocaleState(next);
-        if (typeof window !== "undefined") {
-          window.localStorage.setItem(storageKey, next);
-        }
+        persistLocale(next);
         setReady(true);
       })
       .catch((err) => {
         console.warn("[i18n] failed to load locale, falling back to en", err);
-        if (enMessagesCache) setMessages(enMessagesCache);
-        setLocaleState("en");
+        setMessages(messagesByLocale[DEFAULT_LOCALE]);
+        setLocaleState(DEFAULT_LOCALE);
         setReady(true);
       });
   }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const detected = detectLocale();
-    changeLocale(detected);
-  }, [changeLocale]);
+
+    const stored = window.localStorage.getItem(LOCALE_COOKIE);
+    if (isSupportedLocale(stored) && stored !== locale) {
+      changeLocale(stored);
+    }
+  }, [changeLocale, locale]);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
