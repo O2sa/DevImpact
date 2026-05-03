@@ -20,7 +20,7 @@ export function BreakdownBars({ user1, user2 }: Props) {
   const { t,dir } = useTranslation();
 
   return (
-    <Card>
+    <Card dir={dir}>
       <CardHeader>
         <CardTitle>{t('breakdown.title')}</CardTitle>
         <CardDescription>
