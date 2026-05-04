@@ -115,6 +115,16 @@ Use descriptive commit messages with a prefix:
 - `style:` for formatting changes (no logic change)
 - `test:` for adding or updating tests
 
+## AI-Generated Content Policy
+
+We welcome contributions assisted by AI tools (GitHub Copilot, ChatGPT, Claude, etc.). To maintain quality and reliability:
+
+1. **Disclose AI assistance**: If AI tools were used to generate a significant portion of your contribution, mention it in your PR description.
+2. **Review before submitting**: Always review AI-generated content for accuracy, relevance, and adherence to our coding standards before submitting.
+3. **No bulk AI submissions**: Do not submit large batches of AI-generated code without thorough review. Each PR should represent thoughtful, intentional work.
+4. **Originality**: Ensure your contribution does not reproduce copyrighted material from AI training data.
+5. **Accountability**: You are responsible for the quality and correctness of all content in your PRs, regardless of how it was generated.
+
 ## Pull Request Guidelines
 
 - Reference the related issue using `Fixes #<issue_number>` in the PR description
