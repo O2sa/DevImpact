@@ -1,8 +1,11 @@
-**⚠️ Important Note on AI-Generated Contributions**
+> [!WARNING]
+> **Important Note on AI-Generated Contributions**
+> 
+> While we appreciate the use of AI as a productivity tool, pull requests consisting of code or documentation generated entirely by AI **without significant human review and testing** are not welcome. 
+> 
+> Every contributor is responsible for the code they submit. If we suspect a contribution is a "blind" AI generation that has not been verified for logic, security, or style, it will be closed without review.
 
-While we appreciate the use of AI as a productivity tool, pull requests consisting of code or documentation generated entirely by AI **without significant human review and testing** are not welcome.
 
-Every contributor is responsible for the code they submit. If we suspect a contribution is a "blind" AI generation that has not been verified for logic, security, or style, it will be closed without review.
 
 ---
 
