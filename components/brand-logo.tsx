@@ -17,7 +17,7 @@ const sizeClasses = {
 export function BrandLogo({
   size = "md",
   className,
-  priority = false,
+  priority = true,
 }: BrandLogoProps) {
   return (
     <span
@@ -34,6 +34,7 @@ export function BrandLogo({
         height={1024}
         priority={priority}
         className={cn("object-contain", sizeClasses[size])}
+        loading={priority ? "eager" : "lazy"}
       />
     </span>
   );

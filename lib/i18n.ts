@@ -40,8 +40,17 @@ function persistLocale(locale: Locale) {
 }
 
 export function useI18nProvider(initialLocale: Locale = DEFAULT_LOCALE) {
-  const [locale, setLocaleState] = useState<Locale>(initialLocale);
-  const [messages, setMessages] = useState<Messages>(() => messagesByLocale[initialLocale]);
+  const getInitialLocale = () => {
+    if (typeof window !== "undefined") {
+      const stored = window.localStorage.getItem(LOCALE_COOKIE);
+      if (isSupportedLocale(stored)) return stored;
+    }
+    return initialLocale;
+  };
+
+  const initialLoc = getInitialLocale();
+  const [locale, setLocaleState] = useState<Locale>(initialLoc);
+  const [messages, setMessages] = useState<Messages>(() => messagesByLocale[initialLoc]);
   const [ready, setReady] = useState<boolean>(true);
 
   const changeLocale = useCallback((next: Locale) => {
@@ -60,15 +69,6 @@ export function useI18nProvider(initialLocale: Locale = DEFAULT_LOCALE) {
         setReady(true);
       });
   }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const stored = window.localStorage.getItem(LOCALE_COOKIE);
-    if (isSupportedLocale(stored) && stored !== locale) {
-      changeLocale(stored);
-    }
-  }, [changeLocale, locale]);
 
   useEffect(() => {
     if (typeof document === "undefined") return;

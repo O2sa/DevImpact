@@ -56,7 +56,7 @@ export function AppFooter() {
             >
               {t("footer.note")}
             </p>
-            <GithubLink />
+            <GithubLink variant="prominent" />
           </div>
         </div>
 

@@ -1,0 +1,8 @@
+[
+
+  {
+    "title": "refactor: Extract ApiResponse type to the types directory",
+    "body": "The `ApiResponse` type is currently defined directly inside `app/page.tsx`. To improve code organization and make the type reusable across other files (such as API routes), it should be extracted into its own file within the `types` directory.\n\n### Tasks\n- [ ] Create a new file `types/api-response.ts`.\n- [ ] Move the `ApiResponse` type definition from `app/page.tsx` into this new file and `export` it.\n- [ ] Update `app/page.tsx` to import the `ApiResponse` type from the new file.",
+    "labels": "help wanted,good first issue,refactor,easy,beginner friendly"
+  }
+]
