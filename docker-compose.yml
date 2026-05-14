@@ -1,0 +1,25 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: devimpact-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    command: >
+      sh -c "if [ -n \"$${REDIS_PASSWORD}\" ]; then
+        redis-server --appendonly yes --requirepass \"$${REDIS_PASSWORD}\";
+      else
+        redis-server --appendonly yes;
+      fi"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  redis-data:

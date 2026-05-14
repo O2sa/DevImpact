@@ -17,7 +17,7 @@ type Props = {
 export function BreakdownBars({ user1, user2 }: Props) {
   const getMaxScore = (score1: number, score2: number) =>
     Math.max(score1, score2, 1);
-  const { t,dir } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <Card>

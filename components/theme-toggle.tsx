@@ -44,12 +44,7 @@ export function ThemeToggle() {
       >
         {mounted && current === "dark" ? <Sun size={16} /> : <Moon size={16} />}
       </Button>
-      <GithubLink />
-
-
+      <GithubLink variant="compact" />
     </div>
-
-
-
   );
 }

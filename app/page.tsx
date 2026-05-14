@@ -10,7 +10,62 @@ import { BrandLogo } from "@/components/brand-logo";
 import { AppHeader } from "@/components/app-header";
 import { AppFooter } from "@/components/app-footer";
 import { useTranslation } from "@/components/language-provider";
-import { ApiResponse } from "@/types/api-response";
+import {
+  ApiResponse,
+  CompareInsights,
+  CompareWinner,
+  SafeApiError,
+} from "@/types/api-response";
+import { cn } from "@/lib/utils";
+
+type ComparisonData = {
+  user1: UserResult;
+  user2: UserResult;
+  winner?: CompareWinner;
+  languageWinner?: {
+    username: string;
+    finalScoreDifference: number;
+    percentageDifference: number;
+    selectedLanguages: string[];
+  };
+  insights?: CompareInsights;
+  scoreVersion?: string;
+};
+
+type CompareOptions = {
+  selectedLanguages: string[];
+  updateUrl?: boolean;
+};
+
+const EXIT_ANIMATION_MS = 240;
+
+function sanitizeSelectedLanguages(languages: string[]): string[] {
+  const seen = new Set<string>();
+  const output: string[] = [];
+
+  for (const language of languages) {
+    const trimmed = language.trim();
+    const normalized = trimmed.toLowerCase();
+    if (!trimmed || seen.has(normalized)) {
+      continue;
+    }
+    output.push(trimmed);
+    seen.add(normalized);
+    if (output.length >= 5) {
+      break;
+    }
+  }
+
+  return output;
+}
+
+function normalizeUsers(body: ApiResponse): { user1: UserResult; user2: UserResult } | null {
+  if (body.users && body.users.length >= 2) {
+    return { user1: body.users[0], user2: body.users[1] };
+  }
+
+  return null;
+}
 
 function HomePageInner() {
   const { t } = useTranslation();
@@ -19,21 +74,51 @@ function HomePageInner() {
   const initialUsernames = searchParams.getAll("username");
   const initialUsername1 = initialUsernames[0] ?? "";
   const initialUsername2 = initialUsernames[1] ?? "";
+  const initialSelectedLanguages = sanitizeSelectedLanguages(
+    searchParams.getAll("selectedLanguage"),
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [username1, setUsername1] = useState(initialUsername1);
   const [username2, setUsername2] = useState(initialUsername2);
-  const [data, setData] = useState<{
-    user1: UserResult;
-    user2: UserResult;
-  } | null>(null);
-  // Track the URL pair we last fetched against so back/forward navigation
-  // can resync the form and results without re-fetching identical pairs.
-  const lastFetchedPairRef = useRef<[string, string] | null>(null);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
+    initialSelectedLanguages,
+  );
+  const [data, setData] = useState<ComparisonData | null>(null);
+  const [displayData, setDisplayData] = useState<ComparisonData | null>(null);
+  const lastFetchedKeyRef = useRef<string | null>(null);
+  const inFlightFetchKeyRef = useRef<string | null>(null);
+  const inFlightPromiseRef = useRef<Promise<void> | null>(null);
+  const hideTimerRef = useRef<number | null>(null);
 
-  const localizeErrorMessage = (message?: string) => {
+  const localizeErrorMessage = (message?: string, details?: SafeApiError) => {
+    if (details) {
+      switch (details.code) {
+        case "RATE_LIMITED":
+          return t("error.rateLimited", {
+            seconds: details.retryAfterSeconds ?? 60,
+          });
+        case "TEMPORARY_THROTTLE":
+          return t("error.tempThrottle", {
+            seconds: details.retryAfterSeconds ?? 60,
+          });
+        case "GITHUB_TIMEOUT":
+          return t("error.timeout");
+        case "GITHUB_RESOURCE_LIMIT":
+          return t("error.resourceLimit");
+        case "GITHUB_AUTH":
+          return t("error.missingToken");
+        case "GITHUB_NOT_FOUND":
+          return t("error.userNotFound");
+        case "NETWORK":
+          return t("error.fetchFailed");
+        default:
+          break;
+      }
+    }
+
     switch (message) {
-      case "provide at least one username param":
+      case "provide exactly two username params":
         return t("error.missingUsername");
       case "GitHub user not found":
         return t("error.userNotFound");
@@ -43,89 +128,195 @@ function HomePageInner() {
         return t("error.comparisonFailed");
       case "Failed to fetch":
         return t("error.fetchFailed");
+      case "Missing GITHUB_TOKEN":
+        return t("error.missingToken");
       default:
-        return message || t("error.generic");
+        return t("error.generic");
     }
   };
 
-  const handleCompare = async (u1: string, u2: string) => {
-    lastFetchedPairRef.current = [u1, u2];
-    router.push(
-      `/?username=${encodeURIComponent(u1)}&username=${encodeURIComponent(u2)}`,
-      { scroll: false }
-    );
-    setLoading(true);
-    setError(null);
-    setData(null);
+  const createFetchKey = (
+    u1: string,
+    u2: string,
+    options: CompareOptions,
+  ) =>
+    JSON.stringify({
+      u1,
+      u2,
+      selectedLanguages: [...sanitizeSelectedLanguages(options.selectedLanguages)].sort(),
+    });
 
-    try {
-      const params = new URLSearchParams();
-      params.append("username", u1);
-      params.append("username", u2);
+  const handleCompare = async (
+    u1: string,
+    u2: string,
+    options: CompareOptions,
+  ) => {
+    const sanitizedLanguages = sanitizeSelectedLanguages(options.selectedLanguages);
+    const fetchKey = createFetchKey(u1, u2, options);
 
-      const res = await fetch(`/api/compare?${params.toString()}`);
-      const body: ApiResponse = await res.json();
-
-      if (!body.success || !body.users || body.users.length < 2) {
-        throw new Error(localizeErrorMessage(body.error || "Comparison failed"));
-      }
-
-      if (body.users[0].finalScore > body.users[1].finalScore) {
-        setData({
-          user1: { ...body.users[0], isWinner: true },
-          user2: body.users[1],
-        });
-      } else if (body.users[1].finalScore > body.users[0].finalScore) {
-        setData({
-          user1: body.users[0],
-          user2: { ...body.users[1], isWinner: true },
-        });
-      } else {
-        setData({ user1: body.users[0], user2: body.users[1] });
-      }
-    } catch (err: unknown) {
-      setError(localizeErrorMessage(err instanceof Error ? err.message : undefined));
-    } finally {
-      setLoading(false);
+    if (inFlightFetchKeyRef.current === fetchKey && inFlightPromiseRef.current) {
+      return inFlightPromiseRef.current;
     }
-  };
 
-  // Resync form + results to whatever the URL says — handles initial mount
-  // AND back/forward navigation. We fetch only when the URL pair differs from
-  // the last pair we fetched, so no infinite loop with the router.push above.
-  const syncToUrl = useEffectEvent((u1: string, u2: string) => {
-    setUsername1(u1);
-    setUsername2(u2);
+    lastFetchedKeyRef.current = fetchKey;
 
-    if (!u1 || !u2) {
-      // Empty params: clear results so the empty state matches the URL.
-      lastFetchedPairRef.current = null;
-      setData(null);
+    const requestPromise = (async () => {
+      if (options.updateUrl !== false) {
+        const params = new URLSearchParams();
+        params.append("username", u1);
+        params.append("username", u2);
+        for (const language of sanitizedLanguages) {
+          params.append("selectedLanguage", language);
+        }
+        router.push(`/?${params.toString()}`, { scroll: false });
+      }
+
+      setLoading(true);
       setError(null);
-      return;
-    }
 
-    const last = lastFetchedPairRef.current;
-    if (last && last[0] === u1 && last[1] === u2) {
-      // URL already reflects the most recent fetch; nothing to do.
-      return;
-    }
+      try {
+        const requestParams = new URLSearchParams();
+        requestParams.append("username", u1);
+        requestParams.append("username", u2);
+        for (const language of sanitizedLanguages) {
+          requestParams.append("selectedLanguage", language);
+        }
 
-    void handleCompare(u1, u2);
-  });
+        const res = await fetch(`/api/compare?${requestParams.toString()}`);
+
+        const body: ApiResponse = await res.json();
+        if (!res.ok) {
+          setData(null);
+          setError(localizeErrorMessage(body.error, body.errorDetails));
+          return;
+        }
+        const users = normalizeUsers(body);
+
+        if (!body.success || !users) {
+          setData(null);
+          setError(localizeErrorMessage(body.error || "Comparison failed", body.errorDetails));
+          return;
+        }
+
+        const winnerUsername =
+          body.winner?.username ??
+          (users.user1.finalScore > users.user2.finalScore
+            ? users.user1.username
+            : users.user2.finalScore > users.user1.finalScore
+              ? users.user2.username
+              : undefined);
+
+        const nextData: ComparisonData = {
+          user1: { ...users.user1, isWinner: winnerUsername === users.user1.username },
+          user2: { ...users.user2, isWinner: winnerUsername === users.user2.username },
+          winner: body.winner,
+          languageWinner: body.languageWinner,
+          insights: body.insights,
+          scoreVersion: body.scoreVersion,
+        };
+
+        setData(nextData);
+        setDisplayData(nextData);
+      } catch (err: unknown) {
+        setData(null);
+        setError(localizeErrorMessage(err instanceof Error ? err.message : undefined));
+      } finally {
+        if (inFlightFetchKeyRef.current === fetchKey) {
+          inFlightFetchKeyRef.current = null;
+          inFlightPromiseRef.current = null;
+        }
+        setLoading(false);
+      }
+    })();
+
+    inFlightFetchKeyRef.current = fetchKey;
+    inFlightPromiseRef.current = requestPromise;
+
+    return requestPromise;
+  };
+
+  const syncToUrl = useEffectEvent(
+    (u1: string, u2: string, languages: string[]) => {
+      setUsername1(u1);
+      setUsername2(u2);
+      setSelectedLanguages(languages);
+
+      if (!u1 || !u2) {
+        lastFetchedKeyRef.current = null;
+        setData(null);
+        setError(null);
+        return;
+      }
+
+      const nextKey = createFetchKey(u1, u2, {
+        selectedLanguages: languages,
+      });
+
+      if (
+        lastFetchedKeyRef.current === nextKey &&
+        (data || inFlightFetchKeyRef.current === nextKey)
+      ) {
+        return;
+      }
+
+      void handleCompare(u1, u2, {
+        selectedLanguages: languages,
+        updateUrl: false,
+      });
+    },
+  );
 
   useEffect(() => {
     const params = searchParams.getAll("username");
-    syncToUrl(params[0] ?? "", params[1] ?? "");
+    const urlLanguages = sanitizeSelectedLanguages(searchParams.getAll("selectedLanguage"));
+    syncToUrl(
+      params[0] ?? "",
+      params[1] ?? "",
+      urlLanguages,
+    );
   }, [searchParams]);
 
+  useEffect(() => {
+    if (hideTimerRef.current !== null) {
+      window.clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+
+    if (data) {
+      setDisplayData(data);
+      return;
+    }
+
+    if (loading || !displayData) {
+      return;
+    }
+
+    hideTimerRef.current = window.setTimeout(() => {
+      setDisplayData(null);
+      hideTimerRef.current = null;
+    }, EXIT_ANIMATION_MS);
+
+    return () => {
+      if (hideTimerRef.current !== null) {
+        window.clearTimeout(hideTimerRef.current);
+        hideTimerRef.current = null;
+      }
+    };
+  }, [data, displayData, loading]);
+
   const skeleton = useMemo(() => <DashboardSkeleton />, []);
+  const isRefreshing = loading && Boolean(displayData);
+  const isExiting = !loading && !data && Boolean(displayData);
 
   const reset = () => {
+    setLoading(false);
     setData(null);
     setError(null);
+    inFlightFetchKeyRef.current = null;
+    inFlightPromiseRef.current = null;
     setUsername1("");
     setUsername2("");
+    setSelectedLanguages([]);
     router.push("/", { scroll: false });
   };
 
@@ -137,46 +328,77 @@ function HomePageInner() {
     setUsername2(nextUsername2);
     router.push(
       `/?username=${encodeURIComponent(nextUsername1)}&username=${encodeURIComponent(nextUsername2)}`,
-      { scroll: false }
+      { scroll: false },
     );
 
     if (!data) return;
-    setData((d) => ({ user1: d!.user2, user2: d!.user1 }));
+    setData((current) => (current ? { ...current, user1: current.user2, user2: current.user1 } : current));
   };
 
   return (
-    <main className="min-h-screen flex flex-col">
+    <main className="flex min-h-screen flex-col">
       <AppHeader />
 
       <div className="w-full flex-1 max-w-6xl mx-auto px-4 py-10 space-y-6">
         <CompareForm
           username1={username1}
           username2={username2}
+          selectedLanguages={selectedLanguages}
           setUsername1={setUsername1}
           setUsername2={setUsername2}
+          setSelectedLanguages={setSelectedLanguages}
           onSubmit={handleCompare}
           loading={loading}
           reset={reset}
           swapUsers={swapUsers}
           hasData={Boolean(data)}
+          error={error}
         />
 
-        {loading && skeleton}
-        {error && (
-          <div className="card border border-red-100 bg-red-50 p-4 text-sm text-red-600">
-            {error}
-          </div>
-        )}
+        <div className="relative min-h-[28rem]" aria-live="polite">
+          {displayData ? (
+            <div
+              className={cn(
+                "transition-all duration-300 ease-out",
+                isRefreshing
+                  ? "pointer-events-none scale-[0.99] opacity-55 blur-[1px] saturate-75"
+                  : isExiting
+                    ? "pointer-events-none -translate-y-2 scale-[0.99] opacity-0 blur-[2px]"
+                    : "opacity-100",
+              )}
+            >
+              <ResultDashboard
+                key={`${displayData.user1.username}-${displayData.user2.username}-${displayData.user1.finalScore}-${displayData.user2.finalScore}`}
+                user1={displayData.user1}
+                user2={displayData.user2}
+                winner={displayData.winner}
+                languageWinner={displayData.languageWinner}
+                insights={displayData.insights}
+                scoreVersion={displayData.scoreVersion}
+              />
+            </div>
+          ) : loading ? (
+            <div className="transition-all duration-300 ease-out">
+              {skeleton}
+            </div>
+          ) : null}
 
-        {data && <ResultDashboard user1={data.user1} user2={data.user2} />}
+          {loading && displayData ? (
+            <div className="pointer-events-none absolute inset-0 flex items-start justify-center pt-4">
+              <div className="rounded-full border border-border/70 bg-background/85 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground shadow-sm backdrop-blur">
+                {t("form.compare.ing")}
+              </div>
+            </div>
+          ) : null}
 
-        {!loading && !error && !data && (
-          <div className="flex flex-col items-center justify-center gap-4 py-20 text-center text-muted-foreground">
-            <BrandLogo size="xl" />
-            <p className="text-lg font-medium">{t("page.empty.title")}</p>
-            <p className="text-sm opacity-70">{t("page.empty.description")}</p>
-          </div>
-        )}
+          {!loading && !error && !displayData ? (
+            <div className="flex flex-col items-center justify-center gap-4 py-20 text-center text-muted-foreground animate-fadeIn">
+              <BrandLogo size="xl" />
+              <p className="text-lg font-medium">{t("page.empty.title")}</p>
+              <p className="text-sm opacity-70">{t("page.empty.description")}</p>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <AppFooter />
