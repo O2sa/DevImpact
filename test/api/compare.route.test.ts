@@ -99,13 +99,14 @@ describe("GET /api/compare", () => {
     const body = (await response.json()) as {
       success: boolean;
       error?: string;
-      errorDetails?: { code?: string; retryAfterSeconds?: number };
+      errorDetails?: { code?: string; retryAfterSeconds?: number; rateLimit?: unknown };
     };
 
     expect(response.status).toBe(429);
     expect(body.success).toBe(false);
     expect(body.errorDetails?.code).toBe("RATE_LIMITED");
-    expect(body.errorDetails?.retryAfterSeconds).toBe(60);
+    expect(body.errorDetails?.retryAfterSeconds).toBeUndefined();
+    expect(body.errorDetails?.rateLimit).toBeUndefined();
   });
 
   test("returns success payload when both users are processed", async () => {
@@ -154,5 +155,24 @@ describe("GET /api/compare", () => {
     expect(body.success).toBe(true);
     expect(body.users).toHaveLength(2);
     expect(body.winner?.username).toBe("user-a");
+  });
+
+  test("returns targeted username for not-found errors", async () => {
+    mocks.fetchGitHubUserData.mockRejectedValueOnce(new Error("User not found"));
+
+    const response = await GET(
+      makeRequest({
+        username: ["missing-user", "valid-user"],
+      }),
+    );
+    const body = (await response.json()) as {
+      success: boolean;
+      errorDetails?: { code?: string; targetUsernames?: string[] };
+    };
+
+    expect(response.status).toBe(404);
+    expect(body.success).toBe(false);
+    expect(body.errorDetails?.code).toBe("GITHUB_NOT_FOUND");
+    expect(body.errorDetails?.targetUsernames).toEqual(["missing-user"]);
   });
 });

@@ -18,6 +18,7 @@ export type SafeApiError = {
     | "UNKNOWN";
   message: string;
   retryAfterSeconds?: number;
+  targetUsernames?: string[];
   rateLimit?: {
     limit?: number;
     remaining?: number;

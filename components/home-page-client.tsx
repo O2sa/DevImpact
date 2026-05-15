@@ -2,6 +2,7 @@
 
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { CompareForm } from "../components/compare-form";
 import { ResultDashboard } from "../components/result-dashboard";
 import { DashboardSkeleton } from "../components/skeletons";
@@ -35,6 +36,11 @@ type ComparisonData = {
 type CompareOptions = {
   selectedLanguages: string[];
   updateUrl?: boolean;
+};
+
+type UsernameErrors = {
+  username1: string | null;
+  username2: string | null;
 };
 
 const EXIT_ANIMATION_MS = 240;
@@ -78,7 +84,11 @@ export function HomePageClient() {
     searchParams.getAll("selectedLanguage"),
   );
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [generalError, setGeneralError] = useState<string | null>(null);
+  const [usernameErrors, setUsernameErrors] = useState<UsernameErrors>({
+    username1: null,
+    username2: null,
+  });
   const [username1, setUsername1] = useState(initialUsername1);
   const [username2, setUsername2] = useState(initialUsername2);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
@@ -135,6 +145,66 @@ export function HomePageClient() {
     }
   };
 
+  const createNotFoundFieldMessage = (username: string): string => {
+    const localizedPrefix = t("error.userNotFound");
+    return `${localizedPrefix}: ${username}`;
+  };
+
+  const resetErrors = () => {
+    setGeneralError(null);
+    setUsernameErrors({
+      username1: null,
+      username2: null,
+    });
+  };
+
+  const applyApiError = (
+    requestUser1: string,
+    requestUser2: string,
+    body: ApiResponse,
+  ) => {
+    const details = body.errorDetails;
+    const localizedMessage = localizeErrorMessage(body.error, details);
+
+    if (details?.code === "GITHUB_NOT_FOUND" && details.targetUsernames?.length) {
+      const requestedUsernames = [
+        {
+          key: "username1" as const,
+          value: requestUser1,
+        },
+        {
+          key: "username2" as const,
+          value: requestUser2,
+        },
+      ];
+
+      const nextErrors: UsernameErrors = { username1: null, username2: null };
+
+      for (const targetUsername of details.targetUsernames) {
+        const normalizedTarget = targetUsername.trim().toLowerCase();
+        const match = requestedUsernames.find(
+          (entry) => entry.value.trim().toLowerCase() === normalizedTarget,
+        );
+
+        if (match) {
+          nextErrors[match.key] = createNotFoundFieldMessage(match.value);
+        }
+      }
+
+      if (nextErrors.username1 || nextErrors.username2) {
+        setUsernameErrors(nextErrors);
+        setGeneralError(null);
+        return;
+      }
+    }
+
+    setUsernameErrors({
+      username1: null,
+      username2: null,
+    });
+    setGeneralError(localizedMessage);
+  };
+
   const createFetchKey = (
     u1: string,
     u2: string,
@@ -172,7 +242,7 @@ export function HomePageClient() {
       }
 
       setLoading(true);
-      setError(null);
+      resetErrors();
 
       try {
         const requestParams = new URLSearchParams();
@@ -187,14 +257,14 @@ export function HomePageClient() {
         const body: ApiResponse = await res.json();
         if (!res.ok) {
           setData(null);
-          setError(localizeErrorMessage(body.error, body.errorDetails));
+          applyApiError(u1, u2, body);
           return;
         }
         const users = normalizeUsers(body);
 
         if (!body.success || !users) {
           setData(null);
-          setError(localizeErrorMessage(body.error || "Comparison failed", body.errorDetails));
+          applyApiError(u1, u2, body);
           return;
         }
 
@@ -219,7 +289,11 @@ export function HomePageClient() {
         setDisplayData(nextData);
       } catch (err: unknown) {
         setData(null);
-        setError(localizeErrorMessage(err instanceof Error ? err.message : undefined));
+        setUsernameErrors({
+          username1: null,
+          username2: null,
+        });
+        setGeneralError(localizeErrorMessage(err instanceof Error ? err.message : undefined));
       } finally {
         if (inFlightFetchKeyRef.current === fetchKey) {
           inFlightFetchKeyRef.current = null;
@@ -244,7 +318,7 @@ export function HomePageClient() {
       if (!u1 || !u2) {
         lastFetchedKeyRef.current = null;
         setData(null);
-        setError(null);
+        resetErrors();
         return;
       }
 
@@ -308,10 +382,24 @@ export function HomePageClient() {
   const isRefreshing = loading && Boolean(displayData);
   const isExiting = !loading && !data && Boolean(displayData);
 
+  const handleUsername1Change = (value: string) => {
+    setUsername1(value);
+    if (usernameErrors.username1) {
+      setUsernameErrors((current) => ({ ...current, username1: null }));
+    }
+  };
+
+  const handleUsername2Change = (value: string) => {
+    setUsername2(value);
+    if (usernameErrors.username2) {
+      setUsernameErrors((current) => ({ ...current, username2: null }));
+    }
+  };
+
   const reset = () => {
     setLoading(false);
     setData(null);
-    setError(null);
+    resetErrors();
     inFlightFetchKeyRef.current = null;
     inFlightPromiseRef.current = null;
     setUsername1("");
@@ -344,15 +432,16 @@ export function HomePageClient() {
           username1={username1}
           username2={username2}
           selectedLanguages={selectedLanguages}
-          setUsername1={setUsername1}
-          setUsername2={setUsername2}
+          setUsername1={handleUsername1Change}
+          setUsername2={handleUsername2Change}
           setSelectedLanguages={setSelectedLanguages}
           onSubmit={handleCompare}
           loading={loading}
           reset={reset}
           swapUsers={swapUsers}
           hasData={Boolean(data)}
-          error={error}
+          username1Error={usernameErrors.username1}
+          username2Error={usernameErrors.username2}
         />
 
         <div className="relative min-h-[28rem]" aria-live="polite">
@@ -391,11 +480,32 @@ export function HomePageClient() {
             </div>
           ) : null}
 
-          {!loading && !error && !displayData ? (
+          {!loading && !generalError && !displayData ? (
             <div className="flex flex-col items-center justify-center gap-4 py-20 text-center text-muted-foreground animate-fadeIn">
               <BrandLogo size="xl" />
               <p className="text-lg font-medium">{t("page.empty.title")}</p>
               <p className="text-sm opacity-70">{t("page.empty.description")}</p>
+            </div>
+          ) : null}
+
+          {!loading && generalError && !displayData ? (
+            <div className="mx-auto flex max-w-2xl animate-fadeIn flex-col items-center justify-center gap-5 rounded-3xl border border-destructive/25 bg-gradient-to-b from-destructive/10 via-destructive/5 to-background px-6 py-12 text-center shadow-sm">
+              <div className="rounded-2xl bg-background/70 p-2 ring-1 ring-destructive/20">
+                <Image
+                  src="/error-state.svg"
+                  alt=""
+                  aria-hidden="true"
+                  width={112}
+                  height={112}
+                  className="h-28 w-28"
+                />
+              </div>
+              <p className="text-xl font-semibold tracking-tight text-foreground">
+                {t("error.comparisonFailed")}
+              </p>
+              <p className="max-w-xl text-sm leading-7 text-muted-foreground md:text-base">
+                {generalError}
+              </p>
             </div>
           ) : null}
         </div>

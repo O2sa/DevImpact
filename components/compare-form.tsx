@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { Alert, AlertDescription } from "./ui/alert";
 import { useTranslation } from "./language-provider";
 import { cn } from "@/lib/utils";
 
@@ -46,7 +45,8 @@ type CompareFormProps = {
   loading?: boolean;
   reset?: () => void;
   swapUsers?: () => void;
-  error?: string | null;
+  username1Error?: string | null;
+  username2Error?: string | null;
 };
 
 export function CompareForm({
@@ -61,7 +61,8 @@ export function CompareForm({
   loading,
   swapUsers,
   reset,
-  error,
+  username1Error,
+  username2Error,
 }: CompareFormProps) {
   const { t } = useTranslation();
   const firstInputRef = useRef<HTMLInputElement>(null);
@@ -131,7 +132,14 @@ export function CompareForm({
                 value={username1}
                 onChange={(e) => setUsername1(e.target.value)}
                 aria-label={t("form.username1.label")}
+                aria-invalid={Boolean(username1Error)}
+                aria-describedby={username1Error ? "username1-error" : undefined}
               />
+              {username1Error ? (
+                <p id="username1-error" className="text-xs font-medium text-destructive">
+                  {username1Error}
+                </p>
+              ) : null}
             </div>
             <div className="space-y-1.5">
               <label htmlFor="username2" className="text-xs font-semibold text-muted-foreground">
@@ -144,7 +152,14 @@ export function CompareForm({
                 value={username2}
                 onChange={(e) => setUsername2(e.target.value)}
                 aria-label={t("form.username2.label")}
+                aria-invalid={Boolean(username2Error)}
+                aria-describedby={username2Error ? "username2-error" : undefined}
               />
+              {username2Error ? (
+                <p id="username2-error" className="text-xs font-medium text-destructive">
+                  {username2Error}
+                </p>
+              ) : null}
             </div>
           </div>
 
@@ -250,12 +265,6 @@ export function CompareForm({
               <RefreshCw className="h-4 w-4" />
             </Button>
           </div>
-
-          {error ? (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          ) : null}
         </CardContent>
       </Card>
     </form>

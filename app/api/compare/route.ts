@@ -3,7 +3,7 @@ import { fetchGitHubUserData } from "../../../lib/github";
 import { calculateUserScore } from "../../../lib/score";
 import { normalizeSelectedLanguages } from "@/lib/scoring/languageScoring";
 import { toSafeApiError } from "@/lib/github-graphql-client";
-import type { CompareInsights } from "@/types/api-response";
+import type { CompareInsights, SafeApiError } from "@/types/api-response";
 import {
   DEFAULT_LOCALE,
   LOCALE_COOKIE,
@@ -13,6 +13,18 @@ import {
 } from "@/lib/i18n-core";
 
 export const runtime = "nodejs";
+
+class CompareUserFetchError extends Error {
+  readonly username: string;
+  readonly causeError: unknown;
+
+  constructor(username: string, causeError: unknown) {
+    super(`Failed to fetch GitHub data for ${username}`);
+    this.name = "CompareUserFetchError";
+    this.username = username;
+    this.causeError = causeError;
+  }
+}
 
 type ComparedUserResult = {
   username: string;
@@ -35,6 +47,8 @@ type ComparedUserResult = {
   signals: ReturnType<typeof calculateUserScore>["signals"];
   explanations: ReturnType<typeof calculateUserScore>["explanations"];
 };
+
+type ClientSafeError = Pick<SafeApiError, "code" | "message" | "targetUsernames">;
 
 function parseSelectedLanguagesFromSearchParams(
   searchParams: URLSearchParams,
@@ -292,7 +306,13 @@ async function compareUsers(
   const results: ComparedUserResult[] = [];
 
   for (const username of usernames) {
-    const data = await fetchGitHubUserData(username);
+    let data: Awaited<ReturnType<typeof fetchGitHubUserData>>;
+    try {
+      data = await fetchGitHubUserData(username);
+    } catch (error: unknown) {
+      throw new CompareUserFetchError(username, error);
+    }
+
     const score = calculateUserScore(
       {
         ...data,
@@ -341,6 +361,14 @@ function toApiErrorStatus(code: ReturnType<typeof toSafeApiError>["code"]): numb
   }
 }
 
+function toClientSafeError(error: SafeApiError): ClientSafeError {
+  return {
+    code: error.code,
+    message: error.message,
+    targetUsernames: error.targetUsernames,
+  };
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const usernames = searchParams
@@ -364,16 +392,39 @@ export async function GET(request: Request) {
     return NextResponse.json({ success: true, users, ...winnerData, insights });
   } catch (error: unknown) {
     console.error("GitHub score error:", error);
-    const safeError =
-      error instanceof Error && error.message === "User not found"
-        ? { code: "GITHUB_NOT_FOUND" as const, message: "GitHub user not found" }
-        : toSafeApiError(error);
+
+    let safeError: SafeApiError;
+
+    if (error instanceof CompareUserFetchError) {
+      const mappedCause = toSafeApiError(error.causeError);
+      if (
+        mappedCause.code === "GITHUB_NOT_FOUND" ||
+        (error.causeError instanceof Error &&
+          error.causeError.message === "User not found")
+      ) {
+        safeError = {
+          code: "GITHUB_NOT_FOUND",
+          message: "GitHub user not found",
+          targetUsernames: [error.username],
+          rateLimit: mappedCause.rateLimit,
+        };
+      } else {
+        safeError = mappedCause;
+      }
+    } else {
+      safeError =
+        error instanceof Error && error.message === "User not found"
+          ? { code: "GITHUB_NOT_FOUND", message: "GitHub user not found" }
+          : toSafeApiError(error);
+    }
+
+    const clientSafeError = toClientSafeError(safeError);
 
     return NextResponse.json(
       {
         success: false,
-        error: safeError.message,
-        errorDetails: safeError,
+        error: clientSafeError.message,
+        errorDetails: clientSafeError,
       },
       { status: toApiErrorStatus(safeError.code) },
     );
