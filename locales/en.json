@@ -79,6 +79,7 @@
   "footer.tagline": "Sharper insights. Faster evaluation.",
   "form.compare": "Compare",
   "form.compare.ing": "Comparing...",
+  "form.header.eyebrow": "Developer Impact",
   "form.enterTwo": "Enter two GitHub usernames to compare their developer metrics",
   "form.insights.toggle": "Generate insights",
   "form.languages.clear": "Clear languages",

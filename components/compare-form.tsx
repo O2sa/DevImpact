@@ -111,8 +111,11 @@ export function CompareForm({
     <form onSubmit={submit}>
       <Card className="border-0 p-6 shadow-lg backdrop-blur-sm">
         <CardHeader className="pb-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary/80">
+            {t("form.header.eyebrow")}
+          </p>
           <CardTitle>{t("app.title")}</CardTitle>
-          <CardDescription>{t("app.subtitle")}</CardDescription>
+          <CardDescription>{t("form.enterTwo")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="grid gap-3 md:grid-cols-2">

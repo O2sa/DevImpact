@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="DevImpact GitHub developer comparison">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#0b1220"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="90" y="90" width="1020" height="450" rx="28" fill="#0f1a2f" stroke="#1e293b" stroke-width="2"/>
+  <text x="140" y="195" fill="#e2e8f0" font-family="Segoe UI, Arial, sans-serif" font-size="64" font-weight="700">DevImpact</text>
+  <text x="140" y="255" fill="#94a3b8" font-family="Segoe UI, Arial, sans-serif" font-size="34">GitHub Developer Comparison</text>
+  <text x="140" y="305" fill="#94a3b8" font-family="Segoe UI, Arial, sans-serif" font-size="30">Repository • PR • Community Impact</text>
+
+  <rect x="140" y="360" width="920" height="16" rx="8" fill="#1f2937"/>
+  <rect x="140" y="360" width="515" height="16" rx="8" fill="url(#accent)"/>
+
+  <text x="140" y="432" fill="#cbd5e1" font-family="Segoe UI, Arial, sans-serif" font-size="26">Transparent scoring for open-source impact</text>
+  <text x="140" y="474" fill="#64748b" font-family="Segoe UI, Arial, sans-serif" font-size="22">devimpact.osamamabkhot.dev</text>
+</svg>

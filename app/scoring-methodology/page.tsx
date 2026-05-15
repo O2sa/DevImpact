@@ -1,110 +1,74 @@
-"use client";
+import type { Metadata } from "next";
+import { JsonLd } from "@/components/seo/json-ld";
+import { ScoringMethodologyPageClient } from "@/components/scoring-methodology-page-client";
+import { toAbsoluteUrl } from "@/lib/seo";
 
-import { ArrowLeft } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { AppHeader } from "@/components/app-header";
-import { AppFooter } from "@/components/app-footer";
-import { useTranslation } from "@/components/language-provider";
-import { ScoringMethodologyFlow } from "@/components/scoring/scoring-methodology-flow";
-import { ScoringMethodologySection } from "@/components/scoring/scoring-methodology-section";
+export const metadata: Metadata = {
+  title: "Scoring Methodology",
+  description:
+    "Understand the DevImpact scoring algorithm in detail, including repo score, PR score, contribution score, normalization, and weighting.",
+  alternates: {
+    canonical: "/scoring-methodology",
+  },
+  openGraph: {
+    title: "DevImpact Scoring Methodology",
+    description:
+      "Learn how DevImpact calculates GitHub developer comparison scores with transparent formulas and weighting.",
+    url: "/scoring-methodology",
+    images: [
+      {
+        url: toAbsoluteUrl("/og-image.svg"),
+        width: 1200,
+        height: 630,
+        alt: "DevImpact scoring methodology overview",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DevImpact Scoring Methodology",
+    description:
+      "Detailed breakdown of repository, pull request, contribution, and final score calculations.",
+    images: [toAbsoluteUrl("/og-image.svg")],
+  },
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "How does DevImpact calculate final score?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "DevImpact uses a weighted formula: finalScore = repoScore * 0.45 + prScore * 0.45 + contributionScore * 0.10.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What signals are included in repository score?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Repository score uses stars, forks, watchers, recency/activity factors, and ranking weights with diminishing impact after top repositories.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How does DevImpact prevent score gaming?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The algorithm applies fork penalties, PR size penalties, diminishing returns for repeated contributions, and caps contribution score so it cannot dominate the final result.",
+      },
+    },
+  ],
+};
 
 export default function ScoringMethodologyPage() {
-  const { t, dir } = useTranslation();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const backIconClass = dir === "rtl" ? "rotate-180" : "";
-
-  const handleBack = () => {
-    const query = searchParams.toString();
-    if (query) {
-      router.push(`/?${query}`);
-      return;
-    }
-
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      router.back();
-      return;
-    }
-
-    router.push("/");
-  };
-
   return (
-    <main className="flex min-h-screen flex-col">
-      <AppHeader />
-      <div className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-10">
-        <button
-          type="button"
-          onClick={handleBack}
-          className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
-          aria-label={t("methodology.back")}
-        >
-          <ArrowLeft className={`h-4 w-4 ${backIconClass}`} />
-          {t("methodology.back")}
-        </button>
-
-        <header className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">{t("methodology.title")}</h1>
-          <p className="max-w-3xl text-sm text-muted-foreground">
-            {t("methodology.intro")}
-          </p>
-        </header>
-
-        <ScoringMethodologyFlow />
-
-        <section className="grid gap-4 lg:grid-cols-2">
-          <ScoringMethodologySection
-            title={t("methodology.sections.components.title")}
-            points={[
-              t("methodology.sections.components.repo"),
-              t("methodology.sections.components.pr"),
-              t("methodology.sections.components.contribution"),
-              t("methodology.sections.components.final"),
-            ]}
-          />
-          <ScoringMethodologySection
-            title={t("methodology.sections.weights.title")}
-            description={t("methodology.sections.weights.description")}
-            points={[
-              t("methodology.sections.weights.formula"),
-              t("methodology.sections.weights.repoWeight"),
-              t("methodology.sections.weights.prWeight"),
-              t("methodology.sections.weights.contributionWeight"),
-            ]}
-          />
-          <ScoringMethodologySection
-            title={t("methodology.sections.diminishing.title")}
-            points={[
-              t("methodology.sections.diminishing.repo"),
-              t("methodology.sections.diminishing.pr"),
-            ]}
-          />
-          <ScoringMethodologySection
-            title={t("methodology.sections.adjustments.title")}
-            points={[
-              t("methodology.sections.adjustments.fork"),
-              t("methodology.sections.adjustments.activity"),
-              t("methodology.sections.adjustments.size"),
-              t("methodology.sections.adjustments.contributionCap"),
-            ]}
-          />
-          <ScoringMethodologySection
-            title={t("methodology.sections.normalization.title")}
-            points={[
-              t("methodology.sections.normalization.formula"),
-              t("methodology.sections.normalization.usage"),
-            ]}
-          />
-          <ScoringMethodologySection
-            title={t("methodology.sections.signals.title")}
-            points={[
-              t("methodology.sections.signals.purpose"),
-              t("methodology.sections.signals.examples"),
-            ]}
-          />
-        </section>
-      </div>
-      <AppFooter />
-    </main>
+    <>
+      <JsonLd data={faqSchema} />
+      <ScoringMethodologyPageClient />
+    </>
   );
 }
