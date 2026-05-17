@@ -9,22 +9,59 @@ import { GithubLink } from "./github-link";
 
 const emptySubscribe = () => () => { };
 
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (callback: () => void) => { finished: Promise<void> };
+};
+
 export function ThemeToggle() {
   const { t } = useTranslation();
   const { theme, setTheme, resolvedTheme } = useTheme();
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
-  const THEME_TRANSITION_MS = 520;
+  const getThemeTransitionMs = () => {
+    if (typeof window === "undefined") {
+      return 420;
+    }
+
+    const value = window
+      .getComputedStyle(document.documentElement)
+      .getPropertyValue("--theme-transition-duration")
+      .trim();
+
+    if (!value) {
+      return 420;
+    }
+
+    const numeric = Number.parseFloat(value);
+    if (!Number.isFinite(numeric)) {
+      return 420;
+    }
+
+    return value.endsWith("ms") ? Math.round(numeric) + 60 : Math.round(numeric * 1000) + 60;
+  };
 
   const current = resolvedTheme || theme || "light";
   const next = current === "light" ? "dark" : "light";
 
   const handleToggle = () => {
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const doc = document as ViewTransitionDocument;
+    if (doc.startViewTransition && !prefersReducedMotion) {
+      doc.startViewTransition(() => {
+        setTheme(next);
+      });
+      return;
+    }
+
     if (typeof document !== "undefined") {
       const root = document.documentElement;
+      const transitionMs = getThemeTransitionMs();
       root.classList.add("theme-transition");
       window.setTimeout(() => {
         root.classList.remove("theme-transition");
-      }, THEME_TRANSITION_MS);
+      }, transitionMs);
     }
 
     requestAnimationFrame(() => {

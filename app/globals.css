@@ -4,6 +4,8 @@
 
 :root {
   color-scheme: light;
+  --theme-transition-duration: 420ms;
+  --theme-transition-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --background: 210 40% 98%;
   --foreground: 222 47% 11%;
   --card: 0 0% 100%;
@@ -52,19 +54,48 @@
 body {
   @apply bg-background text-foreground antialiased;
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  background-color: hsl(var(--background));
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity calc(var(--theme-transition-duration) + 120ms) var(--theme-transition-ease);
+}
+
+body::before {
   background-image:
     radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08), transparent 35%),
     radial-gradient(circle at 80% 0%, rgba(168, 85, 247, 0.08), transparent 30%),
     linear-gradient(180deg, #f8fbff 0%, #f2f5f9 40%, #f9fafb 100%);
-  min-height: 100vh;
+  opacity: 1;
 }
 
-.dark body {
-  @apply bg-background text-foreground;
+body::after {
   background-image:
     radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08), transparent 35%),
     radial-gradient(circle at 80% 0%, rgba(124, 58, 237, 0.12), transparent 30%),
     linear-gradient(180deg, #0f172a 0%, #0b1221 40%, #0a0f1c 100%);
+  opacity: 0;
+}
+
+.dark body {
+  @apply bg-background text-foreground;
+}
+
+.dark body::before {
+  opacity: 0;
+}
+
+.dark body::after {
+  opacity: 1;
 }
 
 .card {
@@ -83,9 +114,15 @@ html.theme-transition,
 html.theme-transition *,
 html.theme-transition *::before,
 html.theme-transition *::after {
-  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
-  transition-duration: 460ms;
-  transition-timing-function: cubic-bezier(0.32, 0, 0.2, 1);
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity, backdrop-filter;
+  transition-duration: var(--theme-transition-duration);
+  transition-timing-function: var(--theme-transition-ease);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--theme-transition-duration);
+  animation-timing-function: var(--theme-transition-ease);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -94,5 +131,10 @@ html.theme-transition *::after {
   html.theme-transition *::before,
   html.theme-transition *::after {
     transition: none !important;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
   }
 }
