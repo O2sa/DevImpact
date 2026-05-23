@@ -1,4 +1,4 @@
-export const supportedLocales = ["en", "ar"] as const;
+export const supportedLocales = ["en", "ar", "vi"] as const;
 export type Locale = (typeof supportedLocales)[number];
 export const DEFAULT_LOCALE: Locale = "en";
 export const LOCALE_COOKIE = "app-locale";
@@ -6,6 +6,7 @@ export const LOCALE_COOKIE = "app-locale";
 export const localeMeta: Record<Locale, { dir: "ltr" | "rtl"; label: string }> = {
   en: { dir: "ltr", label: "English" },
   ar: { dir: "rtl", label: "\u0627\u0644\u0639\u0631\u0628\u064a\u0629" },
+  vi: { dir: "ltr", label: "Ti\u1ebfng Vi\u1ec7t" },
 };
 
 export function isSupportedLocale(value: string | null | undefined): value is Locale {

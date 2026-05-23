@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import arMessages from "../locales/ar.json";
 import enMessages from "../locales/en.json";
+import viMessages from "../locales/vi.json";
 import {
   DEFAULT_LOCALE,
   LOCALE_COOKIE,
@@ -26,6 +27,7 @@ const cookieMaxAge = 60 * 60 * 24 * 365;
 const messagesByLocale: Record<Locale, Messages> = {
   en: enMessages,
   ar: arMessages,
+  vi: viMessages,
 };
 
 async function loadMessages(locale: Locale): Promise<Messages> {
