@@ -11,10 +11,16 @@ export function AppHeader() {
           <BrandLogo priority size="md" />
         </Link>
 
-        <div className="flex gap-4">
+        <nav className="flex items-center gap-4">
+          <Link
+            href="/leaderboard"
+            className="hidden rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:inline-flex"
+          >
+            Leaderboard
+          </Link>
           <LanguageSwitcher />
           <ThemeToggle />
-        </div>
+        </nav>
       </div>
     </header>
   );

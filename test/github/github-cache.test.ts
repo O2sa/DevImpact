@@ -35,7 +35,7 @@ function makeExecutor(
         await new Promise((resolve) => setTimeout(resolve, delayMs));
       }
 
-      if (params.operationName === "FetchUserAndPullRequests") {
+      if (params.operationName === "FetchUser") {
         return {
           user: {
             name: "User Name",
@@ -63,6 +63,11 @@ function makeExecutor(
               totalIssueContributions: 0,
             },
           },
+        } as unknown as TData;
+      }
+
+      if (params.operationName === "FetchUserPullRequests") {
+        return {
           pullRequests: {
             nodes: [
               {
@@ -83,6 +88,7 @@ function makeExecutor(
                 },
               },
             ],
+            pageInfo: { hasNextPage: false, endCursor: null },
           },
         } as unknown as TData;
       }
@@ -102,6 +108,7 @@ function makeExecutor(
                 },
               },
             ],
+            pageInfo: { hasNextPage: false, endCursor: null },
           },
         } as unknown as TData;
       }
@@ -121,6 +128,7 @@ function makeExecutor(
                 },
               },
             ],
+            pageInfo: { hasNextPage: false, endCursor: null },
           },
         } as unknown as TData;
       }
@@ -224,7 +232,7 @@ describe("GitHub user data caching", () => {
 
     const result = await fetcher("TeStUser");
     expect(isGitHubUserData(result)).toBe(true);
-    expect(calls).toHaveLength(3);
+    expect(calls).toHaveLength(4);
     expect(setCalls).toHaveLength(1);
     expect(setCalls[0]?.ttl).toBe(604_800);
     expect(setCalls[0]?.key).toBe("devimpact:v1:github-user:testuser");
@@ -247,7 +255,7 @@ describe("GitHub user data caching", () => {
 
     const result = await fetcher("testuser");
     expect(result.name).toBe("User Name");
-    expect(calls).toHaveLength(3);
+    expect(calls).toHaveLength(4);
   });
 
   test("cache write failure does not fail request", async () => {
@@ -268,7 +276,7 @@ describe("GitHub user data caching", () => {
 
     const result = await fetcher("testuser");
     expect(result.pullRequests).toHaveLength(1);
-    expect(calls).toHaveLength(3);
+    expect(calls).toHaveLength(4);
   });
 
   test("corrupted cache payload is treated as miss", async () => {
@@ -290,7 +298,7 @@ describe("GitHub user data caching", () => {
 
     const result = await fetcher("testuser");
     expect(result.name).toBe("User Name");
-    expect(calls).toHaveLength(3);
+    expect(calls).toHaveLength(4);
     expect(deleted).toEqual(["devimpact:v1:github-user:testuser"]);
   });
 
@@ -313,7 +321,7 @@ describe("GitHub user data caching", () => {
     ]);
 
     expect(first.avatarUrl).toBe(second.avatarUrl);
-    expect(calls).toHaveLength(3);
+    expect(calls).toHaveLength(4);
   });
 
   test("default cache TTL is seven days", () => {

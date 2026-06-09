@@ -1,0 +1,606 @@
+[
+  {
+    "slug": "afghanistan",
+    "title": "Afghanistan"
+  },
+  {
+    "slug": "albania",
+    "title": "Albania"
+  },
+  {
+    "slug": "algeria",
+    "title": "Algeria"
+  },
+  {
+    "slug": "angola",
+    "title": "Angola"
+  },
+  {
+    "slug": "argentina",
+    "title": "Argentina"
+  },
+  {
+    "slug": "armenia",
+    "title": "Armenia"
+  },
+  {
+    "slug": "australia",
+    "title": "Australia"
+  },
+  {
+    "slug": "austria",
+    "title": "Austria"
+  },
+  {
+    "slug": "azerbaijan",
+    "title": "Azerbaijan"
+  },
+  {
+    "slug": "bahrain",
+    "title": "Bahrain"
+  },
+  {
+    "slug": "bangladesh",
+    "title": "Bangladesh"
+  },
+  {
+    "slug": "belarus",
+    "title": "Belarus"
+  },
+  {
+    "slug": "belgium",
+    "title": "Belgium"
+  },
+  {
+    "slug": "benin",
+    "title": "Benin"
+  },
+  {
+    "slug": "bolivia",
+    "title": "Bolivia"
+  },
+  {
+    "slug": "bosnia_and_herzegovina",
+    "title": "Bosnia and Herzegovina"
+  },
+  {
+    "slug": "botswana",
+    "title": "Botswana"
+  },
+  {
+    "slug": "brazil",
+    "title": "Brazil"
+  },
+  {
+    "slug": "bulgaria",
+    "title": "Bulgaria"
+  },
+  {
+    "slug": "burkina_faso",
+    "title": "Burkina Faso"
+  },
+  {
+    "slug": "burundi",
+    "title": "Burundi"
+  },
+  {
+    "slug": "cambodia",
+    "title": "Cambodia"
+  },
+  {
+    "slug": "cameroon",
+    "title": "Cameroon"
+  },
+  {
+    "slug": "canada",
+    "title": "Canada"
+  },
+  {
+    "slug": "chad",
+    "title": "Chad"
+  },
+  {
+    "slug": "chile",
+    "title": "Chile"
+  },
+  {
+    "slug": "china",
+    "title": "China"
+  },
+  {
+    "slug": "colombia",
+    "title": "Colombia"
+  },
+  {
+    "slug": "costa_rica",
+    "title": "Costa Rica"
+  },
+  {
+    "slug": "croatia",
+    "title": "Croatia"
+  },
+  {
+    "slug": "cuba",
+    "title": "Cuba"
+  },
+  {
+    "slug": "cyprus",
+    "title": "Cyprus"
+  },
+  {
+    "slug": "czech_republic",
+    "title": "Czech Republic"
+  },
+  {
+    "slug": "congo_kinshasa",
+    "title": "Democratic Republic of the Congo"
+  },
+  {
+    "slug": "denmark",
+    "title": "Denmark"
+  },
+  {
+    "slug": "dominican_republic",
+    "title": "Dominican Republic"
+  },
+  {
+    "slug": "ecuador",
+    "title": "Ecuador"
+  },
+  {
+    "slug": "egypt",
+    "title": "Egypt"
+  },
+  {
+    "slug": "el_salvador",
+    "title": "El Salvador"
+  },
+  {
+    "slug": "estonia",
+    "title": "Estonia"
+  },
+  {
+    "slug": "ethiopia",
+    "title": "Ethiopia"
+  },
+  {
+    "slug": "finland",
+    "title": "Finland"
+  },
+  {
+    "slug": "france",
+    "title": "France"
+  },
+  {
+    "slug": "gabon",
+    "title": "Gabon"
+  },
+  {
+    "slug": "georgia",
+    "title": "Georgia"
+  },
+  {
+    "slug": "germany",
+    "title": "Germany"
+  },
+  {
+    "slug": "ghana",
+    "title": "Ghana"
+  },
+  {
+    "slug": "greece",
+    "title": "Greece"
+  },
+  {
+    "slug": "guatemala",
+    "title": "Guatemala"
+  },
+  {
+    "slug": "guinea",
+    "title": "Guinea"
+  },
+  {
+    "slug": "haiti",
+    "title": "Haiti"
+  },
+  {
+    "slug": "honduras",
+    "title": "Honduras"
+  },
+  {
+    "slug": "hong_kong",
+    "title": "Hong Kong"
+  },
+  {
+    "slug": "hungary",
+    "title": "Hungary"
+  },
+  {
+    "slug": "india",
+    "title": "India"
+  },
+  {
+    "slug": "indonesia",
+    "title": "Indonesia"
+  },
+  {
+    "slug": "iran",
+    "title": "Iran"
+  },
+  {
+    "slug": "iraq",
+    "title": "Iraq"
+  },
+  {
+    "slug": "ireland",
+    "title": "Ireland"
+  },
+  {
+    "slug": "israel",
+    "title": "Israel"
+  },
+  {
+    "slug": "italy",
+    "title": "Italy"
+  },
+  {
+    "slug": "ivory_coast",
+    "title": "Ivory Coast"
+  },
+  {
+    "slug": "japan",
+    "title": "Japan"
+  },
+  {
+    "slug": "jordan",
+    "title": "Jordan"
+  },
+  {
+    "slug": "kazakhstan",
+    "title": "Kazakhstan"
+  },
+  {
+    "slug": "kenya",
+    "title": "Kenya"
+  },
+  {
+    "slug": "kosovo",
+    "title": "Kosovo"
+  },
+  {
+    "slug": "kurdistan",
+    "title": "Kurdistan"
+  },
+  {
+    "slug": "kyrgyzstan",
+    "title": "Kyrgyzstan"
+  },
+  {
+    "slug": "laos",
+    "title": "Laos"
+  },
+  {
+    "slug": "latvia",
+    "title": "Latvia"
+  },
+  {
+    "slug": "lebanon",
+    "title": "Lebanon"
+  },
+  {
+    "slug": "libya",
+    "title": "Libya"
+  },
+  {
+    "slug": "lithuania",
+    "title": "Lithuania"
+  },
+  {
+    "slug": "luxembourg",
+    "title": "Luxembourg"
+  },
+  {
+    "slug": "macau",
+    "title": "Macau"
+  },
+  {
+    "slug": "madagascar",
+    "title": "Madagascar"
+  },
+  {
+    "slug": "malawi",
+    "title": "Malawi"
+  },
+  {
+    "slug": "malaysia",
+    "title": "Malaysia"
+  },
+  {
+    "slug": "mali",
+    "title": "Mali"
+  },
+  {
+    "slug": "malta",
+    "title": "Malta"
+  },
+  {
+    "slug": "mauritania",
+    "title": "Mauritania"
+  },
+  {
+    "slug": "mauritius",
+    "title": "Mauritius"
+  },
+  {
+    "slug": "mexico",
+    "title": "Mexico"
+  },
+  {
+    "slug": "moldova",
+    "title": "Moldova"
+  },
+  {
+    "slug": "morocco",
+    "title": "Morocco"
+  },
+  {
+    "slug": "mozambique",
+    "title": "Mozambique"
+  },
+  {
+    "slug": "myanmar",
+    "title": "Myanmar"
+  },
+  {
+    "slug": "nepal",
+    "title": "Nepal"
+  },
+  {
+    "slug": "netherlands",
+    "title": "Netherlands"
+  },
+  {
+    "slug": "new_zealand",
+    "title": "New Zealand"
+  },
+  {
+    "slug": "nicaragua",
+    "title": "Nicaragua"
+  },
+  {
+    "slug": "niger",
+    "title": "Niger"
+  },
+  {
+    "slug": "nigeria",
+    "title": "Nigeria"
+  },
+  {
+    "slug": "macedonia",
+    "title": "North Macedonia"
+  },
+  {
+    "slug": "norway",
+    "title": "Norway"
+  },
+  {
+    "slug": "oman",
+    "title": "Oman"
+  },
+  {
+    "slug": "pakistan",
+    "title": "Pakistan"
+  },
+  {
+    "slug": "palestine",
+    "title": "Palestine"
+  },
+  {
+    "slug": "panama",
+    "title": "Panama"
+  },
+  {
+    "slug": "papua_new_guinea",
+    "title": "Papua New Guinea"
+  },
+  {
+    "slug": "paraguay",
+    "title": "Paraguay"
+  },
+  {
+    "slug": "peru",
+    "title": "Peru"
+  },
+  {
+    "slug": "philippines",
+    "title": "Philippines"
+  },
+  {
+    "slug": "poland",
+    "title": "Poland"
+  },
+  {
+    "slug": "portugal",
+    "title": "Portugal"
+  },
+  {
+    "slug": "qatar",
+    "title": "Qatar"
+  },
+  {
+    "slug": "south_korea",
+    "title": "Republic of Korea"
+  },
+  {
+    "slug": "congo_brazzaville",
+    "title": "Republic of the Congo"
+  },
+  {
+    "slug": "romania",
+    "title": "Romania"
+  },
+  {
+    "slug": "russia",
+    "title": "Russia"
+  },
+  {
+    "slug": "rwanda",
+    "title": "Rwanda"
+  },
+  {
+    "slug": "saudi_arabia",
+    "title": "Saudi Arabia"
+  },
+  {
+    "slug": "senegal",
+    "title": "Senegal"
+  },
+  {
+    "slug": "serbia",
+    "title": "Serbia"
+  },
+  {
+    "slug": "sierra_leone",
+    "title": "Sierra Leone"
+  },
+  {
+    "slug": "singapore",
+    "title": "Singapore"
+  },
+  {
+    "slug": "slovakia",
+    "title": "Slovakia"
+  },
+  {
+    "slug": "slovenia",
+    "title": "Slovenia"
+  },
+  {
+    "slug": "somalia",
+    "title": "Somalia"
+  },
+  {
+    "slug": "south_africa",
+    "title": "South Africa"
+  },
+  {
+    "slug": "south_sudan",
+    "title": "South Sudan"
+  },
+  {
+    "slug": "spain",
+    "title": "Spain"
+  },
+  {
+    "slug": "sri_lanka",
+    "title": "Sri Lanka"
+  },
+  {
+    "slug": "sudan",
+    "title": "Sudan"
+  },
+  {
+    "slug": "suriname",
+    "title": "Suriname"
+  },
+  {
+    "slug": "sweden",
+    "title": "Sweden"
+  },
+  {
+    "slug": "switzerland",
+    "title": "Switzerland"
+  },
+  {
+    "slug": "syria",
+    "title": "Syria"
+  },
+  {
+    "slug": "taiwan",
+    "title": "Taiwan"
+  },
+  {
+    "slug": "tajikistan",
+    "title": "Tajikistan"
+  },
+  {
+    "slug": "tanzania",
+    "title": "Tanzania"
+  },
+  {
+    "slug": "thailand",
+    "title": "Thailand"
+  },
+  {
+    "slug": "the_bahamas",
+    "title": "The Bahamas"
+  },
+  {
+    "slug": "togo",
+    "title": "Togo"
+  },
+  {
+    "slug": "tunisia",
+    "title": "Tunisia"
+  },
+  {
+    "slug": "turkey",
+    "title": "Turkey"
+  },
+  {
+    "slug": "turkmenistan",
+    "title": "Turkmenistan"
+  },
+  {
+    "slug": "uganda",
+    "title": "Uganda"
+  },
+  {
+    "slug": "ukraine",
+    "title": "Ukraine"
+  },
+  {
+    "slug": "uae",
+    "title": "United Arab Emirates"
+  },
+  {
+    "slug": "uk",
+    "title": "United Kingdom"
+  },
+  {
+    "slug": "united_states",
+    "title": "United States"
+  },
+  {
+    "slug": "uruguay",
+    "title": "Uruguay"
+  },
+  {
+    "slug": "uzbekistan",
+    "title": "Uzbekistan"
+  },
+  {
+    "slug": "venezuela",
+    "title": "Venezuela"
+  },
+  {
+    "slug": "vietnam",
+    "title": "Vietnam"
+  },
+  {
+    "slug": "worldwide",
+    "title": "Worldwide"
+  },
+  {
+    "slug": "yemen",
+    "title": "Yemen"
+  },
+  {
+    "slug": "zambia",
+    "title": "Zambia"
+  },
+  {
+    "slug": "zimbabwe",
+    "title": "Zimbabwe"
+  }
+]
