@@ -5,7 +5,6 @@ import { useTheme } from "next-themes";
 import { useSyncExternalStore } from "react";
 import { useTranslation } from "./language-provider";
 import { Button } from "./ui/button";
-import { GithubLink } from "./github-link";
 
 const emptySubscribe = () => () => { };
 
@@ -81,7 +80,6 @@ export function ThemeToggle() {
       >
         {mounted && current === "dark" ? <Sun size={16} /> : <Moon size={16} />}
       </Button>
-      <GithubLink variant="compact" />
     </div>
   );
 }

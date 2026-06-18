@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { GithubLink } from "@/components/github-link";
 
 export function AppHeader() {
   return (
@@ -11,9 +12,10 @@ export function AppHeader() {
           <BrandLogo priority size="md" />
         </Link>
 
-        <div className="flex gap-4">
+        <div className="flex gap-4 [&>*:last-child]:-ml-4">
           <LanguageSwitcher />
           <ThemeToggle />
+          <GithubLink variant="compact" />
         </div>
       </div>
     </header>
