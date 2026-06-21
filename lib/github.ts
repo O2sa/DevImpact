@@ -16,7 +16,7 @@ import type {
 
 type Logger = Pick<Console, "info" | "warn">;
 
-type GitHubRawUser = {
+type GitHubRawUser = { 
   name: string | null;
   avatarUrl: string;
   repositories: { nodes: Array<RepoNode | null> };
@@ -70,6 +70,31 @@ export type GitHubFetcherDependencies = {
   cacheConfig: Pick<CacheConfig, "namespace" | "ttlSeconds">;
   logger?: Logger;
 };
+
+const DEFAULT_GITHUB_REPO_COUNT = 30;
+const DEFAULT_GITHUB_PR_COUNT = 80;
+const DEFAULT_GITHUB_ISSUE_COUNT = 20;
+const DEFAULT_GITHUB_DISCUSSION_COUNT = 10;
+
+
+const MAX_GITHUB_REPO_COUNT = 100;
+const MAX_GITHUB_PR_COUNT = 100;
+const MAX_GITHUB_ISSUE_COUNT = 100;
+const MAX_GITHUB_DISCUSSION_COUNT = 100;
+
+export function parseCountEnv(
+  value: string | undefined,
+  fallback: number,
+  maxValue: number,
+): number{
+
+  const parsed = Number.parseInt(value ?? "", 10);
+  if(!Number.isInteger(parsed)|| parsed<=0){
+    return fallback;
+  }
+  return Math.min(parsed, maxValue);
+
+}
 
 const USER_AND_PULL_REQUESTS_QUERY = /* GraphQL */ `
   query FetchUserAndPullRequests(
@@ -275,6 +300,8 @@ export function buildGitHubUserCacheKey(
   return `${namespace}:github-user:${normalizeGitHubUsername(username)}`;
 }
 
+
+
 async function fetchUserDataFromGitHub(
   executor: GitHubQueryExecutor,
   username: string,
@@ -282,6 +309,31 @@ async function fetchUserDataFromGitHub(
   const externalPrQuery = `type:pr is:merged author:${username} -user:${username}`;
   const externalIssueQuery = `type:issue author:${username} -user:${username}`;
   const externalDiscussionQuery = `author:${username} -user:${username}`;
+
+  
+const repoCount = parseCountEnv(
+  process.env.GITHUB_REPO_COUNT,
+  DEFAULT_GITHUB_REPO_COUNT,
+  MAX_GITHUB_REPO_COUNT,
+);
+
+const prCount = parseCountEnv(
+  process.env.GITHUB_PR_COUNT,
+  DEFAULT_GITHUB_PR_COUNT,
+  MAX_GITHUB_PR_COUNT,
+);
+
+const issueCount = parseCountEnv(
+  process.env.GITHUB_ISSUE_COUNT,
+  DEFAULT_GITHUB_ISSUE_COUNT,
+  MAX_GITHUB_ISSUE_COUNT,
+);
+
+const discussionCount = parseCountEnv(
+  process.env.GITHUB_DISCUSSION_COUNT,
+  DEFAULT_GITHUB_DISCUSSION_COUNT,
+  MAX_GITHUB_DISCUSSION_COUNT,
+);
 
   const userAndPrResponse =
     await executor.execute<
@@ -297,8 +349,8 @@ async function fetchUserDataFromGitHub(
       query: USER_AND_PULL_REQUESTS_QUERY,
       variables: {
         login: username,
-        repoCount: 30,
-        prCount: 80,
+        repoCount,
+        prCount,
         externalPrQuery,
       },
     });
@@ -319,7 +371,7 @@ async function fetchUserDataFromGitHub(
       operationName: "FetchUserIssues",
       query: ISSUES_QUERY,
       variables: {
-        issueCount: 20,
+        issueCount,
         externalIssueQuery,
       },
     }),
@@ -333,7 +385,7 @@ async function fetchUserDataFromGitHub(
       operationName: "FetchUserDiscussions",
       query: DISCUSSIONS_QUERY,
       variables: {
-        discussionCount: 10,
+        discussionCount,
         externalDiscussionQuery,
       },
     }),

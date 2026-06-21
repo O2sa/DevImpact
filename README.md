@@ -186,6 +186,12 @@ Create a `.env` file:
 
 ```
 GITHUB_TOKEN=your_github_token
+NEXT_PUBLIC_GITHUB_REPO_URL=your_github_repo_url
+GITHUB_REPO_COUNT=30
+GITHUB_PR_COUNT=80
+GITHUB_ISSUE_COUNT=20
+GITHUB_DISCUSSION_COUNT=10
+
 ```
 
 ---
