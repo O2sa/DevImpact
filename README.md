@@ -204,38 +204,6 @@ pnpm run dev
 
 ---
 
----
-
-## 📡 API Example
-
-The compare endpoint accepts one or more `username` query parameters.
-
-### Example request
-
-```bash
-curl "api/compare?username=devimpact&username=octocat"
-```
-
-### Example response
-
-```json
-{
-  "success": true,
-  "users": [
-    {
-      "username": "octocat",
-      "name": "The Octocat",
-      "avatarUrl": "https://avatars.githubusercontent.com/u/583231?v=4",
-      "repoScore": 87,
-      "prScore": 64,
-      "contributionScore": 42,
-      "finalScore": 73,
-      "topRepos": [],
-      "topPullRequests": []
-    }
-  ]
-}
-```
 
 ## 🌍 Localization
 
