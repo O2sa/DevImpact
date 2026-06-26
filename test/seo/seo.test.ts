@@ -42,8 +42,8 @@ describe("seo routes", () => {
     expect(result.sitemap).toContain("/sitemap.xml");
   });
 
-  test("sitemap includes key public pages", () => {
-    const result = sitemap();
+  test("sitemap includes key public pages", async () => {
+    const result = await sitemap();
     const urls = result.map((entry) => entry.url);
 
     expect(urls).toContain("http://localhost:3000/");
