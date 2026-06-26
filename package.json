@@ -10,7 +10,8 @@
     "test": "vitest",
     "test:watch": "vitest --watch",
     "redis:up": "docker compose up -d redis",
-    "redis:down": "docker compose stop redis"
+    "redis:down": "docker compose stop redis",
+    "validate-locales": "node scripts/validate-locales.js"
   },
   "dependencies": {
     "@octokit/graphql": "^9.0.3",

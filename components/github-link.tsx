@@ -11,9 +11,10 @@ type GithubLinkProps = {
 export function GithubLink({ variant = "compact" }: GithubLinkProps) {
   const isProminent = variant === "prominent";
 
+  const githubRepoUrl= process.env.NEXT_PUBLIC_GITHUB_REPO_URL || "https://github.com/O2sa/DevImpact";
   return (
     <a
-      href="https://github.com/O2sa/DevImpact"
+      href={githubRepoUrl}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="GitHub repository"

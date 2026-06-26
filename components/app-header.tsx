@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { GithubLink } from "@/components/github-link";
 
 export function AppHeader() {
   return (
@@ -11,16 +12,11 @@ export function AppHeader() {
           <BrandLogo priority size="md" />
         </Link>
 
-        <nav className="flex items-center gap-4">
-          <Link
-            href="/leaderboard"
-            className="hidden rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:inline-flex"
-          >
-            Leaderboard
-          </Link>
+        <div className="flex gap-4 [&>*:last-child]:-ml-4">
           <LanguageSwitcher />
           <ThemeToggle />
-        </nav>
+          <GithubLink variant="compact" />
+        </div>
       </div>
     </header>
   );
