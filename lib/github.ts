@@ -49,17 +49,38 @@ type RawDiscussionNode = {
   };
 };
 
+type PageInfo = {
+  hasNextPage: boolean;
+  endCursor: string | null;
+};
+
 type FetchUserAndPullRequestsResponse = {
   user: GitHubRawUser | null;
-  pullRequests: { nodes: Array<PullRequestNode | null> };
+  pullRequests: {
+    nodes: Array<PullRequestNode | null>;
+    pageInfo: PageInfo;
+  };
 };
 
-type FetchIssuesResponse = {
-  issues: { nodes: Array<RawIssueNode | null> };
+type FetchPullRequestsPageResponse = {
+  pullRequests: {
+    nodes: Array<PullRequestNode | null>;
+    pageInfo: PageInfo;
+  };
 };
 
-type FetchDiscussionsResponse = {
-  discussions: { nodes: Array<RawDiscussionNode | null> };
+type FetchIssuesPageResponse = {
+  issues: {
+    nodes: Array<RawIssueNode | null>;
+    pageInfo: PageInfo;
+  };
+};
+
+type FetchDiscussionsPageResponse = {
+  discussions: {
+    nodes: Array<RawDiscussionNode | null>;
+    pageInfo: PageInfo;
+  };
 };
 
 type GitHubQueryExecutor = Pick<GitHubGraphQLClient, "execute">;
@@ -71,14 +92,14 @@ export type GitHubFetcherDependencies = {
   logger?: Logger;
 };
 
-const DEFAULT_GITHUB_REPO_COUNT = 30;
-const DEFAULT_GITHUB_PR_COUNT = 80;
-const DEFAULT_GITHUB_ISSUE_COUNT = 20;
-const DEFAULT_GITHUB_DISCUSSION_COUNT = 10;
+const DEFAULT_GITHUB_REPO_COUNT = 50;
+const DEFAULT_GITHUB_PR_COUNT = 250;
+const DEFAULT_GITHUB_ISSUE_COUNT = 100;
+const DEFAULT_GITHUB_DISCUSSION_COUNT = 50;
 
 
 const MAX_GITHUB_REPO_COUNT = 100;
-const MAX_GITHUB_PR_COUNT = 100;
+const MAX_GITHUB_PR_COUNT = 1000;
 const MAX_GITHUB_ISSUE_COUNT = 100;
 const MAX_GITHUB_DISCUSSION_COUNT = 100;
 
@@ -96,13 +117,8 @@ export function parseCountEnv(
 
 }
 
-const USER_AND_PULL_REQUESTS_QUERY = /* GraphQL */ `
-  query FetchUserAndPullRequests(
-    $login: String!
-    $repoCount: Int = 100
-    $prCount: Int = 100
-    $externalPrQuery: String!
-  ) {
+const USER_QUERY = /* GraphQL */ `
+  query FetchUser($login: String!, $repoCount: Int = 100) {
     user(login: $login) {
       name
       avatarUrl(size: 80)
@@ -139,30 +155,31 @@ const USER_AND_PULL_REQUESTS_QUERY = /* GraphQL */ `
         }
       }
     }
+  }
+`;
 
-    pullRequests: search(query: $externalPrQuery, type: ISSUE, first: $prCount) {
-      nodes {
-        ... on PullRequest {
-          merged
-          additions
-          deletions
-          title
-          url
-          repository {
-            nameWithOwner
-            url
-            stargazerCount
-            pushedAt
-            owner {
-              login
-            }
-            languages(first: 5, orderBy: { field: SIZE, direction: DESC }) {
-              edges {
-                size
-                node {
-                  name
-                }
-              }
+const PULL_REQUESTS_SEARCH_FRAGMENT = `
+  pageInfo { hasNextPage endCursor }
+  nodes {
+    ... on PullRequest {
+      merged
+      additions
+      deletions
+      title
+      url
+      repository {
+        nameWithOwner
+        url
+        stargazerCount
+        pushedAt
+        owner {
+          login
+        }
+        languages(first: 5, orderBy: { field: SIZE, direction: DESC }) {
+          edges {
+            size
+            node {
+              name
             }
           }
         }
@@ -171,9 +188,18 @@ const USER_AND_PULL_REQUESTS_QUERY = /* GraphQL */ `
   }
 `;
 
+const PULL_REQUESTS_QUERY = /* GraphQL */ `
+  query FetchUserPullRequests($prCount: Int = 100, $externalPrQuery: String!, $prCursor: String) {
+    pullRequests: search(query: $externalPrQuery, type: ISSUE, first: $prCount, after: $prCursor) {
+      ${PULL_REQUESTS_SEARCH_FRAGMENT}
+    }
+  }
+`;
+
 const ISSUES_QUERY = /* GraphQL */ `
-  query FetchUserIssues($issueCount: Int = 20, $externalIssueQuery: String!) {
-    issues: search(query: $externalIssueQuery, type: ISSUE, first: $issueCount) {
+  query FetchUserIssues($issueCount: Int = 100, $externalIssueQuery: String!, $issueCursor: String) {
+    issues: search(query: $externalIssueQuery, type: ISSUE, first: $issueCount, after: $issueCursor) {
+      pageInfo { hasNextPage endCursor }
       nodes {
         ... on Issue {
           title
@@ -196,14 +222,17 @@ const ISSUES_QUERY = /* GraphQL */ `
 
 const DISCUSSIONS_QUERY = /* GraphQL */ `
   query FetchUserDiscussions(
-    $discussionCount: Int = 10
+    $discussionCount: Int = 100
     $externalDiscussionQuery: String!
+    $discussionCursor: String
   ) {
     discussions: search(
       query: $externalDiscussionQuery
       type: DISCUSSION
       first: $discussionCount
+      after: $discussionCursor
     ) {
+      pageInfo { hasNextPage endCursor }
       nodes {
         ... on Discussion {
           title
@@ -223,6 +252,82 @@ const DISCUSSIONS_QUERY = /* GraphQL */ `
     }
   }
 `;
+
+// ---------------------------------------------------------------------------
+// Search pagination helper
+// ---------------------------------------------------------------------------
+
+type SearchPaginateParams<TNode> = {
+  operationName: string;
+  query: string;
+  buildVariables: (cursor: string | null, pageSize: number) => Record<string, unknown>;
+  extractField: (data: Record<string, unknown>) => {
+    nodes: Array<TNode | null>;
+    pageInfo: PageInfo;
+  } | undefined;
+  maxPages?: number;
+  maxItems?: number;
+};
+
+const SEARCH_PAGE_SIZE = 100;
+const DEFAULT_MAX_SEARCH_PAGES = 10;
+
+async function paginateSearch<TNode>(
+  executor: GitHubQueryExecutor,
+  params: SearchPaginateParams<TNode>,
+): Promise<Array<TNode>> {
+  const maxPages = params.maxPages ?? DEFAULT_MAX_SEARCH_PAGES;
+  const maxItems = params.maxItems;
+  const allNodes: Array<TNode> = [];
+  let cursor: string | null = null;
+
+  for (let page = 0; page < maxPages; page += 1) {
+    const remainingItems =
+      maxItems === undefined ? undefined : Math.max(0, maxItems - allNodes.length);
+    if (remainingItems === 0) {
+      break;
+    }
+
+    const pageSize =
+      remainingItems === undefined
+        ? SEARCH_PAGE_SIZE
+        : Math.min(SEARCH_PAGE_SIZE, remainingItems);
+
+    const variables = params.buildVariables(cursor, pageSize);
+    const data = await executor.execute<
+      Record<string, unknown>,
+      Record<string, unknown>
+    >({
+      operationName: params.operationName,
+      query: params.query,
+      variables,
+    });
+
+    const field = params.extractField(data);
+    if (!field) {
+      break;
+    }
+
+    const pageNodes = field.nodes.filter(isDefined);
+    allNodes.push(...pageNodes);
+
+    if (maxItems !== undefined && allNodes.length >= maxItems) {
+      break;
+    }
+
+    if (!field.pageInfo.hasNextPage || !field.pageInfo.endCursor) {
+      break;
+    }
+
+    cursor = field.pageInfo.endCursor;
+  }
+
+  return allNodes;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 function isDefined<T>(value: T | null | undefined): value is T {
   return value !== null && value !== undefined;
@@ -302,6 +407,10 @@ export function buildGitHubUserCacheKey(
 
 
 
+// ---------------------------------------------------------------------------
+// Core data fetch
+// ---------------------------------------------------------------------------
+
 async function fetchUserDataFromGitHub(
   executor: GitHubQueryExecutor,
   username: string,
@@ -335,74 +444,78 @@ const discussionCount = parseCountEnv(
   MAX_GITHUB_DISCUSSION_COUNT,
 );
 
-  const userAndPrResponse =
-    await executor.execute<
-      FetchUserAndPullRequestsResponse,
-      {
-        login: string;
-        repoCount: number;
-        prCount: number;
-        externalPrQuery: string;
-      }
+  const [userResponse, pullRequests, issues, discussions] = await Promise.all([
+    executor.execute<
+      { user: GitHubRawUser | null },
+      { login: string; repoCount: number }
     >({
-      operationName: "FetchUserAndPullRequests",
-      query: USER_AND_PULL_REQUESTS_QUERY,
-      variables: {
-        login: username,
-        repoCount,
-        prCount,
+      operationName: "FetchUser",
+      query: USER_QUERY,
+      variables: { login: username, repoCount },
+    }),
+    paginateSearch<PullRequestNode>(executor, {
+      operationName: "FetchUserPullRequests",
+      query: PULL_REQUESTS_QUERY,
+      buildVariables: (cursor, pageSize) => ({
+        prCount: pageSize,
         externalPrQuery,
-      },
-    });
+        prCursor: cursor,
+      }),
+      extractField: (data) =>
+        data.pullRequests as
+          | { nodes: Array<PullRequestNode | null>; pageInfo: PageInfo }
+          | undefined,
+      maxItems: prCount,
+    }),
+    paginateSearch<IssueNode>(executor, {
+      operationName: "FetchUserIssues",
+      query: ISSUES_QUERY,
+      buildVariables: (cursor, pageSize) => ({
+        issueCount: pageSize,
+        externalIssueQuery,
+        issueCursor: cursor,
+      }),
+      extractField: (data) =>
+        data.issues as
+          | { nodes: Array<RawIssueNode | null>; pageInfo: PageInfo }
+          | undefined,
+      maxItems: issueCount,
+    }),
+    paginateSearch<DiscussionNode>(executor, {
+      operationName: "FetchUserDiscussions",
+      query: DISCUSSIONS_QUERY,
+      buildVariables: (cursor, pageSize) => ({
+        discussionCount: pageSize,
+        externalDiscussionQuery,
+        discussionCursor: cursor,
+      }),
+      extractField: (data) =>
+        data.discussions as
+          | { nodes: Array<RawDiscussionNode | null>; pageInfo: PageInfo }
+          | undefined,
+      maxItems: discussionCount,
+    }),
+  ]);
 
-  const user = userAndPrResponse.user;
+  const user = userResponse.user;
   if (!user) {
     throw new Error("User not found");
   }
-
-  const [issuesResponse, discussionsResponse] = await Promise.all([
-    executor.execute<
-      FetchIssuesResponse,
-      {
-        issueCount: number;
-        externalIssueQuery: string;
-      }
-    >({
-      operationName: "FetchUserIssues",
-      query: ISSUES_QUERY,
-      variables: {
-        issueCount,
-        externalIssueQuery,
-      },
-    }),
-    executor.execute<
-      FetchDiscussionsResponse,
-      {
-        discussionCount: number;
-        externalDiscussionQuery: string;
-      }
-    >({
-      operationName: "FetchUserDiscussions",
-      query: DISCUSSIONS_QUERY,
-      variables: {
-        discussionCount,
-        externalDiscussionQuery,
-      },
-    }),
-  ]);
 
   return {
     name: user.name,
     avatarUrl: user.avatarUrl,
     repos: user.repositories.nodes.filter(isDefined),
-    pullRequests: userAndPrResponse.pullRequests.nodes.filter(isDefined),
+    pullRequests,
     contributions: user.contributionsCollection,
-    issues: issuesResponse.issues.nodes.filter(isDefined).map(toIssueNode),
-    discussions: discussionsResponse.discussions.nodes
-      .filter(isDefined)
-      .map(toDiscussionNode),
+    issues: issues.map(toIssueNode),
+    discussions: discussions.map(toDiscussionNode),
   };
 }
+
+// ---------------------------------------------------------------------------
+// Fetcher factory (caching + single-flight)
+// ---------------------------------------------------------------------------
 
 export function createGitHubUserDataFetcher(
   dependencies: GitHubFetcherDependencies,
@@ -478,6 +591,10 @@ export function createGitHubUserDataFetcher(
     return request;
   };
 }
+
+// ---------------------------------------------------------------------------
+// Default singleton
+// ---------------------------------------------------------------------------
 
 function createDefaultGitHubExecutor(): GitHubQueryExecutor {
   const token = process.env.GITHUB_TOKEN?.trim();
