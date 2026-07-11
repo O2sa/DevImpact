@@ -3,7 +3,6 @@
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import yaml from "js-yaml";
 import { LeaderboardTable } from "@/components/leaderboard-table";
 import { AppHeader } from "@/components/app-header";
 import { AppFooter } from "@/components/app-footer";
@@ -11,20 +10,6 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/components/language-provider";
 
 // ─── Types ─────────────────────────────────────────────────────────────
-
-type CommitterEntry = {
-  rank: number;
-  name: string;
-  login: string;
-  avatarUrl: string;
-  contributions: number;
-};
-
-type CommitterYaml = {
-  title?: string;
-  total_user_count?: number;
-  users?: CommitterEntry[];
-};
 
 type ScoredEntry = {
   username: string;
@@ -39,37 +24,26 @@ type ScoredEntry = {
   impactRank: number;
 };
 
+type LeaderboardApiResponse = {
+  success: boolean;
+  title: string;
+  totalFromSource: number;
+  scored: ScoredEntry[];
+  errors: string[];
+};
+
 type Props = {
   params: Promise<{ country: string }>;
 };
 
 // ─── Fetch helpers ─────────────────────────────────────────────────────
 
-async function fetchCommiters(country: string) {
-  const url = `https://raw.githubusercontent.com/ashkulz/committers.top/gh-pages/_data/locations/${country}.yml`;
-  const res = await fetch(url, {
-    headers: { "User-Agent": "DevImpact-Bot" },
-  });
-  if (!res.ok) throw new Error(`Failed to fetch ${country}`);
-  const text = await res.text();
-  const data = yaml.load(text) as CommitterYaml;
-  if (!data?.users) throw new Error("Invalid data");
-  return {
-    title: data.title || country,
-    totalFromSource: data.total_user_count ?? data.users.length,
-    users: data.users,
-  };
-}
-
-async function fetchScores(logins: string[]) {
-  const params = logins
-    .map((u) => `username=${encodeURIComponent(u)}`)
-    .join("&");
-  const res = await fetch(`/api/score?${params}`);
-  if (!res.ok) throw new Error("Failed to score users");
+async function fetchLeaderboard(country: string): Promise<LeaderboardApiResponse> {
+  const res = await fetch(`/api/leaderboard?country=${encodeURIComponent(country)}`);
+  if (!res.ok) throw new Error(`Failed to fetch leaderboard for ${country}`);
   const json = await res.json();
-  if (!json.success) throw new Error(json.error || "Scoring failed");
-  return { scored: json.scored, errors: json.errors };
+  if (!json.success) throw new Error(json.error || "Failed to load leaderboard");
+  return json;
 }
 
 // ─── Component ─────────────────────────────────────────────────────────
@@ -90,47 +64,18 @@ export default function CountryLeaderboardPage({ params }: Props) {
 
     (async () => {
       try {
-        const data = await fetchCommiters(country);
+        const data = await fetchLeaderboard(country);
         if (cancelled) return;
+
         setTitle(data.title);
         setTotalFromSource(data.totalFromSource);
-
-        const logins = data.users.map((u) => u.login);
-        const { scored: apiScored, errors: apiErrors } =
-          await fetchScores(logins);
-        if (cancelled) return;
-
-        // Build a rank lookup from the original committers data
-        const rankMap = new Map(
-          data.users.map((u) => [u.login, { rank: u.rank, contributions: u.contributions }])
-        );
-
-        const results: ScoredEntry[] = apiScored.map((s: Record<string, unknown>) => {
-          const original = rankMap.get(s.username as string) ?? { rank: 0, contributions: 0 };
-          return {
-            username: s.username as string,
-            name: s.name as string | null,
-            avatarUrl: s.avatarUrl as string,
-            repoScore: s.repoScore as number,
-            prScore: s.prScore as number,
-            contributionScore: s.contributionScore as number,
-            finalScore: s.finalScore as number,
-            originalRank: original.rank,
-            originalContributions: original.contributions,
-            impactRank: 0,
-          };
-        });
-
-        results.sort((a, b) => b.finalScore - a.finalScore);
-        results.forEach((u, idx) => (u.impactRank = idx + 1));
-
-        setScored(results);
-        setErrors(apiErrors);
+        setScored(data.scored);
+        setErrors(data.errors);
         setLoading(false);
       } catch (err) {
         if (!cancelled)
           setFailed(
-            err instanceof Error ? err.message : "Failed to load leaderboard"
+            err instanceof Error ? err.message : "Failed to load leaderboard",
           );
       }
     })();

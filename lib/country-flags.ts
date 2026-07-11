@@ -63,7 +63,6 @@ const SLUG_TO_ISO: Record<string, string> = {
   iran: "ir",
   iraq: "iq",
   ireland: "ie",
-  israel: "il",
   italy: "it",
   ivory_coast: "ci",
   japan: "jp",
