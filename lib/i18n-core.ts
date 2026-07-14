@@ -6,6 +6,7 @@ export const LOCALE_COOKIE = "app-locale";
 export const localeMeta: Record<Locale, { dir: "ltr" | "rtl"; label: string }> = {
   en: { dir: "ltr", label: "English" },
   ar: { dir: "rtl", label: "\u0627\u0644\u0639\u0631\u0628\u064a\u0629" },
+  id: { dir: "ltr", label: "Bahasa Indonesia" },
 };
 
 export function isSupportedLocale(value: string | null | undefined): value is Locale {
