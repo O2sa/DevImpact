@@ -1,0 +1,63 @@
+{
+  "locale": "id",
+  "name": "Bahasa Indonesia",
+  "translations": {
+    "common": {
+      "search": "Cari",
+      "filter": "Filter",
+      "sort": "Urutkan",
+      "loading": "Memuat...",
+      "error": "Terjadi kesalahan",
+      "retry": "Coba lagi",
+      "save": "Simpan",
+      "cancel": "Batal",
+      "delete": "Hapus",
+      "edit": "Edit",
+      "create": "Buat",
+      "close": "Tutup",
+      "back": "Kembali",
+      "next": "Selanjutnya",
+      "previous": "Sebelumnya",
+      "no_results": "Tidak ada hasil",
+      "confirm": "Konfirmasi",
+      "yes": "Ya",
+      "no": "Tidak"
+    },
+    "nav": {
+      "home": "Beranda",
+      "dashboard": "Dasbor",
+      "profile": "Profil",
+      "settings": "Pengaturan",
+      "logout": "Keluar",
+      "login": "Masuk",
+      "signup": "Daftar"
+    },
+    "dashboard": {
+      "title": "Dasbor",
+      "overview": "Ringkasan",
+      "recent_activity": "Aktivitas Terbaru",
+      "statistics": "Statistik",
+      "contributors": "Kontributor",
+      "repositories": "Repositori",
+      "pull_requests": "Pull Request",
+      "issues": "Issue"
+    },
+    "project": {
+      "title": "Proyek",
+      "description": "Deskripsi",
+      "stars": "Bintang",
+      "forks": "Fork",
+      "language": "Bahasa",
+      "last_updated": "Terakhir diperbarui",
+      "view_project": "Lihat Proyek"
+    },
+    "contribution": {
+      "title": "Kontribusi",
+      "type": "Jenis",
+      "status": "Status",
+      "merged": "Digabung",
+      "open": "Terbuka",
+      "closed": "Ditutup"
+    }
+  }
+}
