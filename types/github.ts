@@ -65,8 +65,10 @@ export type ContributionTotals = {
 };
 
 export type GitHubUserData = {
+  login: string;
   name: string | null;
   avatarUrl: string;
+  location: string | null;
   repos: RepoNode[];
   pullRequests: PullRequestNode[];
   contributions: ContributionTotals;

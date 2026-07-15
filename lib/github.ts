@@ -17,8 +17,10 @@ import type {
 type Logger = Pick<Console, "info" | "warn">;
 
 type GitHubRawUser = { 
+  login: string;
   name: string | null;
   avatarUrl: string;
+  location: string | null;
   repositories: { nodes: Array<RepoNode | null> };
   contributionsCollection: {
     totalCommitContributions: number;
@@ -93,7 +95,7 @@ export type GitHubFetcherDependencies = {
 };
 
 const DEFAULT_GITHUB_REPO_COUNT = 50;
-const DEFAULT_GITHUB_PR_COUNT = 250;
+const DEFAULT_GITHUB_PR_COUNT = 300;
 const DEFAULT_GITHUB_ISSUE_COUNT = 100;
 const DEFAULT_GITHUB_DISCUSSION_COUNT = 50;
 
@@ -120,8 +122,10 @@ export function parseCountEnv(
 const USER_QUERY = /* GraphQL */ `
   query FetchUser($login: String!, $repoCount: Int = 100) {
     user(login: $login) {
+      login
       name
       avatarUrl(size: 80)
+      location
       contributionsCollection {
         totalCommitContributions
         totalPullRequestContributions
@@ -503,8 +507,10 @@ const discussionCount = parseCountEnv(
   }
 
   return {
+    login: user.login,
     name: user.name,
     avatarUrl: user.avatarUrl,
+    location: user.location,
     repos: user.repositories.nodes.filter(isDefined),
     pullRequests,
     contributions: user.contributionsCollection,

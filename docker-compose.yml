@@ -1,4 +1,24 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: devimpact-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: devimpact
+      POSTGRES_USER: devimpact
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devimpact}
+      # Required for local dev: trust auth allows non-SSL connections from Docker bridge
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devimpact"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   redis:
     image: redis:7-alpine
     container_name: devimpact-redis
@@ -23,3 +43,4 @@ services:
 
 volumes:
   redis-data:
+  pgdata:

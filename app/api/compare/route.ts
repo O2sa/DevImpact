@@ -3,6 +3,12 @@ import { fetchGitHubUserData } from "../../../lib/github";
 import { calculateUserScore } from "../../../lib/score";
 import { normalizeSelectedLanguages } from "@/lib/scoring/languageScoring";
 import { toSafeApiError } from "@/lib/github-graphql-client";
+import { getDatabaseStore } from "@/lib/db-store";
+import {
+  createCacheStore,
+  getCacheConfigFromEnv,
+} from "@/lib/cache-store";
+import { detectCountry } from "@/lib/location-detector";
 import type { CompareInsights, SafeApiError } from "@/types/api-response";
 import {
   DEFAULT_LOCALE,
@@ -322,7 +328,7 @@ async function compareUsers(
     );
 
     results.push({
-      username,
+      username: data.login,
       name: data.name,
       avatarUrl: data.avatarUrl,
       repoScore: Math.round(score.repoScore),
@@ -340,6 +346,43 @@ async function compareUsers(
       signals: score.signals,
       explanations: score.explanations,
     });
+
+    // ── Fire-and-forget: detect country & upsert into DB ──────────────
+    const country = detectCountry(data.location);
+    if (country) {
+      const staleDays = parseInt(
+        process.env.GITHUB_USER_STALE_DAYS ?? "14",
+        10,
+      );
+
+      const db = getDatabaseStore();
+      db.upsertUser({
+        username: data.login,
+        name: data.name,
+        avatarUrl: data.avatarUrl,
+        location: data.location,
+        country,
+        rawData: data,
+        scores: score,
+        repoScore: Math.round(score.repoScore),
+        prScore: Math.round(score.prScore),
+        contributionScore: Math.round(score.contributionScore),
+        finalScore: Math.round(score.finalScore),
+        staleDays,
+      })
+        .then(() => {
+          // Invalidate Redis cache for this country
+          const cacheConfig = getCacheConfigFromEnv();
+          const cacheStore = createCacheStore(cacheConfig);
+          if (cacheStore.enabled && cacheStore.del) {
+            const key = `${cacheConfig.namespace}:leaderboard:${country}`;
+            cacheStore.del(key).catch(() => {});
+          }
+        })
+        .catch((err: unknown) => {
+          console.warn("Failed to upsert user from compare:", err);
+        });
+    }
   }
 
   return results;

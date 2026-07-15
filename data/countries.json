@@ -1,602 +1,752 @@
 [
   {
     "slug": "afghanistan",
-    "title": "Afghanistan"
+    "title": "Afghanistan",
+    "keywords": ["afghanistan", "kabul", "kandahar", "herat", "mazar-e-sharif", "jalalabad", "ghazni", "nangarhar", "khost", "zabul", "helmand", "parwan", "farah", "kunar", "wardak", "baghlan", "kunduz", "takhar", "paktia", "paktika"]
   },
   {
     "slug": "albania",
-    "title": "Albania"
+    "title": "Albania",
+    "keywords": ["albania", "tirana", "durres", "vlore", "elbasan", "shkoder"]
   },
   {
     "slug": "algeria",
-    "title": "Algeria"
+    "title": "Algeria",
+    "keywords": ["algeria", "algiers", "oran", "constantine", "annaba", "blida", "batna", "djelfa", "setif", "sidi bel abbes", "biskra", "tiaret", "relizane", "mostaganem", "tlemcen", "chlef", "jijel"]
   },
   {
     "slug": "angola",
-    "title": "Angola"
+    "title": "Angola",
+    "keywords": ["angola", "luanda", "huambo", "lobito", "benguela"]
   },
   {
     "slug": "argentina",
-    "title": "Argentina"
+    "title": "Argentina",
+    "keywords": ["argentina", "buenos aires", "cordoba", "rosario", "mendoza", "la plata", "tucuman", "mar del plata", "salta", "resistencia"]
   },
   {
     "slug": "armenia",
-    "title": "Armenia"
+    "title": "Armenia",
+    "keywords": ["armenia", "yerevan", "gyumri", "vanadzor", "vagharshapat", "abovyan", "kapan", "hrazdan", "armavir", "artashat", "ijevan", "gavar", "goris", "dilijan", "stepanakert", "martuni", "sisian", "alaverdi", "stepanavan", "berd"]
   },
   {
     "slug": "australia",
-    "title": "Australia"
+    "title": "Australia",
+    "keywords": ["australia", "sydney", "melbourne", "brisbane", "perth", "adelaide", "canberra", "hobart"]
   },
   {
     "slug": "austria",
-    "title": "Austria"
+    "title": "Austria",
+    "keywords": ["austria", "österreich", "vienna", "wien", "linz", "salzburg", "graz", "innsbruck", "klagenfurt", "wels", "dornbirn"]
   },
   {
     "slug": "azerbaijan",
-    "title": "Azerbaijan"
+    "title": "Azerbaijan",
+    "keywords": ["azerbaijan", "baku", "sumqayit", "ganja", "lankaran"]
   },
   {
     "slug": "bahrain",
-    "title": "Bahrain"
+    "title": "Bahrain",
+    "keywords": ["bahrain", "manama", "muharraq", "riffa", "hamad town", "isa town"]
   },
   {
     "slug": "bangladesh",
-    "title": "Bangladesh"
+    "title": "Bangladesh",
+    "keywords": ["bangladesh", "dhaka", "chittagong", "khulna", "rajshahi", "barisal", "sylhet", "rangpur", "comilla", "gazipur"]
   },
   {
     "slug": "belarus",
-    "title": "Belarus"
+    "title": "Belarus",
+    "keywords": ["belarus", "minsk", "brest", "grodno", "gomel", "vitebsk", "mogilev", "slutsk", "borisov", "pinsk", "baranovichi", "bobruisk", "soligorsk"]
   },
   {
     "slug": "belgium",
-    "title": "Belgium"
+    "title": "Belgium",
+    "keywords": ["belgium", "antwerp", "ghent", "charleroi", "liege", "brussels", "belgique"]
   },
   {
     "slug": "benin",
-    "title": "Benin"
+    "title": "Benin",
+    "keywords": ["benin", "cotonou", "porto-novo", "abomey"]
   },
   {
     "slug": "bolivia",
-    "title": "Bolivia"
+    "title": "Bolivia",
+    "keywords": ["bolivia", "santa cruz de la sierra", "el alto", "la paz", "cochabamba", "oruro", "sucre"]
   },
   {
     "slug": "bosnia_and_herzegovina",
-    "title": "Bosnia and Herzegovina"
+    "title": "Bosnia and Herzegovina",
+    "keywords": ["sarajevo", "banja luka", "tuzla", "zenica", "bijeljina", "mostar", "prijedor", "brcko", "doboj", "cazin"]
   },
   {
     "slug": "botswana",
-    "title": "Botswana"
+    "title": "Botswana",
+    "keywords": ["botswana", "gaborone", "francistown"]
   },
   {
     "slug": "brazil",
-    "title": "Brazil"
+    "title": "Brazil",
+    "keywords": ["brazil", "brasil", "são paulo", "brasília", "salvador", "fortaleza", "belém", "belo horizonte", "manaus", "curitiba", "recife", "rio de janeiro", "maceió", "aracaju", "porto alegre", "florianópolis", "acre", "alagoas", "amapá", "amazonas", "bahia", "ceará", "distrito federal", "espírito santo", "goiás", "maranhão", "mato grosso", "mato grosso do sul", "minas gerais", "pará", "paraíba", "paraná", "pernambuco", "piauí", "rio grande do norte", "rio grande do sul", "rondônia", "roraima", "santa catarina", "sergipe", "tocantins"]
   },
   {
     "slug": "bulgaria",
-    "title": "Bulgaria"
+    "title": "Bulgaria",
+    "keywords": ["bulgaria", "sofia", "plovdiv", "varna", "burgas", "ruse", "stara zagora", "pleven"]
   },
   {
     "slug": "burkina_faso",
-    "title": "Burkina Faso"
+    "title": "Burkina Faso",
+    "keywords": ["burkina faso", "ouagadougou", "bobo-dioulasso", "koudougou", "banfora", "ouahigouya", "pouytenga", "kaya", "tenkodogo", "fada n'gourma", "houndé"]
   },
   {
     "slug": "burundi",
-    "title": "Burundi"
+    "title": "Burundi",
+    "keywords": ["burundi", "bujumbura", "gitega"]
   },
   {
     "slug": "cambodia",
-    "title": "Cambodia"
+    "title": "Cambodia",
+    "keywords": ["cambodia", "phnom", "battambang", "siem reap", "kampong"]
   },
   {
     "slug": "cameroon",
-    "title": "Cameroon"
+    "title": "Cameroon",
+    "keywords": ["cameroon", "douala", "yaoundé", "bafoussam", "bamenda", "garoua", "maroua", "ngaoundéré", "kumba", "nkongsamba", "buea"]
   },
   {
     "slug": "canada",
-    "title": "Canada"
+    "title": "Canada",
+    "keywords": ["canada", "ottawa", "edmonton", "winnipeg", "vancouver", "toronto", "quebec", "montreal", "mississauga", "calgary"]
   },
   {
     "slug": "chad",
-    "title": "Chad"
+    "title": "Chad",
+    "keywords": ["chad", "tchad", "n'djamena", "moundou"]
   },
   {
     "slug": "chile",
-    "title": "Chile"
+    "title": "Chile",
+    "keywords": ["chile", "santiago", "valparaíso", "concepción", "la serena", "antofagasta", "temuco", "rancagua", "talca", "arica", "chillán"]
   },
   {
     "slug": "china",
-    "title": "China"
+    "title": "China",
+    "keywords": ["china", "中国", "guangzhou", "shanghai", "beijing", "hangzhou"]
   },
   {
     "slug": "colombia",
-    "title": "Colombia"
+    "title": "Colombia",
+    "keywords": ["colombia", "bogota", "medellin", "cali", "barranquilla", "cartagena", "cucuta", "bucaramanga", "ibague", "soledad", "pereira", "santa marta"]
   },
   {
     "slug": "costa_rica",
-    "title": "Costa Rica"
+    "title": "Costa Rica",
+    "keywords": ["costa rica", "san josé", "alajuela", "cartago", "heredia", "guanacaste", "puntarenas", "limón"]
   },
   {
     "slug": "croatia",
-    "title": "Croatia"
+    "title": "Croatia",
+    "keywords": ["croatia", "hrvatska", "zagreb", "split", "rijeka", "osijek", "zadar", "pula"]
   },
   {
     "slug": "cuba",
-    "title": "Cuba"
+    "title": "Cuba",
+    "keywords": ["cuba", "havana", "santiago de cuba", "camaguey", "holguin", "guantanamo", "bayamo"]
   },
   {
     "slug": "cyprus",
-    "title": "Cyprus"
+    "title": "Cyprus",
+    "keywords": ["cyprus", "nicosia", "lefkosia", "limassol", "lemessos", "larnaka", "paphos"]
   },
   {
     "slug": "czech_republic",
-    "title": "Czech Republic"
+    "title": "Czech Republic",
+    "keywords": ["czech", "czechia", "ceska", "prague", "budejovice", "plzen", "karlovy", "ostrava", "brno"]
   },
   {
     "slug": "congo_kinshasa",
-    "title": "Democratic Republic of the Congo"
+    "title": "Democratic Republic of the Congo",
+    "keywords": ["congo kinshasa", "drc", "cod", "kinshasa", "lubumbashi", "bukavu", "kananga", "goma", "mbuji mayi", "likasi", "kolwezi", "kalemie", "uvira", "matadi", "moba", "kamina", "kabalo", "fungurume"]
   },
   {
     "slug": "denmark",
-    "title": "Denmark"
+    "title": "Denmark",
+    "keywords": ["denmark", "danmark", "copenhagen", "aarhus", "odense", "aalborg"]
   },
   {
     "slug": "dominican_republic",
-    "title": "Dominican Republic"
+    "title": "Dominican Republic",
+    "keywords": ["dominican republic", "republica dominicana", "santo domingo", "la vega", "macoris"]
   },
   {
     "slug": "ecuador",
-    "title": "Ecuador"
+    "title": "Ecuador",
+    "keywords": ["ecuador", "guayaquil", "quito", "cuenca", "machala"]
   },
   {
     "slug": "egypt",
-    "title": "Egypt"
+    "title": "Egypt",
+    "keywords": ["egypt", "cairo", "alexandria", "giza", "port said", "suez", "luxor", "el mahalla", "asyut", "asiut", "al mansurah", "mansoura", "tanta", "ismailia", "hurghada", "sharm el-sheikh", "nuweiba", "dahab", "ain shams", "ain el sokhna", "ain elsokhna", "gouna", "el gouna", "zagazig", "fayoum", "faiyum", "aswan", "minya", "sohag", "beni suef", "damietta", "kafr el-sheikh", "banha", "damanhur", "shibin el kom", "qena", "arish", "marsa matrouh", "kharga", "monufia", "sharkia", "sharqia", "dakahlia", "gharbia", "qalyubia", "beheira", "matrouh", "north sinai", "south sinai", "red sea", "new valley", "10th of ramadan", "6th of october", "obour city", "new cairo", "sadat city", "borg el arab", "om el donia", "masr", "heliopolis", "nasr city"]
   },
   {
     "slug": "el_salvador",
-    "title": "El Salvador"
+    "title": "El Salvador",
+    "keywords": ["el salvador"]
   },
   {
     "slug": "estonia",
-    "title": "Estonia"
+    "title": "Estonia",
+    "keywords": ["estonia", "eesti", "tallinn", "tartu", "narva", "pärnu", "rakvere", "kohtla-järve", "viljandi", "maardu", "sillamäe"]
   },
   {
     "slug": "ethiopia",
-    "title": "Ethiopia"
+    "title": "Ethiopia",
+    "keywords": ["ethiopia", "addis ababa", "gondar", "adama", "hawassa", "bahir dar"]
   },
   {
     "slug": "finland",
-    "title": "Finland"
+    "title": "Finland",
+    "keywords": ["finland", "suomi", "helsinki", "tampere", "oulu", "espoo", "vantaa", "turku", "rovaniemi", "jyväskylä", "lahti", "kuopio", "pori", "lappeenranta", "vaasa"]
   },
   {
     "slug": "france",
-    "title": "France"
+    "title": "France",
+    "keywords": ["france", "paris", "marseille", "lyon", "toulouse", "nice", "nantes", "strasbourg", "montpellier", "bordeaux", "lille", "rennes", "reims", "rouen", "toulon", "le havre", "grenoble", "dijon", "le mans", "brest", "tours"]
   },
   {
     "slug": "gabon",
-    "title": "Gabon"
+    "title": "Gabon",
+    "keywords": ["gabon", "libreville", "port-gentil", "franceville", "oyem", "moanda"]
   },
   {
     "slug": "georgia",
-    "title": "Georgia"
+    "title": "Georgia",
+    "keywords": ["tbilisi", "batumi", "kutaisi", "rustavi", "zugdidi", "gori", "poti", "telavi", "akhaltsikhe", "mtskheta", "ozurgeti", "sukhumi", "samtredia", "marneuli"]
   },
   {
     "slug": "germany",
-    "title": "Germany"
+    "title": "Germany",
+    "keywords": ["germany", "deutschland", "berlin", "frankfurt", "munich", "münchen", "hamburg", "cologne", "köln"]
   },
   {
     "slug": "ghana",
-    "title": "Ghana"
+    "title": "Ghana",
+    "keywords": ["ghana", "accra", "kumasi", "sekondi", "ashaiman", "sunyani", "tamale", "tema"]
   },
   {
     "slug": "greece",
-    "title": "Greece"
+    "title": "Greece",
+    "keywords": ["greece", "ελλάδα", "athens", "thessaloniki", "patras", "heraklion", "larissa", "volos", "rhodes", "ioannina", "chania", "crete"]
   },
   {
     "slug": "guatemala",
-    "title": "Guatemala"
+    "title": "Guatemala",
+    "keywords": ["guatemala", "mixco", "villa nueva", "petapa", "quetzaltenango"]
   },
   {
     "slug": "guinea",
-    "title": "Guinea"
+    "title": "Guinea",
+    "keywords": ["conakry"]
   },
   {
     "slug": "haiti",
-    "title": "Haiti"
+    "title": "Haiti",
+    "keywords": ["haiti", "port-au-prince", "cap-haitien", "carrefour", "delmas", "petion-ville"]
   },
   {
     "slug": "honduras",
-    "title": "Honduras"
+    "title": "Honduras",
+    "keywords": ["honduras", "tegucigalpa", "san pedro sula", "choloma", "la ceiba", "el progreso", "choluteca", "comayagua"]
   },
   {
     "slug": "hong_kong",
-    "title": "Hong Kong"
+    "title": "Hong Kong",
+    "keywords": ["hong kong", "香港", "kowloon", "九龍"]
   },
   {
     "slug": "hungary",
-    "title": "Hungary"
+    "title": "Hungary",
+    "keywords": ["hungary", "magyarország", "budapest", "szeged", "miskolc"]
   },
   {
     "slug": "india",
-    "title": "India"
+    "title": "India",
+    "keywords": ["india", "mumbai", "delhi", "bangalore", "hyderabad", "ahmedabad", "chennai", "kolkata", "jaipur", "pune", "gurgaon", "noida"]
   },
   {
     "slug": "indonesia",
-    "title": "Indonesia"
+    "title": "Indonesia",
+    "keywords": ["indonesia", "jakarta", "surabaya", "bandung", "medan", "bekasi", "semarang", "tangerang", "depok", "makassar", "palembang"]
   },
   {
     "slug": "iran",
-    "title": "Iran"
+    "title": "Iran",
+    "keywords": ["iran", "tehran", "mashhad", "isfahan", "esfahan", "karaj", "shiraz", "tabriz", "qom", "ahvaz", "ahwaz", "kermanshah", "urmia", "rasht", "kerman"]
   },
   {
     "slug": "iraq",
-    "title": "Iraq"
+    "title": "Iraq",
+    "keywords": ["baghdad", "mosul", "basra", "najaf", "karbala", "al-nasiriya", "al-amarah"]
   },
   {
     "slug": "ireland",
-    "title": "Ireland"
+    "title": "Ireland",
+    "keywords": ["ireland", "dublin", "cork", "limerick", "galway", "waterford", "drogheda", "dundalk"]
   },
   {
     "slug": "italy",
-    "title": "Italy"
+    "title": "Italy",
+    "keywords": ["italy", "italia", "rome", "roma", "milan", "naples", "napoli", "turin", "torino", "palermo", "genoa", "genova", "bologna", "florence", "firenze", "bari", "catania", "venice", "verona"]
   },
   {
     "slug": "ivory_coast",
-    "title": "Ivory Coast"
+    "title": "Ivory Coast",
+    "keywords": ["ivory", "abidjan", "bouaké", "daloa", "yamoussoukro"]
   },
   {
     "slug": "japan",
-    "title": "Japan"
+    "title": "Japan",
+    "keywords": ["japan", "tokyo", "yokohama", "osaka", "nagoya", "sapporo", "kobe", "kyoto", "fukuoka", "kawasaki", "saitama", "hiroshima", "sendai"]
   },
   {
     "slug": "jordan",
-    "title": "Jordan"
+    "title": "Jordan",
+    "keywords": ["jordan", "amman", "zarqa", "irbid"]
   },
   {
     "slug": "kazakhstan",
-    "title": "Kazakhstan"
+    "title": "Kazakhstan",
+    "keywords": ["kazakhstan", "almaty", "shymkent", "karagandy", "taraz", "nur-sultan", "pavlodar", "oskemen", "semey"]
   },
   {
     "slug": "kenya",
-    "title": "Kenya"
+    "title": "Kenya",
+    "keywords": ["kenya", "nairobi", "mombasa", "kisumu", "nakuru", "eldoret", "kisii", "nyeri", "machakos", "embu"]
   },
   {
     "slug": "kosovo",
-    "title": "Kosovo"
+    "title": "Kosovo",
+    "keywords": ["kosovo", "kosove", "prishtine", "prizren", "peja", "gjakova", "ferizaj", "gjilan", "mitrovica", "podujev", "vushtrri", "suhareke", "rahovec", "lipjan", "skenderaj", "kamenice", "malisheve", "decan", "istog", "kline", "fushe kosove"]
   },
   {
     "slug": "kurdistan",
-    "title": "Kurdistan"
+    "title": "Kurdistan",
+    "keywords": ["kurdistan", "erbil", "hawler", "sulaymaniyah", "slemani", "duhok", "halabja", "kirkuk"]
   },
   {
     "slug": "kyrgyzstan",
-    "title": "Kyrgyzstan"
+    "title": "Kyrgyzstan",
+    "keywords": ["kyrgyzstan", "bishkek", "osh", "jalal-abad", "karakol", "tokmok"]
   },
   {
     "slug": "laos",
-    "title": "Laos"
+    "title": "Laos",
+    "keywords": ["laos", "vientiane", "pakse"]
   },
   {
     "slug": "latvia",
-    "title": "Latvia"
+    "title": "Latvia",
+    "keywords": ["latvia", "latvija", "riga", "rīga", "kuldiga", "kuldīga", "ventspils", "liepaja", "liepāja", "daugavpils", "jelgava", "jurmala", "jūrmala"]
   },
   {
     "slug": "lebanon",
-    "title": "Lebanon"
+    "title": "Lebanon",
+    "keywords": ["lebanon", "beirut", "sidon", "tyre", "tripoli", "byblos", "bekaa", "jounieh", "zahle", "baalbek", "nabatieh", "jbeil", "batroun", "achrafieh", "hamra"]
   },
   {
     "slug": "libya",
-    "title": "Libya"
+    "title": "Libya",
+    "keywords": ["libya", "tripoli", "benghazi", "misrata", "zliten", "bayda"]
   },
   {
     "slug": "lithuania",
-    "title": "Lithuania"
+    "title": "Lithuania",
+    "keywords": ["lithuania", "vilnius", "kaunas", "klaipeda", "siauliai", "panevezys", "alytus"]
   },
   {
     "slug": "luxembourg",
-    "title": "Luxembourg"
+    "title": "Luxembourg",
+    "keywords": ["luxembourg", "esch-sur-alzette", "differdange", "dudelange", "ettelbruck", "diekirch", "wiltz", "echternach", "rumelange", "grevenmacher", "bertrange", "mamer", "capellen", "strassen"]
   },
   {
     "slug": "macau",
-    "title": "Macau"
+    "title": "Macau",
+    "keywords": ["macau", "macao"]
   },
   {
     "slug": "madagascar",
-    "title": "Madagascar"
+    "title": "Madagascar",
+    "keywords": ["madagascar", "antananarivo", "toamasina", "antsiranana", "mahajanga", "fianarantsoa", "toliara", "antsirabe", "ambositra", "ambatondrazaka", "manakara", "sambava", "morondava", "ambanja", "farafangana", "maintirano", "antsalova", "isoa", "mampikony", "ambatolampy", "ambatofinandrahana", "mandritsara", "marovoay", "moramanga", "vangaindrano", "soaindrana", "ikongo", "tamatave", "diego suarez", "mananjary", "vohemar", "amparafaravola"]
   },
   {
     "slug": "malawi",
-    "title": "Malawi"
+    "title": "Malawi",
+    "keywords": ["malawi", "lilongwe", "blantyre", "mzuzu", "zomba", "karonga", "kasungu", "mangochi", "salima", "liwonde", "balaka"]
   },
   {
     "slug": "malaysia",
-    "title": "Malaysia"
+    "title": "Malaysia",
+    "keywords": ["malaysia", "kuala lumpur", "kajang", "klang", "subang", "penang", "ipoh", "selangor", "melaka", "johor", "sabah", "johor bahru", "shah alam", "iskandar puteri"]
   },
   {
     "slug": "mali",
-    "title": "Mali"
+    "title": "Mali",
+    "keywords": ["mali", "bamako", "sikasso", "kalabancoro", "koutiala", "ségou", "kayes", "kati", "mopti", "niono"]
   },
   {
     "slug": "malta",
-    "title": "Malta"
+    "title": "Malta",
+    "keywords": ["malta", "birgu", "bormla", "mdina", "qormi", "senglea", "siġġiewi", "valletta", "zabbar", "zebbuġ", "zejtun"]
   },
   {
     "slug": "mauritania",
-    "title": "Mauritania"
+    "title": "Mauritania",
+    "keywords": ["mauritania", "mauritanie", "nouakchott", "nouadhibou"]
   },
   {
     "slug": "mauritius",
-    "title": "Mauritius"
+    "title": "Mauritius",
+    "keywords": ["mauritius", "port louis", "curepipe", "quatre bornes", "vacoas-phoenix", "vacoas", "beau-bassin-rose-hill", "beau bassin", "rose hill", "mahebourg", "goodlands", "triolet", "bel air", "flacq", "souillac", "pamplemousses", "grand baie", "ebene"]
   },
   {
     "slug": "mexico",
-    "title": "Mexico"
+    "title": "Mexico",
+    "keywords": ["mexico", "mexico city", "guadalajara", "puebla", "tijuana", "mexicali", "monterrey", "hermosillo", "zapopan", "ciudad juarez", "chihuahua", "aguascalientes", "mx"]
   },
   {
     "slug": "moldova",
-    "title": "Moldova"
+    "title": "Moldova",
+    "keywords": ["moldova", "chisinau", "tiraspol", "balti", "bender", "ribnita", "cahul", "ungheni", "soroca", "orhei", "dubasari"]
   },
   {
     "slug": "morocco",
-    "title": "Morocco"
+    "title": "Morocco",
+    "keywords": ["morocco", "casablanca", "fez", "tangier", "marrakesh", "salé", "meknes", "rabat", "oujda", "kenitra", "agadir", "tetouan", "temara", "safi", "mohammedia", "khouribga", "el jadida"]
   },
   {
     "slug": "mozambique",
-    "title": "Mozambique"
+    "title": "Mozambique",
+    "keywords": ["mozambique", "maputo", "matola", "nampula", "beira", "sofala", "chimoio", "tete", "quelimane"]
   },
   {
     "slug": "myanmar",
-    "title": "Myanmar"
+    "title": "Myanmar",
+    "keywords": ["myanmar", "burma", "yangon", "rangoon", "mandalay", "nay pyi taw", "taunggyi", "bago", "mawlamyine"]
   },
   {
     "slug": "nepal",
-    "title": "Nepal"
+    "title": "Nepal",
+    "keywords": ["nepal", "kathmandu", "pokhara", "lalitpur", "bharatpur", "birgunj", "biratnagar", "janakpur", "ghorahi"]
   },
   {
     "slug": "netherlands",
-    "title": "Netherlands"
+    "title": "Netherlands",
+    "keywords": ["netherlands", "nederland", "amsterdam", "rotterdam", "hague", "utrecht", "holland", "delft"]
   },
   {
     "slug": "new_zealand",
-    "title": "New Zealand"
+    "title": "New Zealand",
+    "keywords": ["new zealand", "auckland", "wellington", "christchurch", "hamilton", "tauranga", "napier-hastings", "dunedin", "palmerston north", "nelson", "rotorua", "whangarei", "new plymouth", "invercargill", "whanganui", "gisborne"]
   },
   {
     "slug": "nicaragua",
-    "title": "Nicaragua"
+    "title": "Nicaragua",
+    "keywords": ["nicaragua", "managua", "matagalpa", "chinandega"]
   },
   {
     "slug": "niger",
-    "title": "Niger"
+    "title": "Niger",
+    "keywords": ["niger", "niamey", "maradi", "zinder", "tahoua", "agadez", "arlit", "birni-n'konni", "dosso", "gaya", "tessaoua"]
   },
   {
     "slug": "nigeria",
-    "title": "Nigeria"
+    "title": "Nigeria",
+    "keywords": ["nigeria", "lagos", "kano", "ibadan", "benin city", "port harcourt", "jos", "ilorin", "kaduna"]
   },
   {
     "slug": "macedonia",
-    "title": "North Macedonia"
+    "title": "North Macedonia",
+    "keywords": ["macedonia", "fyrom", "north macedonia", "mk", "mkd", "ohd", "skp", "skopje", "bitola", "kumanovo", "prilep", "tetovo", "veles", "shtip", "ohrid", "gostivar", "strumica", "kavadarci", "negotino", "berovo", "kratovo", "struga", "valandovo", "demir kapija", "demir hisar", "krusheve", "gevgelija"]
   },
   {
     "slug": "norway",
-    "title": "Norway"
+    "title": "Norway",
+    "keywords": ["norway", "norge", "oslo", "bergen", "trondheim", "stavanger", "drammen", "fredrikstad", "kristiansand", "tromsø", "sandnes", "ålesund", "bodø", "skien", "haugesund", "tønsberg", "arendal", "porsgrunn", "hamar", "larvik", "moss", "sandefjord", "halden", "harstad", "lillehammer", "molde", "gjøvik", "mo i rana", "steinkjer", "alta", "lommedalen"]
   },
   {
     "slug": "oman",
-    "title": "Oman"
+    "title": "Oman",
+    "keywords": ["oman", "ad+dakhiliyah", "ad+dhahirah", "batinah+north", "batinah+south", "al+buraymi", "al+wusta", "ash+sharqiyah+north", "ash+sharqiyah+south", "dhofar", "muscat", "musandam"]
   },
   {
     "slug": "pakistan",
-    "title": "Pakistan"
+    "title": "Pakistan",
+    "keywords": ["pakistan", "karachi", "lahore", "faisalabad", "rawalpindi", "peshawar", "islamabad"]
   },
   {
     "slug": "palestine",
-    "title": "Palestine"
+    "title": "Palestine",
+    "keywords": ["palestine", "jerusalem", "gaza", "hebron", "jenin", "nablus", "ramallah", "rafah"]
   },
   {
     "slug": "panama",
-    "title": "Panama"
+    "title": "Panama",
+    "keywords": ["panama", "panamá", "tocumen"]
   },
   {
     "slug": "papua_new_guinea",
-    "title": "Papua New Guinea"
+    "title": "Papua New Guinea",
+    "keywords": ["papua new guinea", "port moresby", "lae"]
   },
   {
     "slug": "paraguay",
-    "title": "Paraguay"
+    "title": "Paraguay",
+    "keywords": ["paraguay", "asunción", "asuncion", "ciudad del este", "san lorenzo", "luque", "capiata"]
   },
   {
     "slug": "peru",
-    "title": "Peru"
+    "title": "Peru",
+    "keywords": ["peru", "lima", "cusco", "cuzco", "ica", "arequipa", "trujillo", "chiclayo", "huancayo", "piura", "chimbote", "iquitos", "juliaca", "cajamarca"]
   },
   {
     "slug": "philippines",
-    "title": "Philippines"
+    "title": "Philippines",
+    "keywords": ["philippines", "pilipinas", "quezon", "manila", "davao", "caloocan", "cebu", "zamboanga", "bohol", "pasig", "bacolod", "makati", "baguio", "cavite"]
   },
   {
     "slug": "poland",
-    "title": "Poland"
+    "title": "Poland",
+    "keywords": ["poland", "polska", "warsaw", "krakow", "lodz", "wroclaw", "poznan", "gdansk", "szczecin", "bydgoszcz", "lublin", "katowice", "bialystok"]
   },
   {
     "slug": "portugal",
-    "title": "Portugal"
+    "title": "Portugal",
+    "keywords": ["portugal", "lisbon", "lisboa", "braga", "porto", "aveiro", "coimbra", "funchal", "madeira"]
   },
   {
     "slug": "qatar",
-    "title": "Qatar"
+    "title": "Qatar",
+    "keywords": ["qatar", "doha"]
   },
   {
     "slug": "south_korea",
-    "title": "Republic of Korea"
+    "title": "Republic of Korea",
+    "keywords": ["south korea", "rok", "korea", "seoul", "busan", "incheon", "daegu", "daejeon", "gwangju", "대한민국", "서울", "서울시"]
   },
   {
     "slug": "congo_brazzaville",
-    "title": "Republic of the Congo"
+    "title": "Republic of the Congo",
+    "keywords": ["congo brazza", "cog", "brazzaville", "djambala", "pointe noire", "sibiti", "owando", "madingou", "loango", "kinkala", "impfondo", "dolisie"]
   },
   {
     "slug": "romania",
-    "title": "Romania"
+    "title": "Romania",
+    "keywords": ["romania", "bucharest", "cluj", "iasi", "timisoara", "craiova", "brasov", "sibiu", "constanta", "oradea", "galati", "ploesti", "pitesti", "arad", "bacau"]
   },
   {
     "slug": "russia",
-    "title": "Russia"
+    "title": "Russia",
+    "keywords": ["russia", "moscow", "saint petersburg", "novosibirsk", "yekaterinburg", "nizhny novgorod", "samara", "omsk", "kazan", "chelyabinsk", "rostov-on-don", "ufa", "volgograd"]
   },
   {
     "slug": "rwanda",
-    "title": "Rwanda"
+    "title": "Rwanda",
+    "keywords": ["rwanda", "kigali", "butare", "muhanga", "ruhengeri", "gisenyi", "nyarugenge", "huye", "musanze", "rubavu", "rwamagana", "kirehe", "kibungo", "ngoma", "nyagatare", "gicumbi", "nyabihu", "kibuye", "karongi", "rusizi", "nyamasheke", "ruhango", "nyanza", "kamonyi", "kicukiro", "gasabo"]
   },
   {
     "slug": "saudi_arabia",
-    "title": "Saudi Arabia"
+    "title": "Saudi Arabia",
+    "keywords": ["saudi", "ksa", "riyadh", "mecca", "jeddah", "dammam"]
   },
   {
     "slug": "senegal",
-    "title": "Senegal"
+    "title": "Senegal",
+    "keywords": ["senegal", "dakar", "touba", "thies", "rufisque", "kaolack", "ziguinchor", "tambacounda", "kaffrine", "diourbel"]
   },
   {
     "slug": "serbia",
-    "title": "Serbia"
+    "title": "Serbia",
+    "keywords": ["serbia", "belgrade", "novi sad", "nis", "kragujevac", "subotica", "zrenjanin", "pancevo", "cacak", "novi pazar", "kraljevo", "smederevo"]
   },
   {
     "slug": "sierra_leone",
-    "title": "Sierra Leone"
+    "title": "Sierra Leone",
+    "keywords": ["sierra leone", "freetown", "makeni", "koidu"]
   },
   {
     "slug": "singapore",
-    "title": "Singapore"
+    "title": "Singapore",
+    "keywords": ["singapore"]
   },
   {
     "slug": "slovakia",
-    "title": "Slovakia"
+    "title": "Slovakia",
+    "keywords": ["slovakia", "bratislava", "kosice", "presov", "zilina"]
   },
   {
     "slug": "slovenia",
-    "title": "Slovenia"
+    "title": "Slovenia",
+    "keywords": ["slovenia", "slovenija", "ljubljana", "maribor", "celje", "kranj", "koper", "velenje", "novo mesto", "nova gorica", "krsko", "krško", "murska sobota", "postojna", "slovenj gradec"]
   },
   {
     "slug": "somalia",
-    "title": "Somalia"
+    "title": "Somalia",
+    "keywords": ["somalia", "mogadishu", "hargeisa", "bosaso", "borama", "garowe", "kismayo"]
   },
   {
     "slug": "south_africa",
-    "title": "South Africa"
+    "title": "South Africa",
+    "keywords": ["south africa", "johannesburg", "cape town", "rsa", "durban", "port elizabeth", "pretoria", "nelspruit", "knysna"]
   },
   {
     "slug": "south_sudan",
-    "title": "South Sudan"
+    "title": "South Sudan",
+    "keywords": ["south sudan", "juba", "yei", "wau", "aweil", "jonglei", "maridi"]
   },
   {
     "slug": "spain",
-    "title": "Spain"
+    "title": "Spain",
+    "keywords": ["spain", "españa", "madrid", "barcelona", "valencia", "seville", "sevilla", "zaragoza", "malaga", "murcia", "palma", "bilbao", "alicante", "cordoba"]
   },
   {
     "slug": "sri_lanka",
-    "title": "Sri Lanka"
+    "title": "Sri Lanka",
+    "keywords": ["sri lanka", "balangoda", "ratnapura", "colombo", "moratuwa", "negombo", "galle", "jaffna"]
   },
   {
     "slug": "sudan",
-    "title": "Sudan"
+    "title": "Sudan",
+    "keywords": ["sudan", "khartoum", "omdurman"]
   },
   {
     "slug": "suriname",
-    "title": "Suriname"
+    "title": "Suriname",
+    "keywords": ["suriname", "paramaribo"]
   },
   {
     "slug": "sweden",
-    "title": "Sweden"
+    "title": "Sweden",
+    "keywords": ["sweden", "sverige", "stockholm", "malmö", "uppsala", "göteborg", "gothenburg"]
   },
   {
     "slug": "switzerland",
-    "title": "Switzerland"
+    "title": "Switzerland",
+    "keywords": ["switzerland", "zurich", "zürich", "geneva", "basel", "lausanne", "bern", "winterthur", "lucerne", "gallen", "lugano", "biel", "thun"]
   },
   {
     "slug": "syria",
-    "title": "Syria"
+    "title": "Syria",
+    "keywords": ["syria", "سوريا", "damascus", "hama", "aleppo", "homs", "rif dimashq", "tartus", "latakia", "idlib", "raqqa", "daraa", "alhasakah", "dierezzor", "quneitra", "alsuwayda"]
   },
   {
     "slug": "taiwan",
-    "title": "Taiwan"
+    "title": "Taiwan",
+    "keywords": ["taiwan", "taichung", "kaohsiung", "taipei", "taoyuan", "tainan", "hsinchu", "keelung", "chiayi", "changhua"]
   },
   {
     "slug": "tajikistan",
-    "title": "Tajikistan"
+    "title": "Tajikistan",
+    "keywords": ["tajikistan", "dushanbe", "khujand", "kulob", "bokhtar", "khorugh", "panjakent", "isfara", "hisor", "ghissar", "rasht"]
   },
   {
     "slug": "tanzania",
-    "title": "Tanzania"
+    "title": "Tanzania",
+    "keywords": ["tanzania", "dar es salaam", "mwanza", "arusha", "dodoma", "mbeya", "morogoro", "tanga", "kilimanjaro"]
   },
   {
     "slug": "thailand",
-    "title": "Thailand"
+    "title": "Thailand",
+    "keywords": ["thailand", "bangkok", "nonthaburi", "nakhon", "phuket", "pattaya", "chiang mai"]
   },
   {
     "slug": "the_bahamas",
-    "title": "The Bahamas"
+    "title": "The Bahamas",
+    "keywords": ["bahamas"]
   },
   {
     "slug": "togo",
-    "title": "Togo"
+    "title": "Togo",
+    "keywords": ["togo", "lome"]
   },
   {
     "slug": "tunisia",
-    "title": "Tunisia"
+    "title": "Tunisia",
+    "keywords": ["tunisia", "tunis", "sfax", "sousse", "kairouan", "ariana", "gabes", "bizerte"]
   },
   {
     "slug": "turkey",
-    "title": "Turkey"
+    "title": "Turkey",
+    "keywords": ["turkey", "turkiye", "istanbul", "ankara", "izmir", "bursa", "adana", "gaziantep", "konya", "antalya", "kayseri", "mersin", "eskisehir", "samsun", "denizli", "malatya"]
   },
   {
     "slug": "turkmenistan",
-    "title": "Turkmenistan"
+    "title": "Turkmenistan",
+    "keywords": ["turkmenistan", "turkmenabat"]
   },
   {
     "slug": "uganda",
-    "title": "Uganda"
+    "title": "Uganda",
+    "keywords": ["uganda", "kampala", "mbarara", "mukono", "jinja", "arua", "gulu", "masaka"]
   },
   {
     "slug": "ukraine",
-    "title": "Ukraine"
+    "title": "Ukraine",
+    "keywords": ["ukraine", "kiev", "kyiv", "kharkiv", "dnipro", "odesa", "donetsk", "zaporizhia"]
   },
   {
     "slug": "uae",
-    "title": "United Arab Emirates"
+    "title": "United Arab Emirates",
+    "keywords": ["uae", "emirates", "dubai", "abu dhabi", "sharjah", "al ain", "ajman"]
   },
   {
     "slug": "uk",
-    "title": "United Kingdom"
+    "title": "United Kingdom",
+    "keywords": ["uk", "england", "scotland", "wales", "northern ireland", "london", "birmingham", "leeds", "glasgow", "sheffield", "bradford", "manchester", "edinburgh", "liverpool", "bristol", "cardiff", "belfast", "leicester", "wakefield", "coventry", "nottingham", "newcastle"]
   },
   {
     "slug": "united_states",
-    "title": "United States"
+    "title": "United States",
+    "keywords": ["us", "usa", "united states", "alabama", "alaska", "ak", "arizona", "az", "arkansas", "ar", "california", "ca", "colorado", "co", "connecticut", "ct", "delaware", "de", "florida", "fl", "georgia", "ga", "hawaii", "hi", "idaho", "id", "illinois", "il", "indiana", "in", "iowa", "ia", "kansas", "ks", "kentucky", "ky", "louisiana", "la", "maine", "me", "maryland", "md", "massachusetts", "ma", "michigan", "mi", "minnesota", "mn", "mississippi", "ms", "missouri", "mo", "montana", "mt", "nebraska", "ne", "nevada", "nv", "new hampshire", "nh", "new jersey", "nj", "new mexico", "nm", "new york", "ny", "north carolina", "nc", "north dakota", "nd", "ohio", "oh", "oklahoma", "ok", "oregon", "or", "pennsylvania", "pa", "rhode island", "ri", "south carolina", "sc", "south dakota", "sd", "tennessee", "tn", "texas", "tx", "utah", "ut", "vermont", "vt", "virginia", "va", "washington", "wa", "west virginia", "wv", "wisconsin", "wi", "wyoming", "wy", "los angeles", "chicago", "houston", "phoenix", "philadelphia", "san antonio", "san diego", "dallas", "san jose", "austin", "jacksonville", "fort worth", "columbus", "charlotte", "san francisco", "indianapolis", "seattle", "denver", "boston", "el paso", "nashville", "detroit", "portland", "las vegas", "memphis", "louisville", "baltimore"]
   },
   {
     "slug": "uruguay",
-    "title": "Uruguay"
+    "title": "Uruguay",
+    "keywords": ["uruguay", "montevideo"]
   },
   {
     "slug": "uzbekistan",
-    "title": "Uzbekistan"
+    "title": "Uzbekistan",
+    "keywords": ["uzbekistan", "tashkent", "namangan", "samarkand", "andijan", "nukus", "bukhara", "qarshi", "fergana"]
   },
   {
     "slug": "venezuela",
-    "title": "Venezuela"
+    "title": "Venezuela",
+    "keywords": ["venezuela", "caracas", "maracaibo", "barquisimeto", "guayana", "maturín", "zulia", "bolivar"]
   },
   {
     "slug": "vietnam",
-    "title": "Vietnam"
+    "title": "Vietnam",
+    "keywords": ["vietnam", "viet nam", "ho chi minh", "hanoi", "ha noi", "hai phong", "da nang", "can tho", "bien hoa", "nha trang", "vinh"]
   },
   {
     "slug": "worldwide",
-    "title": "Worldwide"
+    "title": "Worldwide",
+    "keywords": []
   },
   {
     "slug": "yemen",
-    "title": "Yemen"
+    "title": "Yemen",
+    "keywords": ["yemen", "sana'a", "taiz", "aden", "mukalla", "ibb"]
   },
   {
     "slug": "zambia",
-    "title": "Zambia"
+    "title": "Zambia",
+    "keywords": ["zambia", "lusaka", "kitwe", "ndola"]
   },
   {
     "slug": "zimbabwe",
-    "title": "Zimbabwe"
+    "title": "Zimbabwe",
+    "keywords": ["zimbabwe", "harare", "bulawayo", "mutare", "gweru", "kwekwe"]
   }
 ]
