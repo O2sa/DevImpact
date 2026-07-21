@@ -1,5 +1,5 @@
 import yaml from "js-yaml";
-import { createGitHubUserDataFetcherWithMetrics, getUserData } from "@/lib/github";
+import { getUserData } from "@/lib/github";
 import { calculateUserScore } from "@/lib/score";
 import { createCacheStore, getCacheConfigFromEnv } from "@/lib/cache-store";
 import { getDatabaseStore, type DatabaseStore } from "@/lib/db-store";

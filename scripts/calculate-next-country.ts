@@ -20,7 +20,7 @@
 import "dotenv/config";
 
 import { getDatabaseStore } from "@/lib/db-store";
-import { calculateLeaderboard, type LeaderboardResult } from "@/lib/calculate-leaderboard";
+import { calculateLeaderboard } from "@/lib/calculate-leaderboard";
 import { logger } from "@/lib/logger";
 
 async function main() {

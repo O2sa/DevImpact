@@ -343,11 +343,13 @@ export function HomePageClient() {
   useEffect(() => {
     const params = searchParams.getAll("username");
     const urlLanguages = sanitizeSelectedLanguages(searchParams.getAll("selectedLanguage"));
-    syncToUrl(
-      params[0] ?? "",
-      params[1] ?? "",
-      urlLanguages,
-    );
+    queueMicrotask(() => {
+      syncToUrl(
+        params[0] ?? "",
+        params[1] ?? "",
+        urlLanguages,
+      );
+    });
   }, [searchParams]);
 
   useEffect(() => {
@@ -357,7 +359,6 @@ export function HomePageClient() {
     }
 
     if (data) {
-      setDisplayData(data);
       return;
     }
 

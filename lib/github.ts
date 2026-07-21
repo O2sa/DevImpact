@@ -1,5 +1,4 @@
 import {
-  DEFAULT_GITHUB_CACHE_TTL_SECONDS,
   createCacheStore,
   getCacheConfigFromEnv,
   type CacheConfig,
@@ -59,35 +58,6 @@ type RawDiscussionNode = {
 type PageInfo = {
   hasNextPage: boolean;
   endCursor: string | null;
-};
-
-type FetchUserAndPullRequestsResponse = {
-  user: GitHubRawUser | null;
-  pullRequests: {
-    nodes: Array<PullRequestNode | null>;
-    pageInfo: PageInfo;
-  };
-};
-
-type FetchPullRequestsPageResponse = {
-  pullRequests: {
-    nodes: Array<PullRequestNode | null>;
-    pageInfo: PageInfo;
-  };
-};
-
-type FetchIssuesPageResponse = {
-  issues: {
-    nodes: Array<RawIssueNode | null>;
-    pageInfo: PageInfo;
-  };
-};
-
-type FetchDiscussionsPageResponse = {
-  discussions: {
-    nodes: Array<RawDiscussionNode | null>;
-    pageInfo: PageInfo;
-  };
 };
 
 type GitHubQueryExecutor = Pick<GitHubGraphQLClient, "execute">;
@@ -339,15 +309,6 @@ function isDefined<T>(value: T | null | undefined): value is T {
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
-}
-
-function isNumericRecord(value: unknown): value is Record<string, number> {
-  return (
-    isObject(value) &&
-    Object.values(value).every(
-      (item) => typeof item === "number" && Number.isFinite(item),
-    )
-  );
 }
 
 function isGitHubUserData(value: unknown): value is GitHubUserData {
@@ -757,14 +718,6 @@ function getStaleDays(): number {
   if (!raw) return 14;
   const parsed = Number.parseInt(raw, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 14;
-}
-
-/**
- * Fetch fresh user data from the GitHub API.
- */
-async function fetchFromGitHubApi(username: string): Promise<GitHubUserData> {
-  const { data } = await fetchUserDataFromGitHub(executorSingleton, username);
-  return data;
 }
 
 /**
