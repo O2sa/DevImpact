@@ -50,13 +50,14 @@ export function LanguageSwitcher() {
         aria-expanded={open}
         aria-label="Select language"
         className={cn(
-          "flex h-9 min-w-[140px] items-center justify-between rounded-lg border border-input bg-background px-3 text-sm text-foreground transition-colors",
+          "flex h-9 min-w-[78px] items-center justify-between rounded-lg border border-input bg-background px-2.5 text-sm text-foreground transition-colors sm:min-w-[140px] sm:px-3",
           "focus:outline-none focus:ring-2 focus:ring-primary/60",
           open && "ring-2 ring-primary/60"
         )}
         onClick={() => setOpen((prev) => !prev)}
       >
-        <span>{currentLocale?.label ?? locale}</span>
+        <span className="sm:hidden">{locale.toUpperCase()}</span>
+        <span className="hidden sm:inline">{currentLocale?.label ?? locale}</span>
         <svg
           viewBox="0 0 24 24"
           fill="none"

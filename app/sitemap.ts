@@ -1,9 +1,15 @@
 import type { MetadataRoute } from "next";
 import { getSiteUrl } from "@/lib/seo";
+import countriesData from "@/data/countries.json";
+
+type CountryInfo = {
+  slug: string;
+};
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getSiteUrl();
   const now = new Date();
+  const countries = countriesData as CountryInfo[];
 
   const entries: MetadataRoute.Sitemap = [
     {
@@ -12,6 +18,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 1,
     },
+    ...countries.map((country) => ({
+      url: `${baseUrl}/leaderboard/${country.slug}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
+    })),
     {
       url: `${baseUrl}/leaderboard`,
       lastModified: now,

@@ -1,166 +1,177 @@
-"use client";
+import type { Metadata } from "next";
+import countriesData from "@/data/countries.json";
+import { JsonLd } from "@/components/seo/json-ld";
+import { getLeaderboardResult } from "@/lib/leaderboard";
+import { toAbsoluteUrl } from "@/lib/seo";
+import { CountryLeaderboardClient } from "./country-leaderboard-client";
 
-import { useEffect, useState, use } from "react";
-import Link from "next/link";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import { LeaderboardTable } from "@/components/leaderboard-table";
-import { AppHeader } from "@/components/app-header";
-import { AppFooter } from "@/components/app-footer";
-import { Button } from "@/components/ui/button";
-import { useTranslation } from "@/components/language-provider";
-
-// ─── Types ─────────────────────────────────────────────────────────────
-
-type ScoredEntry = {
-  username: string;
-  name: string | null;
-  avatarUrl: string;
-  repoScore: number;
-  prScore: number;
-  contributionScore: number;
-  finalScore: number;
-  originalRank: number;
-  originalContributions: number;
-  impactRank: number;
-};
-
-type LeaderboardApiResponse = {
-  success: boolean;
+type CountryInfo = {
+  slug: string;
   title: string;
-  totalFromSource: number;
-  scored: ScoredEntry[];
-  errors: string[];
+  keywords?: string[];
 };
 
 type Props = {
   params: Promise<{ country: string }>;
 };
 
-// ─── Fetch helpers ─────────────────────────────────────────────────────
+const countries = countriesData as CountryInfo[];
 
-async function fetchLeaderboard(country: string): Promise<LeaderboardApiResponse> {
-  const res = await fetch(`/api/leaderboard?country=${encodeURIComponent(country)}`);
-  if (!res.ok) throw new Error(`Failed to fetch leaderboard for ${country}`);
-  const json = await res.json();
-  if (!json.success) throw new Error(json.error || "Failed to load leaderboard");
-  return json;
+function formatCountryTitle(country: string): string {
+  return country
+    .split("_")
+    .filter(Boolean)
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
 }
 
-// ─── Component ─────────────────────────────────────────────────────────
+function getCountryInfo(country: string): CountryInfo {
+  return (
+    countries.find((entry) => entry.slug === country) ?? {
+      slug: country,
+      title: formatCountryTitle(country),
+      keywords: [],
+    }
+  );
+}
 
-export default function CountryLeaderboardPage({ params }: Props) {
-  const { country } = use(params);
-  const { t } = useTranslation();
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { country } = await params;
+  const countryInfo = getCountryInfo(country);
+  const pageTitle = `${countryInfo.title} Developer Leaderboard`;
+  const description = `Explore the ${countryInfo.title} GitHub developer leaderboard on DevImpact. Compare repository impact, merged pull request strength, and community contribution signals in one country ranking.`;
+  const keywords = [
+    `${countryInfo.title} developer leaderboard`,
+    `${countryInfo.title} GitHub developers`,
+    `${countryInfo.title} open source ranking`,
+    `${countryInfo.title} developer ranking`,
+    "GitHub leaderboard",
+    "developer impact score",
+    ...(countryInfo.keywords ?? []).slice(0, 6),
+  ];
 
-  const [title, setTitle] = useState("");
-  const [totalFromSource, setTotalFromSource] = useState(0);
-  const [scored, setScored] = useState<ScoredEntry[]>([]);
-  const [errors, setErrors] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [failed, setFailed] = useState<string | null>(null);
+  return {
+    title: pageTitle,
+    description,
+    keywords,
+    alternates: {
+      canonical: `/leaderboard/${country}`,
+    },
+    openGraph: {
+      type: "website",
+      title: `${pageTitle} | DevImpact`,
+      description,
+      url: `/leaderboard/${country}`,
+      images: [
+        {
+          url: toAbsoluteUrl("/og-image.svg"),
+          width: 1200,
+          height: 630,
+          alt: `${countryInfo.title} developer leaderboard preview`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${pageTitle} | DevImpact`,
+      description,
+      images: [toAbsoluteUrl("/og-image.svg")],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
+    },
+  };
+}
 
-  useEffect(() => {
-    let cancelled = false;
+export async function generateStaticParams() {
+  return countries.map((country) => ({ country: country.slug }));
+}
 
-    (async () => {
-      try {
-        const data = await fetchLeaderboard(country);
-        if (cancelled) return;
+export default async function CountryLeaderboardPage({ params }: Props) {
+  const { country } = await params;
+  const countryInfo = getCountryInfo(country);
+  const countryUrl = toAbsoluteUrl(`/leaderboard/${country}`);
+  const leaderboard = await getLeaderboardResult(country);
 
-        setTitle(data.title);
-        setTotalFromSource(data.totalFromSource);
-        setScored(data.scored);
-        setErrors(data.errors);
-        setLoading(false);
-      } catch (err) {
-        if (!cancelled)
-          setFailed(
-            err instanceof Error ? err.message : "Failed to load leaderboard",
-          );
+  const webPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `${countryInfo.title} Developer Leaderboard`,
+    description: `Country ranking for ${countryInfo.title} developers based on repository impact, merged pull requests, and community contribution signals.`,
+    url: countryUrl,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "DevImpact",
+      url: toAbsoluteUrl("/"),
+    },
+    about: {
+      "@type": "Thing",
+      name: `${countryInfo.title} open-source developers`,
+    },
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: toAbsoluteUrl("/"),
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Leaderboards",
+        item: toAbsoluteUrl("/leaderboard"),
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: countryInfo.title,
+        item: countryUrl,
+      },
+    ],
+  };
+
+  const topUsersSchema = leaderboard.scored.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        name: `${countryInfo.title} top GitHub developers`,
+        itemListOrder: "https://schema.org/ItemListOrderDescending",
+        numberOfItems: leaderboard.scored.length,
+        itemListElement: leaderboard.scored.map((user) => ({
+          "@type": "ListItem",
+          position: user.impactRank,
+          name: user.name || user.username,
+          url: `https://github.com/${user.username}`,
+        })),
       }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [country]);
-
-  if (failed) {
-    return (
-      <main className="flex min-h-screen flex-col">
-        <AppHeader />
-        <div className="w-full flex-1 max-w-6xl mx-auto px-4 py-10">
-          <div className="mx-auto flex max-w-2xl flex-col items-center justify-center gap-5 rounded-3xl border border-destructive/25 bg-gradient-to-b from-destructive/10 via-destructive/5 to-background px-6 py-12 text-center shadow-sm">
-            <p className="text-lg font-semibold tracking-tight text-foreground">
-              {t("leaderboard.error.title")}
-            </p>
-            <p className="max-w-xl text-sm leading-7 text-muted-foreground">
-              {failed}
-            </p>
-            <Link href="/leaderboard">
-              <Button variant="ghost">{t("leaderboard.back")}</Button>
-            </Link>
-          </div>
-        </div>
-        <AppFooter />
-      </main>
-    );
-  }
+    : null;
 
   return (
-    <main className="flex min-h-screen flex-col">
-      <AppHeader />
-      <div className="w-full flex-1 max-w-6xl mx-auto px-4 py-10 space-y-6">
-        {/* Back navigation */}
-        <div className="flex items-center gap-3">
-          <Link href="/leaderboard">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="mr-1 h-4 w-4 rtl:-scale-x-100" />
-              {t("leaderboard.back")}
-            </Button>
-          </Link>
-        </div>
-
-        {/* Leaderboard table */}
-        {scored.length > 0 ? (
-          <div className="animate-fadeIn">
-            <LeaderboardTable
-              users={scored}
-              failedUsers={errors}
-              title={title}
-              totalFromSource={totalFromSource}
-              usersProcessed={scored.length}
-            />
-          </div>
-        ) : loading ? (
-          <div className="flex items-center justify-center gap-2 py-20">
-            <Loader2 className="h-5 w-5 animate-spin text-primary" />
-            <span className="text-sm text-muted-foreground">
-              {t("leaderboard.loading")}
-            </span>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-4 py-20 text-center">
-            <p className="text-lg font-medium text-muted-foreground">
-              {t("leaderboard.noDevelopersFor", { title })}
-            </p>
-            <Link href="/leaderboard">
-              <Button variant="secondary">{t("leaderboard.back")}</Button>
-            </Link>
-          </div>
-        )}
-
-        {/* Scoring progress indicator */}
-        {loading && scored.length > 0 && (
-          <div className="flex items-center justify-center gap-2 py-4">
-            <Loader2 className="h-5 w-5 animate-spin text-primary" />
-            <span className="text-sm text-muted-foreground">
-              {t("leaderboard.loading")}
-            </span>
-          </div>
-        )}
-      </div>
-      <AppFooter />
-    </main>
+    <>
+      <JsonLd
+        data={
+          topUsersSchema
+            ? [webPageSchema, breadcrumbSchema, topUsersSchema]
+            : [webPageSchema, breadcrumbSchema]
+        }
+      />
+      <CountryLeaderboardClient
+        countryTitle={countryInfo.title}
+        initialLeaderboard={leaderboard}
+      />
+    </>
   );
 }
