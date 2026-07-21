@@ -1,25 +1,77 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: devimpact-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: devimpact
+      POSTGRES_USER: devimpact
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devimpact}
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devimpact -d devimpact"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
   redis:
     image: redis:7-alpine
     container_name: devimpact-redis
     restart: unless-stopped
+
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--requirepass",
+        "${REDIS_PASSWORD}",
+        "--maxmemory",
+        "512mb",
+        "--maxmemory-policy",
+        "allkeys-lru"
+      ]
+
     ports:
       - "6379:6379"
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-    command: >
-      sh -c "if [ -n \"$${REDIS_PASSWORD}\" ]; then
-        redis-server --appendonly yes --requirepass \"$${REDIS_PASSWORD}\";
-      else
-        redis-server --appendonly yes;
-      fi"
+
     volumes:
       - redis-data:/data
+
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "-a",
+          "${REDIS_PASSWORD}",
+          "ping"
+        ]
       interval: 10s
       timeout: 3s
       retries: 5
+      start_period: 10s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
 
 volumes:
+  postgres-data:
   redis-data:

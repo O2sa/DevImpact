@@ -58,18 +58,15 @@ export type PullRequestNode = {
   };
 };
 
-export type ContributionTotals = {
-  totalCommitContributions: number;
-  totalPullRequestContributions: number;
-  totalIssueContributions: number;
-};
+
 
 export type GitHubUserData = {
+  login: string;
   name: string | null;
   avatarUrl: string;
+  location: string | null;
   repos: RepoNode[];
   pullRequests: PullRequestNode[];
-  contributions: ContributionTotals;
   issues?: IssueNode[];
   discussions?: DiscussionNode[];
 };

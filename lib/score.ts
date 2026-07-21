@@ -1,5 +1,4 @@
 import type {
-  ContributionTotals,
   DiscussionNode,
   IssueNode,
   PullRequestNode,
@@ -300,7 +299,6 @@ type CommunityScoreResult = {
 };
 
 function calculateContributionScore(
-  _contrib: ContributionTotals | undefined,
   issues: IssueNode[],
   discussions: DiscussionNode[],
   username: string,
@@ -591,7 +589,6 @@ export function calculateUserScore(
   data: {
     repos: RepoNode[];
     pullRequests: PullRequestNode[];
-    contributions?: ContributionTotals;
     issues?: IssueNode[];
     discussions?: DiscussionNode[];
     referenceDate?: string;
@@ -611,7 +608,6 @@ export function calculateUserScore(
   const repoScore = calculateRepoScore(data.repos, referenceDate);
   const prScore = calculatePRScore(data.pullRequests, username, referenceDate);
   const communityScore = calculateContributionScore(
-    data.contributions,
     data.issues ?? [],
     data.discussions ?? [],
     username,

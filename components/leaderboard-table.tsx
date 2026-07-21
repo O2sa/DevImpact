@@ -1,0 +1,202 @@
+"use client";
+
+import { useState, useMemo } from "react";
+import Image from "next/image";
+import { Search, AlertTriangle } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "./ui/card";
+import { Input } from "./ui/input";
+import { useTranslation } from "./language-provider";
+import { cn } from "@/lib/utils";
+
+type LeaderboardEntry = {
+  username: string;
+  name: string | null;
+  avatarUrl: string;
+  repoScore: number;
+  prScore: number;
+  contributionScore: number;
+  finalScore: number;
+  impactRank: number;
+};
+
+type Props = {
+  users: LeaderboardEntry[];
+  failedUsers: string[];
+  title: string;
+  totalFromSource: number;
+  usersProcessed: number;
+};
+
+function getGithubProfileUrl(username: string): string {
+  return `https://github.com/${username}`;
+}
+
+export function LeaderboardTable({
+  users,
+  failedUsers,
+  title,
+  totalFromSource,
+  usersProcessed,
+}: Props) {
+  const { t } = useTranslation();
+  const [search, setSearch] = useState("");
+
+  const filtered = useMemo(() => {
+    if (!search.trim()) return users;
+    const q = search.trim().toLowerCase();
+    return users.filter(
+      (u) =>
+        u.username.toLowerCase().includes(q) ||
+        (u.name && u.name.toLowerCase().includes(q)),
+    );
+  }, [users, search]);
+
+  if (users.length === 0) return null;
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {t("leaderboard.title")} — {title}
+          </CardTitle>
+          <div className="flex flex-wrap items-center gap-2">
+            <CardDescription>
+              {t("leaderboard.description", {
+                processed: usersProcessed,
+                total: totalFromSource,
+              })}
+            </CardDescription>
+            {failedUsers.length > 0 && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300 cursor-default">
+                    <AlertTriangle className="h-3 w-3" />
+                    {t("leaderboard.partialErrors", {
+                      count: failedUsers.length,
+                    })}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-xs">{failedUsers.join(", ")}</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+          {users.length > 0 && (
+            <div className="relative mt-2 max-w-sm">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                className="h-9 pl-9"
+                placeholder={t("leaderboard.search")}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+          )}
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="px-3 py-3 text-start font-semibold text-muted-foreground">
+                    {t("leaderboard.impactRank")}
+                  </th>
+                  <th className="px-3 py-3 text-start font-semibold text-muted-foreground">
+                    {t("leaderboard.developer")}
+                  </th>
+                  <th className="px-3 py-3 text-start font-semibold text-muted-foreground">
+                    {t("comparsion.final.score")}
+                  </th>
+                  <th className="px-3 py-3 text-start font-semibold text-muted-foreground">
+                    {t("comparsion.repo.score")}
+                  </th>
+                  <th className="px-3 py-3 text-start font-semibold text-muted-foreground">
+                    {t("comparsion.pr.score")}
+                  </th>
+                  <th className="px-3 py-3 text-start font-semibold text-muted-foreground">
+                    {t("comparsion.contribution.score")}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((user) => (
+                  <tr
+                    key={user.username}
+                    className={cn(
+                      "border-b border-border/50 transition-colors hover:bg-muted/30",
+                      user.impactRank <= 3 && "bg-primary/5",
+                    )}
+                  >
+                    <td className="px-3 py-3">
+                      <span
+                        className={cn(
+                          "inline-flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold",
+                          user.impactRank === 1
+                            ? "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
+                            : user.impactRank === 2
+                              ? "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                              : user.impactRank === 3
+                                ? "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300"
+                                : "bg-muted text-muted-foreground",
+                        )}
+                      >
+                        {user.impactRank}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3">
+                      <div className="flex items-center gap-2">
+                        <Image
+                          src={user.avatarUrl}
+                          alt={user.name || user.username}
+                          width={32}
+                          height={32}
+                          className="rounded-full ring-1 ring-border"
+                        />
+                        <div className="min-w-0">
+                          <a
+                            href={getGithubProfileUrl(user.username)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-semibold text-primary hover:underline"
+                          >
+                            {user.name || user.username}
+                          </a>
+                          <p className="text-xs text-muted-foreground">
+                            {user.username}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-start">
+                      <span className="font-bold text-primary">
+                        {user.finalScore}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3 text-start font-mono text-xs">
+                      {user.repoScore}
+                    </td>
+                    <td className="px-3 py-3 text-start font-mono text-xs">
+                      {user.prScore}
+                    </td>
+                    <td className="px-3 py-3 text-start font-mono text-xs">
+                      {user.contributionScore}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

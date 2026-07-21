@@ -200,6 +200,12 @@ GITHUB_DISCUSSION_COUNT=10
 pnpm run dev
 ```
 
+To calculate the next leaderboard country from the script, run:
+
+```bash
+pnpm run calculate-next-country
+```
+
 ---
 
 

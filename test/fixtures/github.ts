@@ -1,5 +1,4 @@
 import type {
-  ContributionTotals,
   DiscussionNode,
   IssueNode,
   PullRequestNode,
@@ -10,7 +9,6 @@ import type {
 export type UserScoreInput = {
   repos: RepoNode[];
   pullRequests: PullRequestNode[];
-  contributions: ContributionTotals;
   issues?: IssueNode[];
   discussions?: DiscussionNode[];
   referenceDate?: string;
@@ -49,11 +47,6 @@ const defaultPullRequest: PullRequestNode = {
   },
 };
 
-const defaultContributions: ContributionTotals = {
-  totalCommitContributions: 0,
-  totalPullRequestContributions: 0,
-  totalIssueContributions: 0,
-};
 
 const defaultIssue: IssueNode = {
   title: "Issue about improving docs",
@@ -135,14 +128,7 @@ export function makeDiscussion(
   };
 }
 
-export function makeContributions(
-  overrides: Partial<ContributionTotals> = {},
-): ContributionTotals {
-  return {
-    ...defaultContributions,
-    ...overrides,
-  };
-}
+
 
 export function makeUserScoreInput(
   overrides: Partial<UserScoreInput> = {},
@@ -150,7 +136,6 @@ export function makeUserScoreInput(
   return {
     repos: overrides.repos ?? [makeRepo()],
     pullRequests: overrides.pullRequests ?? [makePullRequest()],
-    contributions: overrides.contributions ?? makeContributions(),
     issues: overrides.issues ?? [],
     discussions: overrides.discussions ?? [],
     referenceDate: overrides.referenceDate,

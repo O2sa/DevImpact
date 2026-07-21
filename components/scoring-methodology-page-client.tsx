@@ -9,11 +9,9 @@ import { ScoringMethodologyFlow } from "@/components/scoring/scoring-methodology
 import { ScoringMethodologySection } from "@/components/scoring/scoring-methodology-section";
 
 export function ScoringMethodologyPageClient() {
-  const { t, dir } = useTranslation();
+  const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const backIconClass = dir === "rtl" ? "rotate-180" : "";
-
   const handleBack = () => {
     const query = searchParams.toString();
     if (query) {
@@ -39,7 +37,7 @@ export function ScoringMethodologyPageClient() {
           className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
           aria-label={t("methodology.back")}
         >
-          <ArrowLeft className={`h-4 w-4 ${backIconClass}`} />
+          <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" />
           {t("methodology.back")}
         </button>
 

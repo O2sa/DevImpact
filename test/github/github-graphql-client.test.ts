@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import { describe, expect, test } from "vitest";
 import {
   GitHubApiError,

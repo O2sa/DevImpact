@@ -11,15 +11,22 @@
     "test:watch": "vitest --watch",
     "redis:up": "docker compose up -d redis",
     "redis:down": "docker compose stop redis",
+    "db:up": "docker compose up -d postgres",
+    "db:init": "tsx scripts/init-db.ts",
+    "db:migrate": "tsx scripts/init-db.ts",
+    "leaderboard:calculate": "tsx scripts/calculate-next-country.ts",
     "validate-locales": "node scripts/validate-locales.js"
   },
   "dependencies": {
     "@octokit/graphql": "^9.0.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "flag-icons": "^7.5.0",
+    "js-yaml": "^4.1.1",
     "lucide-react": "^1.7.0",
     "next": "^16.2.6",
     "next-themes": "^0.3.0",
+    "pg": "^8.22.0",
     "radix-ui": "^1.4.3",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -29,14 +36,18 @@
     "tailwind-merge": "^2.5.3"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.5.2",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.20",
+    "dotenv": "^17.4.2",
     "eslint": "^9.17.0",
     "eslint-config-next": "^16.2.2",
     "postcss": "^8.5.11",
     "tailwindcss": "^3.4.14",
+    "tsx": "^3.12.7",
     "typescript": "^6.0.2",
     "vitest": "^4.1.5"
   }

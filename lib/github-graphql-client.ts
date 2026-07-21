@@ -290,7 +290,9 @@ export class GitHubGraphQLClient {
   async execute<TData, TVariables extends Record<string, unknown>>(
     params: ExecuteQueryParams<TVariables>,
   ): Promise<TData> {
-    return this.scheduler.schedule(() => this.executeWithRetries<TData, TVariables>(params));
+    return this.scheduler.schedule(() =>
+      this.executeWithRetries<TData, TVariables>(params),
+    );
   }
 
   private async executeWithRetries<
@@ -365,7 +367,10 @@ export class GitHubGraphQLClient {
       });
       throw new GitHubApiError({
         message:
-          payload.errors?.map((error) => error.message).filter(Boolean).join(" | ") ||
+          payload.errors
+            ?.map((error) => error.message)
+            .filter(Boolean)
+            .join(" | ") ||
           `GitHub GraphQL request failed with status ${response.status}`,
         kind,
         status: response.status,
@@ -398,7 +403,8 @@ export class GitHubGraphQLClient {
       return error;
     }
 
-    const message = error instanceof Error ? error.message : "Unknown network error";
+    const message =
+      error instanceof Error ? error.message : "Unknown network error";
     return new GitHubApiError({
       message,
       kind: "NETWORK",
@@ -418,7 +424,10 @@ export class GitHubGraphQLClient {
       typeof rateLimit.remaining === "number" &&
       typeof rateLimit.resetAt === "number"
     ) {
-      const secondsToReset = Math.max(1, rateLimit.resetAt - Math.floor(now / 1000));
+      const secondsToReset = Math.max(
+        1,
+        rateLimit.resetAt - Math.floor(now / 1000),
+      );
       const budgetPerSecond = rateLimit.remaining / secondsToReset;
 
       if (budgetPerSecond < 0.25) {
@@ -468,21 +477,24 @@ export function toSafeApiError(error: unknown): SafeApiError {
     case "TIMEOUT":
       return {
         code: "GITHUB_TIMEOUT",
-        message: "GitHub API timed out while processing the request. Please try again shortly.",
+        message:
+          "GitHub API timed out while processing the request. Please try again shortly.",
         retryAfterSeconds,
         rateLimit,
       };
     case "RESOURCE_LIMIT":
       return {
         code: "GITHUB_RESOURCE_LIMIT",
-        message: "GitHub API resource limits were reached for this query. Please retry shortly.",
+        message:
+          "GitHub API resource limits were reached for this query. Please retry shortly.",
         retryAfterSeconds,
         rateLimit,
       };
     case "AUTH":
       return {
         code: "GITHUB_AUTH",
-        message: "GitHub authentication failed. Check GitHub token configuration.",
+        message:
+          "GitHub authentication failed. Check GitHub token configuration.",
         rateLimit,
       };
     case "NOT_FOUND":

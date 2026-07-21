@@ -1,4 +1,6 @@
-import { describe, expect, test } from "vitest";
+import "dotenv/config";
+
+import { afterEach, describe, expect, test, vi } from "vitest";
 import {
   createGitHubUserDataFetcher,
   type GitHubFetcherDependencies,
@@ -19,10 +21,7 @@ function makeExecutor(
   delayMs = 0,
 ): GitHubFetcherDependencies["executor"] {
   return {
-    async execute<
-      TData,
-      TVariables extends Record<string, unknown>,
-    >(params: {
+    async execute<TData, TVariables extends Record<string, unknown>>(params: {
       operationName: string;
       query: string;
       variables: TVariables;
@@ -35,7 +34,7 @@ function makeExecutor(
         await new Promise((resolve) => setTimeout(resolve, delayMs));
       }
 
-      if (params.operationName === "FetchUserAndPullRequests") {
+      if (params.operationName === "FetchUser") {
         return {
           user: {
             name: "User Name",
@@ -63,6 +62,11 @@ function makeExecutor(
               totalIssueContributions: 0,
             },
           },
+        } as unknown as TData;
+      }
+
+      if (params.operationName === "FetchUserPullRequests") {
+        return {
           pullRequests: {
             nodes: [
               {
@@ -83,6 +87,7 @@ function makeExecutor(
                 },
               },
             ],
+            pageInfo: { hasNextPage: false, endCursor: null },
           },
         } as unknown as TData;
       }
@@ -102,6 +107,7 @@ function makeExecutor(
                 },
               },
             ],
+            pageInfo: { hasNextPage: false, endCursor: null },
           },
         } as unknown as TData;
       }
@@ -121,6 +127,7 @@ function makeExecutor(
                 },
               },
             ],
+            pageInfo: { hasNextPage: false, endCursor: null },
           },
         } as unknown as TData;
       }
@@ -166,23 +173,22 @@ function isGitHubUserData(value: unknown): value is GitHubUserData {
     value !== null &&
     "avatarUrl" in value &&
     "repos" in value &&
-    "pullRequests" in value &&
-    "contributions" in value
+    "pullRequests" in value
   );
 }
 
 describe("GitHub user data caching", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
   test("cache hit skips GitHub calls", async () => {
     const cachedPayload: GitHubUserData = {
       name: "Cached",
+      location: "any",
+      login: "Cached",
       avatarUrl: "https://example.com/cached.png",
       repos: [],
       pullRequests: [],
-      contributions: {
-        totalCommitContributions: 0,
-        totalPullRequestContributions: 0,
-        totalIssueContributions: 0,
-      },
       issues: [],
       discussions: [],
     };
@@ -224,7 +230,7 @@ describe("GitHub user data caching", () => {
 
     const result = await fetcher("TeStUser");
     expect(isGitHubUserData(result)).toBe(true);
-    expect(calls).toHaveLength(3);
+    expect(calls).toHaveLength(4);
     expect(setCalls).toHaveLength(1);
     expect(setCalls[0]?.ttl).toBe(604_800);
     expect(setCalls[0]?.key).toBe("devimpact:v1:github-user:testuser");
@@ -247,7 +253,177 @@ describe("GitHub user data caching", () => {
 
     const result = await fetcher("testuser");
     expect(result.name).toBe("User Name");
-    expect(calls).toHaveLength(3);
+    expect(calls).toHaveLength(4);
+  });
+
+  test("uses configured counts as the total number of fetched search items", async () => {
+    vi.stubEnv("GITHUB_PR_COUNT", "2");
+    vi.stubEnv("GITHUB_ISSUE_COUNT", "2");
+    vi.stubEnv("GITHUB_DISCUSSION_COUNT", "2");
+
+    const calls: Array<{
+      operationName: string;
+      variables: Record<string, unknown>;
+    }> = [];
+    const fetcher = createGitHubUserDataFetcher({
+      executor: {
+        async execute<
+          TData,
+          TVariables extends Record<string, unknown>,
+        >(params: {
+          operationName: string;
+          query: string;
+          variables: TVariables;
+        }): Promise<TData> {
+          calls.push({
+            operationName: params.operationName,
+            variables: params.variables as Record<string, unknown>,
+          });
+
+          if (params.operationName === "FetchUser") {
+            return {
+              user: {
+                name: "User Name",
+                avatarUrl: "https://example.com/avatar.png",
+                repositories: { nodes: [] },
+                contributionsCollection: {
+                  totalCommitContributions: 0,
+                  totalPullRequestContributions: 0,
+                  totalIssueContributions: 0,
+                },
+              },
+            } as unknown as TData;
+          }
+
+          if (params.operationName === "FetchUserPullRequests") {
+            const hasCursor = Boolean(params.variables.prCursor);
+            return {
+              pullRequests: {
+                nodes: hasCursor
+                  ? [
+                      {
+                        merged: true,
+                        additions: 1,
+                        deletions: 0,
+                        title: "Second page",
+                        url: "https://github.com/ext/repo/pull/2",
+                        repository: {
+                          nameWithOwner: "ext/repo",
+                          url: "https://github.com/ext/repo",
+                          stargazerCount: 1,
+                          pushedAt: "2026-05-02T00:00:00.000Z",
+                          owner: { login: "ext" },
+                          languages: {
+                            edges: [{ size: 1, node: { name: "TypeScript" } }],
+                          },
+                        },
+                      },
+                    ]
+                  : [
+                      {
+                        merged: true,
+                        additions: 1,
+                        deletions: 0,
+                        title: "First page",
+                        url: "https://github.com/ext/repo/pull/1",
+                        repository: {
+                          nameWithOwner: "ext/repo",
+                          url: "https://github.com/ext/repo",
+                          stargazerCount: 1,
+                          pushedAt: "2026-05-01T00:00:00.000Z",
+                          owner: { login: "ext" },
+                          languages: {
+                            edges: [{ size: 1, node: { name: "TypeScript" } }],
+                          },
+                        },
+                      },
+                      {
+                        merged: false,
+                        additions: 0,
+                        deletions: 0,
+                        title: "Second item",
+                        url: "https://github.com/ext/repo/pull/2",
+                        repository: {
+                          nameWithOwner: "ext/repo",
+                          url: "https://github.com/ext/repo",
+                          stargazerCount: 1,
+                          pushedAt: "2026-05-02T00:00:00.000Z",
+                          owner: { login: "ext" },
+                          languages: {
+                            edges: [{ size: 1, node: { name: "TypeScript" } }],
+                          },
+                        },
+                      },
+                    ],
+                pageInfo: hasCursor
+                  ? { hasNextPage: false, endCursor: null }
+                  : { hasNextPage: true, endCursor: "next-page" },
+              },
+            } as unknown as TData;
+          }
+
+          if (params.operationName === "FetchUserIssues") {
+            return {
+              issues: {
+                nodes: [
+                  {
+                    title: "Issue",
+                    url: "https://github.com/ext/repo/issues/1",
+                    comments: { totalCount: 1 },
+                    repository: {
+                      nameWithOwner: "ext/repo",
+                      stargazerCount: 1,
+                      owner: { login: "ext" },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            } as unknown as TData;
+          }
+
+          if (params.operationName === "FetchUserDiscussions") {
+            return {
+              discussions: {
+                nodes: [
+                  {
+                    title: "Discussion",
+                    url: "https://github.com/ext/repo/discussions/1",
+                    comments: { totalCount: 1 },
+                    repository: {
+                      nameWithOwner: "ext/repo",
+                      stargazerCount: 1,
+                      owner: { login: "ext" },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            } as unknown as TData;
+          }
+
+          throw new Error(`Unexpected operation: ${params.operationName}`);
+        },
+      },
+      cacheStore: makeMemoryCache({
+        getImpl: async () => undefined,
+      }),
+      cacheConfig: {
+        namespace: "devimpact:v1",
+        ttlSeconds: 604_800,
+      },
+    });
+
+    const result = await fetcher("testuser");
+
+    expect(result.pullRequests).toHaveLength(2);
+    expect(
+      calls.filter((call) => call.operationName === "FetchUserPullRequests"),
+    ).toHaveLength(1);
+    expect(
+      calls.find((call) => call.operationName === "FetchUserPullRequests")
+        ?.variables.prCount,
+    ).toBe(2);
   });
 
   test("cache write failure does not fail request", async () => {
@@ -268,7 +444,7 @@ describe("GitHub user data caching", () => {
 
     const result = await fetcher("testuser");
     expect(result.pullRequests).toHaveLength(1);
-    expect(calls).toHaveLength(3);
+    expect(calls).toHaveLength(4);
   });
 
   test("corrupted cache payload is treated as miss", async () => {
@@ -290,7 +466,7 @@ describe("GitHub user data caching", () => {
 
     const result = await fetcher("testuser");
     expect(result.name).toBe("User Name");
-    expect(calls).toHaveLength(3);
+    expect(calls).toHaveLength(4);
     expect(deleted).toEqual(["devimpact:v1:github-user:testuser"]);
   });
 
@@ -313,7 +489,7 @@ describe("GitHub user data caching", () => {
     ]);
 
     expect(first.avatarUrl).toBe(second.avatarUrl);
-    expect(calls).toHaveLength(3);
+    expect(calls).toHaveLength(4);
   });
 
   test("default cache TTL is seven days", () => {
