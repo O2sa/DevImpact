@@ -697,9 +697,17 @@ function createDefaultGitHubExecutor(): GitHubQueryExecutor {
   });
 }
 
-const executorSingleton = createDefaultGitHubExecutor();
+let executorSingleton: GitHubQueryExecutor | undefined;
 const cacheConfigSingleton = getCacheConfigFromEnv();
 const cacheStoreSingleton = createCacheStore(cacheConfigSingleton);
+
+function getDefaultGitHubExecutor(): GitHubQueryExecutor {
+  if (!executorSingleton) {
+    executorSingleton = createDefaultGitHubExecutor();
+  }
+
+  return executorSingleton;
+}
 
 /**
  * Redis cache entry shape that includes a fetch timestamp for staleness checks.
@@ -811,7 +819,10 @@ export async function getUserData(
   }
 
   // ── 3. Fetch from GitHub API ──────────────────────────────────────────
-  const { data: fresh, metrics } = await fetchUserDataFromGitHub(executorSingleton, normalizedUsername);
+  const { data: fresh, metrics } = await fetchUserDataFromGitHub(
+    getDefaultGitHubExecutor(),
+    normalizedUsername,
+  );
 
   // Upsert into PostgreSQL
   try {
