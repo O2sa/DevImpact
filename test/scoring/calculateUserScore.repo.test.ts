@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import { calculateUserScore } from "@/lib/score";
-import { makeContributions, makeRepo, makeUserScoreInput } from "@/test/fixtures/github";
+import {  makeRepo, makeUserScoreInput } from "@/test/fixtures/github";
 import { expectedRepoScore, sumRepoScores } from "@/test/helpers/score";
 
 describe("calculateUserScore - repository scoring", () => {
@@ -10,7 +10,6 @@ describe("calculateUserScore - repository scoring", () => {
       {
         repos: [],
         pullRequests: [],
-        contributions: makeContributions(),
       },
       "octocat",
     );

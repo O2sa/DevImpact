@@ -2,7 +2,6 @@ import { describe, expect, test } from "vitest";
 
 import { calculateUserScore } from "@/lib/score";
 import {
-  makeContributions,
   makeIssue,
   makePullRequest,
   makeRepo,
@@ -95,7 +94,6 @@ describe("calculateUserScore - final score behavior", () => {
       {
         repos: [],
         pullRequests: [],
-        contributions: makeContributions(),
       },
       "ghost",
     );

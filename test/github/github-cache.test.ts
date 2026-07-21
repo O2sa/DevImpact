@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import { afterEach, describe, expect, test, vi } from "vitest";
 import {
   createGitHubUserDataFetcher,
@@ -19,10 +21,7 @@ function makeExecutor(
   delayMs = 0,
 ): GitHubFetcherDependencies["executor"] {
   return {
-    async execute<
-      TData,
-      TVariables extends Record<string, unknown>,
-    >(params: {
+    async execute<TData, TVariables extends Record<string, unknown>>(params: {
       operationName: string;
       query: string;
       variables: TVariables;
@@ -174,8 +173,7 @@ function isGitHubUserData(value: unknown): value is GitHubUserData {
     value !== null &&
     "avatarUrl" in value &&
     "repos" in value &&
-    "pullRequests" in value &&
-    "contributions" in value
+    "pullRequests" in value
   );
 }
 
@@ -186,14 +184,11 @@ describe("GitHub user data caching", () => {
   test("cache hit skips GitHub calls", async () => {
     const cachedPayload: GitHubUserData = {
       name: "Cached",
+      location: "any",
+      login: "Cached",
       avatarUrl: "https://example.com/cached.png",
       repos: [],
       pullRequests: [],
-      contributions: {
-        totalCommitContributions: 0,
-        totalPullRequestContributions: 0,
-        totalIssueContributions: 0,
-      },
       issues: [],
       discussions: [],
     };
@@ -266,10 +261,16 @@ describe("GitHub user data caching", () => {
     vi.stubEnv("GITHUB_ISSUE_COUNT", "2");
     vi.stubEnv("GITHUB_DISCUSSION_COUNT", "2");
 
-    const calls: Array<{ operationName: string; variables: Record<string, unknown> }> = [];
+    const calls: Array<{
+      operationName: string;
+      variables: Record<string, unknown>;
+    }> = [];
     const fetcher = createGitHubUserDataFetcher({
       executor: {
-        async execute<TData, TVariables extends Record<string, unknown>>(params: {
+        async execute<
+          TData,
+          TVariables extends Record<string, unknown>,
+        >(params: {
           operationName: string;
           query: string;
           variables: TVariables;
@@ -416,8 +417,13 @@ describe("GitHub user data caching", () => {
     const result = await fetcher("testuser");
 
     expect(result.pullRequests).toHaveLength(2);
-    expect(calls.filter((call) => call.operationName === "FetchUserPullRequests")).toHaveLength(1);
-    expect(calls.find((call) => call.operationName === "FetchUserPullRequests")?.variables.prCount).toBe(2);
+    expect(
+      calls.filter((call) => call.operationName === "FetchUserPullRequests"),
+    ).toHaveLength(1);
+    expect(
+      calls.find((call) => call.operationName === "FetchUserPullRequests")
+        ?.variables.prCount,
+    ).toBe(2);
   });
 
   test("cache write failure does not fail request", async () => {

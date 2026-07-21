@@ -2,7 +2,6 @@ import { describe, expect, test } from "vitest";
 
 import { calculateUserScore } from "@/lib/score";
 import {
-  makeContributions,
   makeDiscussion,
   makeIssue,
   makePullRequest,
@@ -17,11 +16,6 @@ describe("calculateUserScore - contribution scoring", () => {
       makeUserScoreInput({
         repos: [],
         pullRequests: [],
-        contributions: makeContributions({
-          totalCommitContributions: 10_000,
-          totalPullRequestContributions: 0,
-          totalIssueContributions: 0,
-        }),
       }),
       "octocat",
     );
@@ -34,11 +28,6 @@ describe("calculateUserScore - contribution scoring", () => {
       makeUserScoreInput({
         repos: [],
         pullRequests: [],
-        contributions: makeContributions({
-          totalCommitContributions: 0,
-          totalPullRequestContributions: 10_000,
-          totalIssueContributions: 0,
-        }),
       }),
       "octocat",
     );

@@ -3,7 +3,6 @@ import { describe, expect, test } from "vitest";
 import { calculateUserScore } from "@/lib/score";
 import { getLanguageFactor } from "@/lib/scoring/languageScoring";
 import {
-  makeContributions,
   makePullRequest,
   makeRepo,
   makeRepoLanguages,
@@ -313,7 +312,6 @@ describe("calculateUserScore - language scoring", () => {
             },
           }),
         ],
-        contributions: makeContributions(),
         selectedLanguages: ["TypeScript"],
       }),
       "octocat",
