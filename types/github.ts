@@ -58,11 +58,7 @@ export type PullRequestNode = {
   };
 };
 
-export type ContributionTotals = {
-  totalCommitContributions: number;
-  totalPullRequestContributions: number;
-  totalIssueContributions: number;
-};
+
 
 export type GitHubUserData = {
   login: string;
@@ -71,7 +67,6 @@ export type GitHubUserData = {
   location: string | null;
   repos: RepoNode[];
   pullRequests: PullRequestNode[];
-  contributions: ContributionTotals;
   issues?: IssueNode[];
   discussions?: DiscussionNode[];
 };

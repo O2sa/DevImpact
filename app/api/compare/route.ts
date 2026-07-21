@@ -1,13 +1,10 @@
 import { NextResponse } from "next/server";
-import { fetchGitHubUserData } from "../../../lib/github";
+import { getUserData } from "../../../lib/github";
 import { calculateUserScore } from "../../../lib/score";
 import { normalizeSelectedLanguages } from "@/lib/scoring/languageScoring";
 import { toSafeApiError } from "@/lib/github-graphql-client";
 import { getDatabaseStore } from "@/lib/db-store";
-import {
-  createCacheStore,
-  getCacheConfigFromEnv,
-} from "@/lib/cache-store";
+import { createCacheStore, getCacheConfigFromEnv } from "@/lib/cache-store";
 import { detectCountry } from "@/lib/location-detector";
 import type { CompareInsights, SafeApiError } from "@/types/api-response";
 import {
@@ -17,6 +14,7 @@ import {
   parseAcceptLanguage,
   type Locale,
 } from "@/lib/i18n-core";
+import { GitHubUserData } from "@/types/github";
 
 export const runtime = "nodejs";
 
@@ -54,7 +52,10 @@ type ComparedUserResult = {
   explanations: ReturnType<typeof calculateUserScore>["explanations"];
 };
 
-type ClientSafeError = Pick<SafeApiError, "code" | "message" | "targetUsernames">;
+type ClientSafeError = Pick<
+  SafeApiError,
+  "code" | "message" | "targetUsernames"
+>;
 
 function parseSelectedLanguagesFromSearchParams(
   searchParams: URLSearchParams,
@@ -66,7 +67,10 @@ function parseSelectedLanguagesFromSearchParams(
     .map((language) => language.trim())
     .filter(Boolean);
 
-  return normalizeSelectedLanguages([...(fromRepeated ?? []), ...(fromCsv ?? [])]);
+  return normalizeSelectedLanguages([
+    ...(fromRepeated ?? []),
+    ...(fromCsv ?? []),
+  ]);
 }
 
 function calculateWinner(users: ComparedUserResult[]): {
@@ -88,7 +92,8 @@ function calculateWinner(users: ComparedUserResult[]): {
 
   const [userA, userB] = users;
   const overallWinner = userA.finalScore >= userB.finalScore ? userA : userB;
-  const overallLoser = overallWinner.username === userA.username ? userB : userA;
+  const overallLoser =
+    overallWinner.username === userA.username ? userB : userA;
   const overallDifference = Math.abs(userA.finalScore - userB.finalScore);
   const overallPercentage =
     overallLoser.finalScore > 0
@@ -120,7 +125,8 @@ function calculateWinner(users: ComparedUserResult[]): {
       userA.languageScores.finalScore >= userB.languageScores.finalScore
         ? userA
         : userB;
-    const languageLoser = languageWinner.username === userA.username ? userB : userA;
+    const languageLoser =
+      languageWinner.username === userA.username ? userB : userA;
     const winnerLanguageScores = languageWinner.languageScores!;
     const loserLanguageScores = languageLoser.languageScores!;
     const languageDifference = Math.abs(
@@ -312,9 +318,14 @@ async function compareUsers(
   const results: ComparedUserResult[] = [];
 
   for (const username of usernames) {
-    let data: Awaited<ReturnType<typeof fetchGitHubUserData>>;
+    let data: Awaited<GitHubUserData>;
     try {
-      data = await fetchGitHubUserData(username);
+      const { data: userData, metrics } = await getUserData(username, {
+        cacheInRedis: true,
+        withMetrics: true,
+      });
+      data = userData;
+      console.log(metrics);
     } catch (error: unknown) {
       throw new CompareUserFetchError(username, error);
     }
@@ -337,7 +348,9 @@ async function compareUsers(
       finalScore: Math.round(score.finalScore),
       normalizedRepoScore: Math.round(score.normalizedRepoScore),
       normalizedPRScore: Math.round(score.normalizedPRScore),
-      normalizedContributionScore: Math.round(score.normalizedContributionScore),
+      normalizedContributionScore: Math.round(
+        score.normalizedContributionScore,
+      ),
       normalizedFinalScore: Math.round(score.normalizedFinalScore),
       topRepos: score.topRepos,
       topPullRequests: score.topPullRequests,
@@ -388,13 +401,17 @@ async function compareUsers(
   return results;
 }
 
-function toApiErrorStatus(code: ReturnType<typeof toSafeApiError>["code"]): number {
+function toApiErrorStatus(
+  code: ReturnType<typeof toSafeApiError>["code"],
+): number {
   switch (code) {
     case "RATE_LIMITED":
     case "TEMPORARY_THROTTLE":
       return 429;
+    case "GITHUB_TIMEOUT":
+    case "GITHUB_RESOURCE_LIMIT":
     case "GITHUB_AUTH":
-      return 401;
+      return code === "GITHUB_AUTH" ? 401 : 503;
     case "GITHUB_NOT_FOUND":
       return 404;
     case "NETWORK":
@@ -428,7 +445,8 @@ export async function GET(request: Request) {
 
   try {
     const locale = resolveLocale(request);
-    const selectedLanguages = parseSelectedLanguagesFromSearchParams(searchParams);
+    const selectedLanguages =
+      parseSelectedLanguagesFromSearchParams(searchParams);
     const users = await compareUsers(usernames, selectedLanguages);
     const winnerData = calculateWinner(users);
     const insights = createComparisonInsights(users, locale);

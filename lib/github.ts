@@ -14,6 +14,11 @@ import type {
   RepoNode,
 } from "@/types/github";
 
+export type UserFetchMetrics = {
+  duration: number;
+  errors: { part: string; reason: string }[];
+};
+
 type Logger = Pick<Console, "info" | "warn">;
 
 type GitHubRawUser = { 
@@ -126,11 +131,6 @@ const USER_QUERY = /* GraphQL */ `
       name
       avatarUrl(size: 80)
       location
-      contributionsCollection {
-        totalCommitContributions
-        totalPullRequestContributions
-        totalIssueContributions
-      }
       repositories(
         first: $repoCount
         privacy: PUBLIC
@@ -360,9 +360,7 @@ function isGitHubUserData(value: unknown): value is GitHubUserData {
     !(typeof candidate.name === "string" || candidate.name === null) ||
     typeof candidate.avatarUrl !== "string" ||
     !Array.isArray(candidate.repos) ||
-    !Array.isArray(candidate.pullRequests) ||
-    !isObject(candidate.contributions) ||
-    !isNumericRecord(candidate.contributions)
+    !Array.isArray(candidate.pullRequests) 
   ) {
     return false;
   }
@@ -418,10 +416,13 @@ export function buildGitHubUserCacheKey(
 async function fetchUserDataFromGitHub(
   executor: GitHubQueryExecutor,
   username: string,
-): Promise<GitHubUserData> {
+): Promise<{ data: GitHubUserData; metrics: UserFetchMetrics }> {
   const externalPrQuery = `type:pr is:merged author:${username} -user:${username}`;
   const externalIssueQuery = `type:issue author:${username} -user:${username}`;
   const externalDiscussionQuery = `author:${username} -user:${username}`;
+
+  const startTime = performance.now();
+  const fetchErrors: { part: string; reason: string }[] = [];
 
   
 const repoCount = parseCountEnv(
@@ -448,7 +449,7 @@ const discussionCount = parseCountEnv(
   MAX_GITHUB_DISCUSSION_COUNT,
 );
 
-  const [userResponse, pullRequests, issues, discussions] = await Promise.all([
+  const [userResult, prResult, issuesResult, discussionsResult] = await Promise.allSettled([
     executor.execute<
       { user: GitHubRawUser | null },
       { login: string; repoCount: number }
@@ -501,21 +502,140 @@ const discussionCount = parseCountEnv(
     }),
   ]);
 
-  const user = userResponse.user;
-  if (!user) {
+  if (userResult.status === "rejected") {
+    fetchErrors.push({ part: "user", reason: userResult.reason?.message ?? String(userResult.reason) });
+  }
+  if (prResult.status === "rejected") {
+    fetchErrors.push({ part: "pullRequests", reason: prResult.reason?.message ?? String(prResult.reason) });
+  }
+  if (issuesResult.status === "rejected") {
+    fetchErrors.push({ part: "issues", reason: issuesResult.reason?.message ?? String(issuesResult.reason) });
+  }
+  if (discussionsResult.status === "rejected") {
+    fetchErrors.push({ part: "discussions", reason: discussionsResult.reason?.message ?? String(discussionsResult.reason) });
+  }
+
+  if (userResult.status === "rejected") {
+    throw userResult.reason;
+  }
+
+  if (!userResult.value.user) {
     throw new Error("User not found");
   }
 
-  return {
-    login: user.login,
-    name: user.name,
-    avatarUrl: user.avatarUrl,
-    location: user.location,
-    repos: user.repositories.nodes.filter(isDefined),
-    pullRequests,
-    contributions: user.contributionsCollection,
-    issues: issues.map(toIssueNode),
-    discussions: discussions.map(toDiscussionNode),
+  const user = userResult.value.user;
+  const pullRequests = prResult.status === "fulfilled" ? prResult.value : [];
+  const issues = issuesResult.status === "fulfilled" ? issuesResult.value : [];
+  const discussions = discussionsResult.status === "fulfilled" ? discussionsResult.value : [];
+
+  const duration = performance.now() - startTime;
+
+  const userData: GitHubUserData = {
+      login: user.login,
+      name: user.name,
+      avatarUrl: user.avatarUrl,
+      location: user.location,
+      repos: user.repositories.nodes.filter(isDefined),
+      pullRequests,
+      issues: issues.map(toIssueNode),
+      discussions: discussions.map(toDiscussionNode),
+  };
+
+  const metrics: UserFetchMetrics = {
+    duration,
+    errors: fetchErrors,
+  };
+
+  return { data: userData, metrics };
+}
+
+// Wrapper to maintain the old function signature for existing callers
+async function fetchUserDataFromGitHubWrapper(
+  executor: GitHubQueryExecutor,
+  username: string,
+): Promise<GitHubUserData> {
+  const { data } = await fetchUserDataFromGitHub(executor, username);
+  return data;
+}
+
+// ---------------------------------------------------------------------------
+// Fetcher factory (caching + single-flight)
+// ---------------------------------------------------------------------------
+
+export function createGitHubUserDataFetcherWithMetrics(
+  dependencies: GitHubFetcherDependencies,
+): (username: string) => Promise<{ data: GitHubUserData; metrics: UserFetchMetrics }> {
+  const inFlightByCacheKey = new Map<string, Promise<{ data: GitHubUserData; metrics: UserFetchMetrics }>>();
+  const logger = dependencies.logger ?? console;
+
+  return async (username: string): Promise<{ data: GitHubUserData; metrics: UserFetchMetrics }> => {
+    const normalizedUsername = normalizeGitHubUsername(username);
+    if (!normalizedUsername) {
+      throw new Error("Username is required");
+    }
+
+    const cacheKey = buildGitHubUserCacheKey(
+      normalizedUsername,
+      dependencies.cacheConfig.namespace,
+    );
+
+    // Caching logic remains the same, but we now cache the { data, metrics } object
+    if (dependencies.cacheStore.enabled) {
+      try {
+        const cached = await dependencies.cacheStore.get<unknown>(cacheKey);
+        if (cached !== undefined) {
+          // A simple check to see if it's our object.
+          if (isObject(cached) && 'data' in cached && 'metrics' in cached && isGitHubUserData(cached.data)) {
+            logger.info("cache-hit", { key: cacheKey });
+            return cached as { data: GitHubUserData; metrics: UserFetchMetrics };
+          }
+          logger.warn("cache-corrupt", { key: cacheKey });
+          await dependencies.cacheStore.del?.(cacheKey);
+        } else {
+          logger.info("cache-miss", { key: cacheKey });
+        }
+      } catch (error: unknown) {
+        logger.warn("cache-read-fail", {
+          key: cacheKey,
+          message: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+
+    const inFlight = inFlightByCacheKey.get(cacheKey);
+    if (inFlight) {
+      logger.info("single-flight-join", { key: cacheKey });
+      return inFlight;
+    }
+
+    const request = (async () => {
+      const freshResult = await fetchUserDataFromGitHub(
+        dependencies.executor,
+        normalizedUsername,
+      );
+
+      if (dependencies.cacheStore.enabled) {
+        try {
+          await dependencies.cacheStore.set(
+            cacheKey,
+            freshResult,
+            dependencies.cacheConfig.ttlSeconds,
+          );
+        } catch (error: unknown) {
+          logger.warn("cache-set-fail", {
+            key: cacheKey,
+            message: error instanceof Error ? error.message : String(error),
+          });
+        }
+      }
+
+      return freshResult;
+    })().finally(() => {
+      inFlightByCacheKey.delete(cacheKey);
+    });
+
+    inFlightByCacheKey.set(cacheKey, request);
+    return request;
   };
 }
 
@@ -568,7 +688,7 @@ export function createGitHubUserDataFetcher(
     }
 
     const request = (async () => {
-      const fresh = await fetchUserDataFromGitHub(
+      const fresh = await fetchUserDataFromGitHubWrapper(
         dependencies.executor,
         normalizedUsername,
       );
@@ -616,29 +736,179 @@ function createDefaultGitHubExecutor(): GitHubQueryExecutor {
   });
 }
 
-let defaultFetcher: ((username: string) => Promise<GitHubUserData>) | undefined;
+const executorSingleton = createDefaultGitHubExecutor();
+const cacheConfigSingleton = getCacheConfigFromEnv();
+const cacheStoreSingleton = createCacheStore(cacheConfigSingleton);
 
-function getDefaultFetcher(): (username: string) => Promise<GitHubUserData> {
-  if (!defaultFetcher) {
-    const cacheConfig = getCacheConfigFromEnv();
-    const cacheStore = createCacheStore(cacheConfig);
+/**
+ * Redis cache entry shape that includes a fetch timestamp for staleness checks.
+ */
+type CachedUserEntry = {
+  data: GitHubUserData;
+  fetchedAt: string; // ISO 8601 timestamp
+};
 
-    defaultFetcher = createGitHubUserDataFetcher({
-      executor: createDefaultGitHubExecutor(),
-      cacheStore,
-      cacheConfig: {
-        namespace: cacheConfig.namespace,
-        ttlSeconds: cacheConfig.ttlSeconds || DEFAULT_GITHUB_CACHE_TTL_SECONDS,
-      },
-      logger: console,
-    });
-  }
-
-  return defaultFetcher;
+function buildUserCacheKey(username: string): string {
+  return buildGitHubUserCacheKey(username, cacheConfigSingleton.namespace);
 }
 
-export async function fetchGitHubUserData(
+function getStaleDays(): number {
+  const raw = process.env.GITHUB_USER_STALE_DAYS?.trim();
+  if (!raw) return 14;
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 14;
+}
+
+/**
+ * Fetch fresh user data from the GitHub API.
+ */
+async function fetchFromGitHubApi(username: string): Promise<GitHubUserData> {
+  const { data } = await fetchUserDataFromGitHub(executorSingleton, username);
+  return data;
+}
+
+/**
+ * Unified function to get GitHub user data.
+ *
+ * Flow:
+ * 1. If cacheInRedis: check Redis → HIT + fresh → return
+ * 2. Check PostgreSQL
+ *    → HIT + fresh (stale_after > now) → return (optionally warm Redis)
+ *    → HIT + stale OR MISS → fetch from GitHub → upsert DB → return
+ * 3. If !cacheInRedis and data was refreshed: delete stale Redis key
+ *
+ * @param username - GitHub username
+ * @param options.cacheInRedis - Whether to cache in Redis (default: true)
+ */
+export async function getUserData(
   username: string,
-): Promise<GitHubUserData> {
-  return getDefaultFetcher()(username);
+  options?: { cacheInRedis?: boolean; withMetrics?: false },
+): Promise<GitHubUserData>;
+export async function getUserData(
+  username: string,
+  options: { cacheInRedis?: boolean; withMetrics: true },
+): Promise<{ data: GitHubUserData; metrics: UserFetchMetrics }>;
+export async function getUserData(
+  username: string,
+  options?: { cacheInRedis?: boolean; withMetrics?: boolean },
+): Promise<GitHubUserData | { data: GitHubUserData; metrics: UserFetchMetrics }> {
+  const normalizedUsername = normalizeGitHubUsername(username);
+  if (!normalizedUsername) {
+    throw new Error("Username is required");
+  }
+
+  const cacheInRedis = options?.cacheInRedis ?? true;
+  const withMetrics = options?.withMetrics ?? false;
+  const staleDays = getStaleDays();
+
+  // ── 1. Check Redis (if enabled) ───────────────────────────────────────
+  if (cacheInRedis && cacheStoreSingleton.enabled) {
+    try {
+      const cacheKey = buildUserCacheKey(normalizedUsername);
+      const cached = await cacheStoreSingleton.get<CachedUserEntry>(cacheKey);
+      if (cached) {
+        const now = Date.now();
+        const fetchedAt = new Date(cached.fetchedAt).getTime();
+        const ageDays = (now - fetchedAt) / 86_400_000;
+
+        if (ageDays < staleDays) {
+          return withMetrics
+            ? { data: cached.data, metrics: { duration: 0, errors: [] } } // No metrics for cached data
+            : cached.data;
+        }
+
+        // Stale — delete and fall through
+        await cacheStoreSingleton.del?.(cacheKey);
+      }
+    } catch {
+      // Non-fatal: continue to DB
+    }
+  }
+
+  // ── 2. Check PostgreSQL ────────────────────────────────────────────────
+  try {
+    const { getDatabaseStore } = await import("@/lib/db-store");
+    const db = getDatabaseStore();
+
+    const row = await db.getUser(normalizedUsername);
+    if (row) {
+      const isFresh = row.stale_after > new Date();
+      if (isFresh) {
+        // DB has fresh data — warm Redis if enabled and return
+        if (cacheInRedis && cacheStoreSingleton.enabled) {
+          try {
+            const cacheKey = buildUserCacheKey(normalizedUsername);
+            const entry: CachedUserEntry = {
+              data: row.raw_data as GitHubUserData,
+              fetchedAt: new Date().toISOString(),
+            };
+            await cacheStoreSingleton.set(cacheKey, entry, cacheConfigSingleton.ttlSeconds);
+          } catch {
+            // Non-fatal: cache write failure
+          }
+        }
+        const userData = row.raw_data as GitHubUserData;
+        return withMetrics
+          ? { data: userData, metrics: { duration: 0, errors: [] } } // No metrics for cached data
+          : userData;
+      }
+    }
+  } catch {
+    // Non-fatal: DB failure, fall through to GitHub API
+  }
+
+  // ── 3. Fetch from GitHub API ──────────────────────────────────────────
+  const { data: fresh, metrics } = await fetchUserDataFromGitHub(executorSingleton, normalizedUsername);
+
+  // Upsert into PostgreSQL
+  try {
+    const { getDatabaseStore: getDb } = await import("@/lib/db-store");
+    const { calculateUserScore: calcScore } = await import("@/lib/score");
+
+    const db = getDb();
+    const score = calcScore(fresh, normalizedUsername);
+
+    await db.upsertUser({
+      username: fresh.login,
+      name: fresh.name,
+      avatarUrl: fresh.avatarUrl,
+      location: fresh.location,
+      country: null,
+      rawData: fresh,
+      scores: score,
+      repoScore: Math.round(score.repoScore),
+      prScore: Math.round(score.prScore),
+      contributionScore: Math.round(score.contributionScore),
+      finalScore: Math.round(score.finalScore),
+      staleDays,
+    });
+  } catch {
+    // Non-fatal: DB write failure
+  }
+
+  // 4. Handle Redis cache
+  if (cacheStoreSingleton.enabled && cacheStoreSingleton.del) {
+    const cacheKey = buildUserCacheKey(normalizedUsername);
+    if (cacheInRedis) {
+      // Warm Redis with fresh data
+      try {
+        const entry: CachedUserEntry = {
+          data: fresh,
+          fetchedAt: new Date().toISOString(),
+        };
+        await cacheStoreSingleton.set(cacheKey, entry, cacheConfigSingleton.ttlSeconds);
+      } catch {
+        // Non-fatal
+      }
+    } else {
+      // Delete stale cache entry (leaderboard calculation path)
+      try {
+        await cacheStoreSingleton.del(cacheKey);
+      } catch {
+        // Non-fatal
+      }
+    }
+  }
+
+  return withMetrics ? { data: fresh, metrics } : fresh;
 }

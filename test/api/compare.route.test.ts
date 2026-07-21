@@ -2,12 +2,12 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { GitHubApiError } from "@/lib/github-graphql-client";
 
 const mocks = vi.hoisted(() => ({
-  fetchGitHubUserData: vi.fn(),
+  getUserData: vi.fn(),
   calculateUserScore: vi.fn(),
 }));
 
 vi.mock("@/lib/github", () => ({
-  fetchGitHubUserData: mocks.fetchGitHubUserData,
+  getUserData: mocks.getUserData,
 }));
 
 vi.mock("@/lib/score", () => ({
@@ -31,6 +31,24 @@ function makeRequest(params: Record<string, string | string[]>): Request {
   return new Request(`http://localhost/api/compare?${search.toString()}`, {
     method: "GET",
   });
+}
+
+function makeUser(login: string, name: string) {
+  return {
+    login,
+    name,
+    avatarUrl: `https://example.com/${login}.png`,
+    location: "Cairo, Egypt",
+    repos: [],
+    pullRequests: [],
+    contributions: {
+      totalCommitContributions: 0,
+      totalPullRequestContributions: 0,
+      totalIssueContributions: 0,
+    },
+    issues: [],
+    discussions: [],
+  };
 }
 
 function makeScore(finalScore: number) {
@@ -70,12 +88,12 @@ function makeScore(finalScore: number) {
 
 describe("GET /api/compare", () => {
   beforeEach(() => {
-    mocks.fetchGitHubUserData.mockReset();
+    mocks.getUserData.mockReset();
     mocks.calculateUserScore.mockReset();
   });
 
   test("returns structured friendly error when GitHub rate limit is hit", async () => {
-    mocks.fetchGitHubUserData.mockRejectedValueOnce(
+    mocks.getUserData.mockRejectedValueOnce(
       new GitHubApiError({
         message: "API rate limit exceeded for user.",
         kind: "PRIMARY_RATE_LIMIT",
@@ -98,7 +116,6 @@ describe("GET /api/compare", () => {
     );
     const body = (await response.json()) as {
       success: boolean;
-      error?: string;
       errorDetails?: { code?: string; retryAfterSeconds?: number; rateLimit?: unknown };
     };
 
@@ -109,32 +126,46 @@ describe("GET /api/compare", () => {
     expect(body.errorDetails?.rateLimit).toBeUndefined();
   });
 
+  test("returns resource-limit errors instead of masking them as not found", async () => {
+    mocks.getUserData.mockRejectedValueOnce(
+      new GitHubApiError({
+        message: "Resource limits for this query exceeded.",
+        kind: "RESOURCE_LIMIT",
+        status: 200,
+        rateLimit: {
+          limit: 5000,
+          remaining: 4993,
+          used: 7,
+          resetAt: Math.floor(Date.now() / 1000) + 60,
+          resource: "graphql",
+        },
+      }),
+    );
+
+    const response = await GET(
+      makeRequest({
+        username: ["petebacondarwin", "o2sa"],
+      }),
+    );
+    const body = (await response.json()) as {
+      success: boolean;
+      errorDetails?: { code?: string; targetUsernames?: string[] };
+    };
+
+    expect(response.status).toBe(503);
+    expect(body.success).toBe(false);
+    expect(body.errorDetails?.code).toBe("GITHUB_RESOURCE_LIMIT");
+    expect(body.errorDetails?.targetUsernames).toBeUndefined();
+  });
+
   test("returns success payload when both users are processed", async () => {
-    mocks.fetchGitHubUserData.mockResolvedValueOnce({
-      name: "User A",
-      avatarUrl: "https://example.com/a.png",
-      repos: [],
-      pullRequests: [],
-      contributions: {
-        totalCommitContributions: 0,
-        totalPullRequestContributions: 0,
-        totalIssueContributions: 0,
-      },
-      issues: [],
-      discussions: [],
+    mocks.getUserData.mockResolvedValueOnce({
+      data: makeUser("user-a", "User A"),
+      metrics: { duration: 0, errors: [] },
     });
-    mocks.fetchGitHubUserData.mockResolvedValueOnce({
-      name: "User B",
-      avatarUrl: "https://example.com/b.png",
-      repos: [],
-      pullRequests: [],
-      contributions: {
-        totalCommitContributions: 0,
-        totalPullRequestContributions: 0,
-        totalIssueContributions: 0,
-      },
-      issues: [],
-      discussions: [],
+    mocks.getUserData.mockResolvedValueOnce({
+      data: makeUser("user-b", "User B"),
+      metrics: { duration: 0, errors: [] },
     });
 
     mocks.calculateUserScore.mockReturnValueOnce(makeScore(20));
@@ -158,7 +189,7 @@ describe("GET /api/compare", () => {
   });
 
   test("returns targeted username for not-found errors", async () => {
-    mocks.fetchGitHubUserData.mockRejectedValueOnce(new Error("User not found"));
+    mocks.getUserData.mockRejectedValueOnce(new Error("User not found"));
 
     const response = await GET(
       makeRequest({
