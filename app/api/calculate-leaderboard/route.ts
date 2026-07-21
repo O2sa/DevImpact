@@ -3,7 +3,20 @@ import { calculateLeaderboard } from "@/lib/calculate-leaderboard";
 
 export const runtime = "nodejs";
 
+function isCalculateLeaderboardDisabled(): boolean {
+  const raw =
+    process.env.DISABLE_CALCULATE_LEADERBOARD_ENDPOINT?.trim().toLowerCase();
+  return raw === "true" || raw === "1" || raw === "yes";
+}
+
 export async function POST(request: Request) {
+  if (isCalculateLeaderboardDisabled()) {
+    return NextResponse.json(
+      { success: false, error: "Not found" },
+      { status: 404 },
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   const country = searchParams.get("country")?.trim();
 
