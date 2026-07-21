@@ -1,4 +1,5 @@
 import { Pool, PoolConfig } from "pg";
+import countries from "@/data/countries.json";
 
 // ─── Types ─────────────────────────────────────────────────────────────
 
@@ -112,7 +113,67 @@ export class DatabaseStore {
       CREATE INDEX IF NOT EXISTS idx_github_users_stale
         ON github_users(stale_after)
         WHERE country IS NOT NULL;
+
+      CREATE TABLE IF NOT EXISTS leaderboard_calculation (
+        country_slug       VARCHAR(100) PRIMARY KEY,
+        country_title      TEXT NOT NULL DEFAULT '',
+        last_calculated_at TIMESTAMPTZ,
+        status             VARCHAR(20) DEFAULT 'pending',
+        error_message      TEXT,
+        updated_at         TIMESTAMPTZ DEFAULT NOW()
+      );
     `);
+  }
+
+  // ── Calculation tracking ──────────────────────────────────────────────
+
+  async seedCalculationCountries(): Promise<void> {
+    const client = getPool();
+    const entries = countries as Array<{ slug: string; title: string; keywords: string[] }>;
+    const values = entries
+      .filter((c) => c.slug !== "worldwide")
+      .map((c) => `('${c.slug.replace(/'/g, "''")}', '${c.title.replace(/'/g, "''")}', 'pending')`)
+      .join(",\n");
+
+    await client.query(`
+      INSERT INTO leaderboard_calculation (country_slug, country_title, status)
+      VALUES ${values}
+      ON CONFLICT (country_slug) DO NOTHING;
+    `);
+  }
+
+  async getNextCountryToCalculate(): Promise<{ slug: string; title: string } | null> {
+    const client = getPool();
+    const result = await client.query(
+      `SELECT country_slug, country_title FROM leaderboard_calculation
+       WHERE status != 'running'
+       ORDER BY last_calculated_at ASC NULLS FIRST
+       LIMIT 1`,
+    );
+    if (result.rows.length === 0) return null;
+    return { slug: result.rows[0].country_slug, title: result.rows[0].country_title };
+  }
+
+  async startCalculation(countrySlug: string): Promise<void> {
+    const client = getPool();
+    await client.query(
+      `UPDATE leaderboard_calculation SET status = 'running', updated_at = NOW() WHERE country_slug = $1`,
+      [countrySlug],
+    );
+  }
+
+  async finishCalculation(countrySlug: string, errorMessage?: string): Promise<void> {
+    const client = getPool();
+    const status = errorMessage ? 'failed' : 'done';
+    await client.query(
+      `UPDATE leaderboard_calculation SET
+        status = $1,
+        last_calculated_at = NOW(),
+        error_message = $2,
+        updated_at = NOW()
+       WHERE country_slug = $3`,
+      [status, errorMessage ?? null, countrySlug],
+    );
   }
 
   // ── User operations ─────────────────────────────────────────────────

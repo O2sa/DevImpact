@@ -5,61 +5,23 @@ import countries from "@/data/countries.json";
 type CountryEntry = {
   slug: string;
   title: string;
+  isoCode: string;
+  keywords: string[];
 };
 
-// ─── Keyword mapping ────────────────────────────────────────────────────
-//
-// GitHub's "location" field is free text. Users might write:
-//   - "Riyadh, Saudi Arabia"
-//   - "Saudi Arabia"
-//   - "Jeddah"
-//   - "KSA"
-//   - "🇸🇦"
-//   - "Earth" (unmatchable)
-//   - "" or null (absent)
-//
-// This mapping converts those variations into country slugs
-// that match the slugs in data/countries.json.
-//
-// Keywords are pulled from committers.top presets via data/countries.json.
-
-type CountryEntry2 = {
-  slug: string;
-  title: string;
-  keywords?: string[];
-};
+// ─── Build keyword mapping from data/countries.json ────────────────────
 
 type CountryMapping = {
   slug: string;
   keywords: string[];
 };
 
-// Build COUNTRY_MAPPINGS from countries.json with keywords
-const COUNTRY_MAPPINGS: CountryMapping[] = (
-  countries as CountryEntry2[]
-)
-  .filter((country) => country.keywords && country.keywords.length > 0)
-  .map((country) => ({
-    slug: country.slug,
-    keywords: country.keywords || [],
+const COUNTRY_MAPPINGS: CountryMapping[] = (countries as CountryEntry[])
+  .filter((c) => c.keywords.length > 0)
+  .map((c) => ({
+    slug: c.slug,
+    keywords: c.keywords,
   }));
-
-// ─── Validate all slugs exist in countries.json ───────────────────────
-
-const VALID_SLUGS = new Set(
-  (countries as CountryEntry[]).map((c) => c.slug),
-);
-
-// Validate on import in development
-if (process.env.NODE_ENV === "development") {
-  for (const mapping of COUNTRY_MAPPINGS) {
-    if (!VALID_SLUGS.has(mapping.slug)) {
-      console.warn(
-        `[location-detector] Warning: slug "${mapping.slug}" not found in data/countries.json`,
-      );
-    }
-  }
-}
 
 // ─── Helpers ───────────────────────────────────────────────────────────
 
