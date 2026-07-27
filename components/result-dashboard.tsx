@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { Check, Copy, Trophy } from "lucide-react";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
+import { Avatar } from "@/components/avatar";
 import { ComparisonChart } from "./comparison-chart";
 import { TopList } from "./top-list";
 import { InsightsList } from "./insights-list";
@@ -139,12 +139,10 @@ export function ResultDashboard({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center justify-between text-base">
             <div className="flex items-center gap-2">
-              <Image
+              <Avatar
                 src={user.avatarUrl}
                 alt={t("comparison.avatarAlt", { name: title })}
-                width={28}
-                height={28}
-                className="rounded-full ring-1 ring-border"
+                size={28}
               />
               <a
                 href={getGithubProfileUrl(user.username)}
@@ -263,12 +261,10 @@ export function ResultDashboard({
       <Card key={`signal-${user.username}`}>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
-            <Image
+            <Avatar
               src={user.avatarUrl}
               alt={t("comparison.avatarAlt", { name: getDisplayName(user) })}
-              width={24}
-              height={24}
-              className="rounded-full ring-1 ring-border"
+              size={24}
             />
             <a
               href={getGithubProfileUrl(user.username)}
@@ -356,12 +352,10 @@ export function ResultDashboard({
               return (
                 <div className="flex items-center gap-2">
                   {winnerAvatar ? (
-                    <Image
+                    <Avatar
                       src={winnerAvatar}
                       alt={t("comparison.avatarAlt", { name: winnerName })}
-                      width={20}
-                      height={20}
-                      className="rounded-full ring-1 ring-border"
+                      size={20}
                     />
                   ) : null}
                   <p className="text-sm font-semibold text-cyan-700 dark:text-cyan-300">
