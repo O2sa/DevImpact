@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Image from "next/image";
 import { Search, AlertTriangle } from "lucide-react";
+import { Avatar } from "./avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import {
   Card,
@@ -154,12 +154,10 @@ export function LeaderboardTable({
                     </td>
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-2">
-                        <Image
+                        <Avatar
                           src={user.avatarUrl}
                           alt={user.name || user.username}
-                          width={32}
-                          height={32}
-                          className="rounded-full ring-1 ring-border"
+                          size={32}
                         />
                         <div className="min-w-0">
                           <a
