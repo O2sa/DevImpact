@@ -1,3 +1,5 @@
+![DevImpact](public/screenshots/screenshot.png)
+
 # 🚀 DevImpact
 
 
@@ -35,11 +37,7 @@
 </p>
 
 
-## Preview
 
-<p align="center">
-  <img src="./public/screenshots/screenshot.png" alt="DevImpact comparison tables and analytics chart" width="900">
-</p>
 
 **DevImpact** is an open-source platform that compares software developers based on their real impact in the open-source ecosystem — not just raw numbers.
 

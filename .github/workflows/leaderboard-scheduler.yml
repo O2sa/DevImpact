@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_DEVIMPACT }}
+      GITHUB_TOKEN: ${{ secrets.LEADERBOARD_TOKEN }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       LEADERBOARD_SOURCE_URL_TEMPLATE: ${{ vars.LEADERBOARD_SOURCE_URL_TEMPLATE || 'https://raw.githubusercontent.com/ashkulz/committers.top/gh-pages/_data/locations/{country}.yml' }}
       GITHUB_REPO_COUNT: ${{ vars.GITHUB_REPO_COUNT || '50' }}
