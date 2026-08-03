@@ -114,6 +114,9 @@ export class DatabaseStore {
         ON github_users(stale_after)
         WHERE country IS NOT NULL;
 
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_github_users_username_lower
+        ON github_users(LOWER(username));
+
       CREATE TABLE IF NOT EXISTS leaderboard_calculation (
         country_slug       VARCHAR(100) PRIMARY KEY,
         country_title      TEXT NOT NULL DEFAULT '',
@@ -193,7 +196,8 @@ export class DatabaseStore {
         $8, $9, $10, $11,
         NOW(), NOW() + ($12 || ' days')::INTERVAL, NOW()
       )
-      ON CONFLICT (username) DO UPDATE SET
+      ON CONFLICT (LOWER(username)) DO UPDATE SET
+        username          = EXCLUDED.username,
         name              = EXCLUDED.name,
         avatar_url        = EXCLUDED.avatar_url,
         location          = EXCLUDED.location,
@@ -251,8 +255,13 @@ export class DatabaseStore {
   ): Promise<GitHubUserRow[]> {
     const client = getPool();
     const result = await client.query(
-      `SELECT * FROM github_users
-       WHERE country = $1
+      `SELECT *
+       FROM (
+         SELECT DISTINCT ON (LOWER(username)) *
+         FROM github_users
+         WHERE country = $1
+         ORDER BY LOWER(username), final_score DESC, updated_at DESC
+       ) deduped_users
        ORDER BY final_score DESC
        LIMIT $2`,
       [country, limit],
@@ -263,7 +272,7 @@ export class DatabaseStore {
   async getLeaderboardCount(country: string): Promise<number> {
     const client = getPool();
     const result = await client.query(
-      "SELECT COUNT(*) FROM github_users WHERE country = $1",
+      "SELECT COUNT(DISTINCT LOWER(username)) FROM github_users WHERE country = $1",
       [country],
     );
     return Number(result.rows[0].count);
@@ -279,8 +288,13 @@ export class DatabaseStore {
   ): Promise<GitHubUserRow[]> {
     const client = getPool();
     const result = await client.query(
-      `SELECT * FROM github_users
-       WHERE country = $1 AND stale_after < NOW()
+      `SELECT *
+       FROM (
+         SELECT DISTINCT ON (LOWER(username)) *
+         FROM github_users
+         WHERE country = $1 AND stale_after < NOW()
+         ORDER BY LOWER(username), final_score DESC, updated_at DESC
+       ) deduped_users
        ORDER BY final_score DESC
        LIMIT $2`,
       [country, limit],
@@ -298,8 +312,13 @@ export class DatabaseStore {
   ): Promise<GitHubUserRow[]> {
     const client = getPool();
     const result = await client.query(
-      `SELECT * FROM github_users
-       WHERE country = $1
+      `SELECT *
+       FROM (
+         SELECT DISTINCT ON (LOWER(username)) *
+         FROM github_users
+         WHERE country = $1
+         ORDER BY LOWER(username), final_score DESC, updated_at DESC
+       ) deduped_users
        ORDER BY final_score DESC
        LIMIT $2`,
       [country, limit],
