@@ -51,7 +51,26 @@ function makeUser(login: string, name: string) {
   };
 }
 
-function makeScore(finalScore: number) {
+function makeLanguageScores(finalScore: number) {
+  return {
+    selectedLanguages: ["TypeScript"],
+    repoScore: 0,
+    prScore: 0,
+    contributionScore: 0,
+    finalScore,
+    normalizedRepoScore: 0,
+    normalizedPRScore: 0,
+    normalizedContributionScore: 0,
+    normalizedFinalScore: 0,
+    topRepos: [],
+    topPullRequests: [],
+  };
+}
+
+function makeScore(
+  finalScore: number,
+  languageScores?: ReturnType<typeof makeLanguageScores>,
+) {
   return {
     repoScore: 10,
     prScore: 20,
@@ -64,7 +83,7 @@ function makeScore(finalScore: number) {
     topRepos: [],
     topPullRequests: [],
     topCommunityContributions: [],
-    languageScores: undefined,
+    languageScores,
     signals: {
       reposAnalyzed: 1,
       pullRequestsAnalyzed: 1,
@@ -186,6 +205,77 @@ describe("GET /api/compare", () => {
     expect(body.success).toBe(true);
     expect(body.users).toHaveLength(2);
     expect(body.winner?.username).toBe("user-a");
+  });
+
+  test("returns null percentage when the losing final score is zero", async () => {
+    mocks.getUserData.mockResolvedValueOnce({
+      data: makeUser("user-a", "User A"),
+      metrics: { duration: 0, errors: [] },
+    });
+    mocks.getUserData.mockResolvedValueOnce({
+      data: makeUser("user-b", "User B"),
+      metrics: { duration: 0, errors: [] },
+    });
+
+    mocks.calculateUserScore.mockReturnValueOnce(makeScore(20));
+    mocks.calculateUserScore.mockReturnValueOnce(makeScore(0));
+
+    const response = await GET(
+      makeRequest({
+        username: ["user-a", "user-b"],
+      }),
+    );
+    const body = (await response.json()) as {
+      winner?: {
+        username: string;
+        finalScoreDifference: number;
+        percentageDifference: number | null;
+      };
+    };
+
+    expect(response.status).toBe(200);
+    expect(body.winner).toEqual({
+      username: "user-a",
+      finalScoreDifference: 20,
+      percentageDifference: null,
+    });
+  });
+
+  test("returns null language winner percentage when language loser score is zero", async () => {
+    mocks.getUserData.mockResolvedValueOnce({
+      data: makeUser("user-a", "User A"),
+      metrics: { duration: 0, errors: [] },
+    });
+    mocks.getUserData.mockResolvedValueOnce({
+      data: makeUser("user-b", "User B"),
+      metrics: { duration: 0, errors: [] },
+    });
+
+    mocks.calculateUserScore.mockReturnValueOnce(makeScore(20, makeLanguageScores(12)));
+    mocks.calculateUserScore.mockReturnValueOnce(makeScore(10, makeLanguageScores(0)));
+
+    const response = await GET(
+      makeRequest({
+        username: ["user-a", "user-b"],
+        selectedLanguage: "TypeScript",
+      }),
+    );
+    const body = (await response.json()) as {
+      languageWinner?: {
+        username: string;
+        finalScoreDifference: number;
+        percentageDifference: number | null;
+        selectedLanguages: string[];
+      };
+    };
+
+    expect(response.status).toBe(200);
+    expect(body.languageWinner).toEqual({
+      username: "user-a",
+      finalScoreDifference: 12,
+      percentageDifference: null,
+      selectedLanguages: ["TypeScript"],
+    });
   });
 
   test("returns targeted username for not-found errors", async () => {

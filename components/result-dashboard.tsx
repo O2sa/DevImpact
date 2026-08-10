@@ -21,7 +21,7 @@ type Props = {
   languageWinner?: {
     username: string;
     finalScoreDifference: number;
-    percentageDifference: number;
+    percentageDifference: number | null;
     selectedLanguages: string[];
   };
   insights?: CompareInsights;
@@ -40,6 +40,17 @@ function getDisplayName(user: UserResult): string {
 
 function getGithubProfileUrl(username: string): string {
   return `https://github.com/${username}`;
+}
+
+function getPercentageDifference(
+  winnerScore: number,
+  loserScore: number,
+): number | null {
+  if (loserScore <= 0) {
+    return winnerScore > loserScore ? null : 0;
+  }
+
+  return Math.round(((winnerScore - loserScore) / loserScore) * 100);
 }
 
 export function ResultDashboard({
@@ -88,13 +99,20 @@ export function ResultDashboard({
         : winnerFromScores;
   const loserUser =
     overallWinnerUser === user1 ? user2 : overallWinnerUser === user2 ? user1 : null;
-  const winnerDiffPct =
-    overallWinnerUser && loserUser && loserUser.finalScore > 0
-      ? Math.round(
-          ((overallWinnerUser.finalScore - loserUser.finalScore) / loserUser.finalScore) *
-            100,
-        )
+  const winnerDiffPct = winner
+    ? winner.percentageDifference
+    : overallWinnerUser && loserUser
+      ? getPercentageDifference(overallWinnerUser.finalScore, loserUser.finalScore)
       : 0;
+  const winnerDiffPoints =
+    winner?.finalScoreDifference ??
+    (overallWinnerUser && loserUser
+      ? Math.round(Math.abs(overallWinnerUser.finalScore - loserUser.finalScore))
+      : 0);
+  const winnerLeadValue =
+    winnerDiffPct === null
+      ? t("results.pointsLead", { points: winnerDiffPoints })
+      : `${winnerDiffPct}%`;
 
   const handleCopy = async () => {
     try {
@@ -210,7 +228,7 @@ export function ResultDashboard({
     );
   };
 
-  const renderSignalStats = (user: UserResult) => {
+  const renderSignalStats = (user: UserResult, idx: number) => {
     if (!user.signals) return null;
 
     const signalEntries: Array<{ label: string; value: string | number }> = [
@@ -258,7 +276,7 @@ export function ResultDashboard({
     ];
 
     return (
-      <Card key={`signal-${user.username}`}>
+      <Card key={`signal-${user.username}-${idx}`}>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <Avatar
@@ -320,7 +338,7 @@ export function ResultDashboard({
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-muted-foreground">{t("banner.leadby")}</p>
-                  <p className="text-2xl font-bold text-primary">{winnerDiffPct}%</p>
+                  <p className="text-2xl font-bold text-primary">{winnerLeadValue}</p>
                 </div>
               </>
             ) : (
@@ -377,7 +395,12 @@ export function ResultDashboard({
               {t("language.focus")}: {languageWinner.selectedLanguages.join(", ")}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              {t("banner.leadby")} {languageWinner.percentageDifference}%
+              {t("banner.leadby")}{" "}
+              {languageWinner.percentageDifference === null
+                ? t("results.pointsLead", {
+                    points: languageWinner.finalScoreDifference,
+                  })
+                : `${languageWinner.percentageDifference}%`}
             </p>
             <p className="mt-2 text-xs text-muted-foreground">{t("language.winnerNote")}</p>
           </CardContent>
@@ -449,8 +472,8 @@ export function ResultDashboard({
           {t("signals.title")}
         </summary>
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
-          {renderSignalStats(user1)}
-          {renderSignalStats(user2)}
+          {renderSignalStats(user1, 1)}
+          {renderSignalStats(user2, 2)}
         </div>
       </details>
 

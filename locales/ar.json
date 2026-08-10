@@ -170,6 +170,7 @@
   "results.copied": "تم النسخ!",
   "results.copy": "نسخ النتيجة",
   "results.copyAria": "نسخ نتائج المقارنة إلى الحافظة",
+  "results.pointsLead": "+{points} نقطة",
   "score.rawLabel": "الدرجة الخام: {value}",
   "results.scoreVersion": "إصدار التقييم",
   "section.language": "النتيجة اللغوية",

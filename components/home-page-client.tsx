@@ -26,7 +26,7 @@ type ComparisonData = {
   languageWinner?: {
     username: string;
     finalScoreDifference: number;
-    percentageDifference: number;
+    percentageDifference: number | null;
     selectedLanguages: string[];
   };
   insights?: CompareInsights;
