@@ -170,6 +170,7 @@
   "results.copied": "Copied!",
   "results.copy": "Copy Result",
   "results.copyAria": "Copy comparison results to clipboard",
+  "results.pointsLead": "+{points} points",
   "score.rawLabel": "Raw: {value}",
   "results.scoreVersion": "Score version",
   "section.language": "Language-focused Score",

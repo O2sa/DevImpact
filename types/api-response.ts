@@ -3,7 +3,7 @@ import { UserResult } from "./user-result";
 export type CompareWinner = {
   username: string;
   finalScoreDifference: number;
-  percentageDifference: number;
+  percentageDifference: number | null;
 };
 
 export type SafeApiError = {
@@ -48,7 +48,7 @@ export type ApiResponse = {
   languageWinner?: {
     username: string;
     finalScoreDifference: number;
-    percentageDifference: number;
+    percentageDifference: number | null;
     selectedLanguages: string[];
   };
   insights?: CompareInsights;

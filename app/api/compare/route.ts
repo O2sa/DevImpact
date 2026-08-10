@@ -77,12 +77,12 @@ function calculateWinner(users: ComparedUserResult[]): {
   winner?: {
     username: string;
     finalScoreDifference: number;
-    percentageDifference: number;
+    percentageDifference: number | null;
   };
   languageWinner?: {
     username: string;
     finalScoreDifference: number;
-    percentageDifference: number;
+    percentageDifference: number | null;
     selectedLanguages: string[];
   };
 } {
@@ -95,28 +95,29 @@ function calculateWinner(users: ComparedUserResult[]): {
   const overallLoser =
     overallWinner.username === userA.username ? userB : userA;
   const overallDifference = Math.abs(userA.finalScore - userB.finalScore);
-  const overallPercentage =
-    overallLoser.finalScore > 0
-      ? (overallDifference / overallLoser.finalScore) * 100
-      : 0;
+  const overallPercentage = calculatePercentageDifference(
+    overallDifference,
+    overallLoser.finalScore,
+  );
 
   const result: {
     winner: {
       username: string;
       finalScoreDifference: number;
-      percentageDifference: number;
+      percentageDifference: number | null;
     };
     languageWinner?: {
       username: string;
       finalScoreDifference: number;
-      percentageDifference: number;
+      percentageDifference: number | null;
       selectedLanguages: string[];
     };
   } = {
     winner: {
       username: overallWinner.username,
       finalScoreDifference: Math.round(overallDifference),
-      percentageDifference: Math.round(overallPercentage),
+      percentageDifference:
+        overallPercentage === null ? null : Math.round(overallPercentage),
     },
   };
 
@@ -132,20 +133,32 @@ function calculateWinner(users: ComparedUserResult[]): {
     const languageDifference = Math.abs(
       winnerLanguageScores.finalScore - loserLanguageScores.finalScore,
     );
-    const languagePercentage =
-      loserLanguageScores.finalScore > 0
-        ? (languageDifference / loserLanguageScores.finalScore) * 100
-        : 0;
+    const languagePercentage = calculatePercentageDifference(
+      languageDifference,
+      loserLanguageScores.finalScore,
+    );
 
     result.languageWinner = {
       username: languageWinner.username,
       finalScoreDifference: Math.round(languageDifference),
-      percentageDifference: Math.round(languagePercentage),
+      percentageDifference:
+        languagePercentage === null ? null : Math.round(languagePercentage),
       selectedLanguages: winnerLanguageScores.selectedLanguages,
     };
   }
 
   return result;
+}
+
+function calculatePercentageDifference(
+  difference: number,
+  baseline: number,
+): number | null {
+  if (baseline <= 0) {
+    return difference > 0 ? null : 0;
+  }
+
+  return (difference / baseline) * 100;
 }
 
 function createComparisonInsights(

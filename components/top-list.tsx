@@ -206,8 +206,8 @@ export function TopList({ userResults, selectedLanguages = [] }: Props) {
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      {userResults.map((user) => (
-        <Card key={`top-${user.username}`}>
+      {userResults.map((user, idx) => (
+        <Card key={`top-${user.username}-${idx}`}>
           <CardHeader>
             <CardTitle className="text-lg">
               {t("topwork.titleForUser", { username: user.name || user.username })}
