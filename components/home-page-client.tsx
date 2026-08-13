@@ -228,6 +228,11 @@ export function HomePageClient() {
       return inFlightPromiseRef.current;
     }
 
+    // If we've already fetched this exact comparison and have the data, skip.
+    if (lastFetchedKeyRef.current === fetchKey && data) {
+      return Promise.resolve();
+    }
+
     lastFetchedKeyRef.current = fetchKey;
 
     const requestPromise = (async () => {
@@ -383,6 +388,14 @@ export function HomePageClient() {
   const isRefreshing = loading && Boolean(displayData);
   const isExiting = !loading && !data && Boolean(displayData);
 
+  const currentFetchKey = createFetchKey(username1.trim(), username2.trim(), {
+    selectedLanguages,
+  });
+
+  const disableDuplicateFetch = Boolean(
+    lastFetchedKeyRef.current === currentFetchKey && (data || inFlightFetchKeyRef.current === currentFetchKey),
+  );
+
   const handleUsername1Change = (value: string) => {
     setUsername1(value);
     if (usernameErrors.username1) {
@@ -441,6 +454,7 @@ export function HomePageClient() {
           reset={reset}
           swapUsers={swapUsers}
           hasData={Boolean(data)}
+          disableDuplicateFetch={disableDuplicateFetch}
           username1Error={usernameErrors.username1}
           username2Error={usernameErrors.username2}
         />

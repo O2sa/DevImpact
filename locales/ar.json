@@ -47,6 +47,7 @@
   "error.resourceLimit": "تم الوصول إلى حدود موارد GitHub API لهذا الطلب. حاول مرة أخرى بعد قليل.",
   "error.missingUsername": "أدخل اسمين للمقارنة.",
   "error.userNotFound": "لم يتم العثور على مستخدم GitHub",
+  "error.sameUser": "مطلوب اسمان مختلفان لمستخدمي GitHub.",
   "explanations.contribution": "درجة المساهمات",
   "explanations.line.contribution.1": "تعتمد درجة المساهمات على المشكلات والنقاشات الخارجية فقط.",
   "explanations.line.contribution.2": "لا يتم احتساب الـ commits وطلبات السحب لتجنب العد المزدوج.",
