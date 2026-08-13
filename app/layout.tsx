@@ -2,7 +2,6 @@ import "./globals.css";
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
-import Script from "next/script";
 import {
   DEFAULT_LOCALE,
   LOCALE_COOKIE,
@@ -112,10 +111,13 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
   return (
     <html lang={initialLocale} dir={dir} suppressHydrationWarning>
+      <head>
+        <script
+          id="theme-init"
+          dangerouslySetInnerHTML={{ __html: themeInitScript }}
+        />
+      </head>
       <body>
-        <Script id="theme-init" strategy="beforeInteractive">
-          {themeInitScript}
-        </Script>
         <Providers initialLocale={initialLocale}>{children}</Providers>
       </body>
     </html>
