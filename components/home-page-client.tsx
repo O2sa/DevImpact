@@ -96,6 +96,7 @@ export function HomePageClient() {
   );
   const [data, setData] = useState<ComparisonData | null>(null);
   const [displayData, setDisplayData] = useState<ComparisonData | null>(null);
+  const [disableDuplicateFetch, setDisableDuplicateFetch] = useState(false);
   const lastFetchedKeyRef = useRef<string | null>(null);
   const inFlightFetchKeyRef = useRef<string | null>(null);
   const inFlightPromiseRef = useRef<Promise<void> | null>(null);
@@ -235,6 +236,11 @@ export function HomePageClient() {
 
     lastFetchedKeyRef.current = fetchKey;
 
+    // update duplicate fetch state for current form values
+    setDisableDuplicateFetch(
+      Boolean(lastFetchedKeyRef.current === createFetchKey(username1.trim(), username2.trim(), { selectedLanguages }) && (data || inFlightFetchKeyRef.current === fetchKey)),
+    );
+
     const requestPromise = (async () => {
       if (options.updateUrl !== false) {
         const params = new URLSearchParams();
@@ -311,6 +317,11 @@ export function HomePageClient() {
     inFlightFetchKeyRef.current = fetchKey;
     inFlightPromiseRef.current = requestPromise;
 
+    // mark duplicate fetch disabled while request is in-flight
+    setDisableDuplicateFetch(
+      Boolean(lastFetchedKeyRef.current === createFetchKey(username1.trim(), username2.trim(), { selectedLanguages }) && (data || inFlightFetchKeyRef.current === fetchKey)),
+    );
+
     return requestPromise;
   };
 
@@ -324,6 +335,7 @@ export function HomePageClient() {
         lastFetchedKeyRef.current = null;
         setData(null);
         resetErrors();
+        setDisableDuplicateFetch(false);
         return;
       }
 
@@ -331,10 +343,7 @@ export function HomePageClient() {
         selectedLanguages: languages,
       });
 
-      if (
-        lastFetchedKeyRef.current === nextKey &&
-        (data || inFlightFetchKeyRef.current === nextKey)
-      ) {
+      if (lastFetchedKeyRef.current === nextKey && data) {
         return;
       }
 
@@ -388,13 +397,18 @@ export function HomePageClient() {
   const isRefreshing = loading && Boolean(displayData);
   const isExiting = !loading && !data && Boolean(displayData);
 
-  const currentFetchKey = createFetchKey(username1.trim(), username2.trim(), {
-    selectedLanguages,
-  });
 
-  const disableDuplicateFetch = Boolean(
-    lastFetchedKeyRef.current === currentFetchKey && (data || inFlightFetchKeyRef.current === currentFetchKey),
-  );
+  useEffect(() => {
+    const currentFetchKey = createFetchKey(username1.trim(), username2.trim(), {
+      selectedLanguages,
+    });
+
+    const lastKey = lastFetchedKeyRef.current;
+    const inFlightKey = inFlightFetchKeyRef.current;
+
+    const disabled = Boolean(lastKey === currentFetchKey && (data || inFlightKey === currentFetchKey));
+    setDisableDuplicateFetch(disabled);
+  }, [username1, username2, selectedLanguages, data, loading]);
 
   const handleUsername1Change = (value: string) => {
     setUsername1(value);
@@ -416,6 +430,7 @@ export function HomePageClient() {
     resetErrors();
     inFlightFetchKeyRef.current = null;
     inFlightPromiseRef.current = null;
+    setDisableDuplicateFetch(false);
     setUsername1("");
     setUsername2("");
     setSelectedLanguages([]);
