@@ -47,6 +47,7 @@
   "error.resourceLimit": "GitHub API resource limits were reached for this request. Please retry shortly.",
   "error.missingUsername": "Provide two usernames to compare.",
   "error.userNotFound": "GitHub user not found",
+  "error.sameUser": "Two different GitHub usernames are required.",
   "explanations.contribution": "Contribution Score",
   "explanations.line.contribution.1": "Contribution score is based on external issues and discussions only.",
   "explanations.line.contribution.2": "Commits and pull requests are excluded to avoid double-counting.",

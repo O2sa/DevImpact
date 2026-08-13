@@ -47,6 +47,7 @@ type CompareFormProps = {
   swapUsers?: () => void;
   username1Error?: string | null;
   username2Error?: string | null;
+  disableDuplicateFetch?: boolean;
 };
 
 export function CompareForm({
@@ -63,6 +64,7 @@ export function CompareForm({
   reset,
   username1Error,
   username2Error,
+  disableDuplicateFetch,
 }: CompareFormProps) {
   const { t } = useTranslation();
   const firstInputRef = useRef<HTMLInputElement>(null);
@@ -71,7 +73,12 @@ export function CompareForm({
     firstInputRef.current?.focus();
   }, []);
 
-  const canSubmit = Boolean(username1.trim() && username2.trim() && !loading);
+  const normalized1 = username1.trim().toLowerCase();
+  const normalized2 = username2.trim().toLowerCase();
+  const sameUsername = Boolean(normalized1 && normalized2 && normalized1 === normalized2);
+  const canSubmit = Boolean(
+    username1.trim() && username2.trim() && !loading && !sameUsername && !disableDuplicateFetch,
+  );
   const isEmpty = !username1.trim() && !username2.trim() && !hasData;
   const hasLanguageSelection = selectedLanguages.length > 0;
 
@@ -238,7 +245,13 @@ export function CompareForm({
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-end gap-3">
+          <div className="flex flex-col gap-2">
+            {sameUsername ? (
+              <p className="text-xs font-medium text-destructive">{t("error.sameUser")}</p>
+            ) : null}
+      
+
+            <div className="flex flex-wrap justify-end gap-3">
             <Button
               type="submit"
               disabled={!canSubmit}
@@ -264,6 +277,7 @@ export function CompareForm({
             >
               <RefreshCw className="h-4 w-4" />
             </Button>
+          </div>
           </div>
         </CardContent>
       </Card>
