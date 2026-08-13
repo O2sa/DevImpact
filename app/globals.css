@@ -74,16 +74,16 @@ body::after {
 
 body::before {
   background-image:
-    radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08), transparent 35%),
-    radial-gradient(circle at 80% 0%, rgba(168, 85, 247, 0.08), transparent 30%),
+    radial-gradient(circle at 20% 20%, hsl(var(--primary) / 0.08), transparent 35%),
+    radial-gradient(circle at 80% 0%, hsl(var(--accent) / 0.08), transparent 30%),
     linear-gradient(180deg, #f8fbff 0%, #f2f5f9 40%, #f9fafb 100%);
   opacity: 1;
 }
 
 body::after {
   background-image:
-    radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08), transparent 35%),
-    radial-gradient(circle at 80% 0%, rgba(124, 58, 237, 0.12), transparent 30%),
+    radial-gradient(circle at 20% 20%, hsl(var(--primary) / 0.08), transparent 35%),
+    radial-gradient(circle at 80% 0%, hsl(var(--accent) / 0.12), transparent 30%),
     linear-gradient(180deg, #0f172a 0%, #0b1221 40%, #0a0f1c 100%);
   opacity: 0;
 }
