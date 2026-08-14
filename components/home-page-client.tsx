@@ -18,6 +18,13 @@ import {
   SafeApiError,
 } from "@/types/api-response";
 import { cn } from "@/lib/utils";
+import {
+  createComparisonQuery,
+  createComparisonRequest,
+  isComparisonFetchDuplicate,
+  reconcileComparisonData,
+  sanitizeSelectedLanguages,
+} from "@/lib/compare-request";
 
 type ComparisonData = {
   user1: UserResult;
@@ -44,26 +51,6 @@ type UsernameErrors = {
 };
 
 const EXIT_ANIMATION_MS = 240;
-
-function sanitizeSelectedLanguages(languages: string[]): string[] {
-  const seen = new Set<string>();
-  const output: string[] = [];
-
-  for (const language of languages) {
-    const trimmed = language.trim();
-    const normalized = trimmed.toLowerCase();
-    if (!trimmed || seen.has(normalized)) {
-      continue;
-    }
-    output.push(trimmed);
-    seen.add(normalized);
-    if (output.length >= 5) {
-      break;
-    }
-  }
-
-  return output;
-}
 
 function normalizeUsers(body: ApiResponse): { user1: UserResult; user2: UserResult } | null {
   if (body.users && body.users.length >= 2) {
@@ -100,6 +87,9 @@ export function HomePageClient() {
   const lastFetchedKeyRef = useRef<string | null>(null);
   const inFlightFetchKeyRef = useRef<string | null>(null);
   const inFlightPromiseRef = useRef<Promise<void> | null>(null);
+  const latestRequestRef = useRef(
+    createComparisonRequest(initialUsername1, initialUsername2, initialSelectedLanguages),
+  );
   const hideTimerRef = useRef<number | null>(null);
 
   const localizeErrorMessage = (message?: string, details?: SafeApiError) => {
@@ -206,24 +196,14 @@ export function HomePageClient() {
     setGeneralError(localizedMessage);
   };
 
-  const createFetchKey = (
-    u1: string,
-    u2: string,
-    options: CompareOptions,
-  ) =>
-    JSON.stringify({
-      u1,
-      u2,
-      selectedLanguages: [...sanitizeSelectedLanguages(options.selectedLanguages)].sort(),
-    });
-
   const handleCompare = async (
     u1: string,
     u2: string,
     options: CompareOptions,
   ) => {
-    const sanitizedLanguages = sanitizeSelectedLanguages(options.selectedLanguages);
-    const fetchKey = createFetchKey(u1, u2, options);
+    const request = createComparisonRequest(u1, u2, options.selectedLanguages);
+    latestRequestRef.current = request;
+    const fetchKey = request.fetchKey;
 
     if (inFlightFetchKeyRef.current === fetchKey && inFlightPromiseRef.current) {
       return inFlightPromiseRef.current;
@@ -231,51 +211,57 @@ export function HomePageClient() {
 
     // If we've already fetched this exact comparison and have the data, skip.
     if (lastFetchedKeyRef.current === fetchKey && data) {
+      const reconciled = reconcileComparisonData(data, fetchKey, request);
+      if (reconciled) {
+        setData(reconciled);
+        setDisplayData(reconciled);
+      }
       return Promise.resolve();
     }
 
     lastFetchedKeyRef.current = fetchKey;
 
     // update duplicate fetch state for current form values
+    const currentFetchKey = createComparisonRequest(
+      username1,
+      username2,
+      selectedLanguages,
+    ).fetchKey;
     setDisableDuplicateFetch(
-      Boolean(lastFetchedKeyRef.current === createFetchKey(username1.trim(), username2.trim(), { selectedLanguages }) && (data || inFlightFetchKeyRef.current === fetchKey)),
+      isComparisonFetchDuplicate(
+        currentFetchKey,
+        lastFetchedKeyRef.current,
+        inFlightFetchKeyRef.current,
+        Boolean(data),
+      ),
     );
 
     const requestPromise = (async () => {
       if (options.updateUrl !== false) {
-        const params = new URLSearchParams();
-        params.append("username", u1);
-        params.append("username", u2);
-        for (const language of sanitizedLanguages) {
-          params.append("selectedLanguage", language);
-        }
-        router.push(`/?${params.toString()}`, { scroll: false });
+        router.push(`/?${createComparisonQuery(request)}`, { scroll: false });
       }
 
       setLoading(true);
       resetErrors();
 
       try {
-        const requestParams = new URLSearchParams();
-        requestParams.append("username", u1);
-        requestParams.append("username", u2);
-        for (const language of sanitizedLanguages) {
-          requestParams.append("selectedLanguage", language);
-        }
-
-        const res = await fetch(`/api/compare?${requestParams.toString()}`);
+        const res = await fetch(`/api/compare?${createComparisonQuery(request)}`);
 
         const body: ApiResponse = await res.json();
         if (!res.ok) {
+          if (latestRequestRef.current.fetchKey !== fetchKey) {
+            return;
+          }
           setData(null);
-          applyApiError(u1, u2, body);
+          applyApiError(latestRequestRef.current.user1, latestRequestRef.current.user2, body);
           return;
         }
         const users = normalizeUsers(body);
 
         if (!body.success || !users) {
+          if (latestRequestRef.current.fetchKey !== fetchKey) return;
           setData(null);
-          applyApiError(u1, u2, body);
+          applyApiError(latestRequestRef.current.user1, latestRequestRef.current.user2, body);
           return;
         }
 
@@ -296,9 +282,25 @@ export function HomePageClient() {
           scoreVersion: body.scoreVersion,
         };
 
-        setData(nextData);
-        setDisplayData(nextData);
+        const reconciled = reconcileComparisonData(
+          nextData,
+          fetchKey,
+          latestRequestRef.current,
+        );
+        if (!reconciled) {
+          if (latestRequestRef.current.fetchKey === fetchKey) {
+            setData(null);
+            setGeneralError(t("error.generic"));
+          }
+          return;
+        }
+
+        setData(reconciled);
+        setDisplayData(reconciled);
       } catch (err: unknown) {
+        if (latestRequestRef.current.fetchKey !== fetchKey) {
+          return;
+        }
         setData(null);
         setUsernameErrors({
           username1: null,
@@ -309,8 +311,8 @@ export function HomePageClient() {
         if (inFlightFetchKeyRef.current === fetchKey) {
           inFlightFetchKeyRef.current = null;
           inFlightPromiseRef.current = null;
+          setLoading(false);
         }
-        setLoading(false);
       }
     })();
 
@@ -319,7 +321,12 @@ export function HomePageClient() {
 
     // mark duplicate fetch disabled while request is in-flight
     setDisableDuplicateFetch(
-      Boolean(lastFetchedKeyRef.current === createFetchKey(username1.trim(), username2.trim(), { selectedLanguages }) && (data || inFlightFetchKeyRef.current === fetchKey)),
+      isComparisonFetchDuplicate(
+        currentFetchKey,
+        lastFetchedKeyRef.current,
+        inFlightFetchKeyRef.current,
+        Boolean(data),
+      ),
     );
 
     return requestPromise;
@@ -332,18 +339,11 @@ export function HomePageClient() {
       setSelectedLanguages(languages);
 
       if (!u1 || !u2) {
+        latestRequestRef.current = createComparisonRequest(u1, u2, languages);
         lastFetchedKeyRef.current = null;
         setData(null);
         resetErrors();
         setDisableDuplicateFetch(false);
-        return;
-      }
-
-      const nextKey = createFetchKey(u1, u2, {
-        selectedLanguages: languages,
-      });
-
-      if (lastFetchedKeyRef.current === nextKey && data) {
         return;
       }
 
@@ -399,14 +399,21 @@ export function HomePageClient() {
 
 
   useEffect(() => {
-    const currentFetchKey = createFetchKey(username1.trim(), username2.trim(), {
+    const currentFetchKey = createComparisonRequest(
+      username1,
+      username2,
       selectedLanguages,
-    });
+    ).fetchKey;
 
     const lastKey = lastFetchedKeyRef.current;
     const inFlightKey = inFlightFetchKeyRef.current;
 
-    const disabled = Boolean(lastKey === currentFetchKey && (data || inFlightKey === currentFetchKey));
+    const disabled = isComparisonFetchDuplicate(
+      currentFetchKey,
+      lastKey,
+      inFlightKey,
+      Boolean(data),
+    );
     setDisableDuplicateFetch(disabled);
   }, [username1, username2, selectedLanguages, data, loading]);
 
@@ -430,6 +437,7 @@ export function HomePageClient() {
     resetErrors();
     inFlightFetchKeyRef.current = null;
     inFlightPromiseRef.current = null;
+    latestRequestRef.current = createComparisonRequest("", "", []);
     setDisableDuplicateFetch(false);
     setUsername1("");
     setUsername2("");
@@ -440,16 +448,27 @@ export function HomePageClient() {
   const swapUsers = () => {
     const nextUsername1 = username2;
     const nextUsername2 = username1;
+    const nextRequest = createComparisonRequest(
+      nextUsername1,
+      nextUsername2,
+      selectedLanguages,
+    );
+    latestRequestRef.current = nextRequest;
 
     setUsername1(nextUsername1);
     setUsername2(nextUsername2);
-    router.push(
-      `/?username=${encodeURIComponent(nextUsername1)}&username=${encodeURIComponent(nextUsername2)}`,
-      { scroll: false },
-    );
+    router.push(`/?${createComparisonQuery(nextRequest)}`, { scroll: false });
 
-    if (!data) return;
-    setData((current) => (current ? { ...current, user1: current.user2, user2: current.user1 } : current));
+    setData((current) =>
+      current
+        ? reconcileComparisonData(current, nextRequest.fetchKey, nextRequest)
+        : current,
+    );
+    setDisplayData((current) =>
+      current
+        ? reconcileComparisonData(current, nextRequest.fetchKey, nextRequest)
+        : current,
+    );
   };
 
   return (
