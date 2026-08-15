@@ -189,8 +189,16 @@ GITHUB_REPO_COUNT=30
 GITHUB_PR_COUNT=80
 GITHUB_ISSUE_COUNT=20
 GITHUB_DISCUSSION_COUNT=10
-
+REDIS_URL=redis://localhost:6379
+REDIS_ENABLED=false
+REDIS_CACHE_NAMESPACE=devimpact:v1
+REDIS_CACHE_TTL_SECONDS=604800
 ```
+
+`CACHE_NAMESPACE` and `CACHE_TTL_SECONDS` are accepted as aliases for the
+Redis-prefixed cache settings. The namespace must be non-empty. Cache TTL must
+be a positive integer no greater than `31536000` seconds (one year); invalid or
+missing values fall back to `devimpact:v1` and `604800` seconds (seven days).
 
 ---
 

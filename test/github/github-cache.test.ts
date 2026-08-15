@@ -6,8 +6,12 @@ import {
   type GitHubFetcherDependencies,
 } from "@/lib/github";
 import {
+  DEFAULT_CACHE_NAMESPACE,
   DEFAULT_GITHUB_CACHE_TTL_SECONDS,
   getCacheConfigFromEnv,
+  getCacheNamespaceFromEnv,
+  getCacheTtlSecondsFromEnv,
+  MAX_CACHE_TTL_SECONDS,
   type CacheStore,
 } from "@/lib/cache-store";
 import type { GitHubUserData } from "@/types/github";
@@ -15,6 +19,12 @@ import type { GitHubUserData } from "@/types/github";
 type ExecuteCall = {
   operationName: string;
 };
+
+function makeProcessEnv(
+  values: Record<string, string> = {},
+): NodeJS.ProcessEnv {
+  return { NODE_ENV: "test", ...values };
+}
 
 function makeExecutor(
   calls: ExecuteCall[],
@@ -495,5 +505,68 @@ describe("GitHub user data caching", () => {
   test("default cache TTL is seven days", () => {
     const config = getCacheConfigFromEnv({} as NodeJS.ProcessEnv);
     expect(config.ttlSeconds).toBe(DEFAULT_GITHUB_CACHE_TTL_SECONDS);
+  });
+
+  test("reads cache TTL aliases with Redis-specific precedence", () => {
+    expect(
+      getCacheTtlSecondsFromEnv(makeProcessEnv({
+        REDIS_CACHE_TTL_SECONDS: "3600",
+        CACHE_TTL_SECONDS: "7200",
+      })),
+    ).toBe(3600);
+    expect(
+      getCacheTtlSecondsFromEnv(makeProcessEnv({
+        CACHE_TTL_SECONDS: "7200",
+      })),
+    ).toBe(7200);
+  });
+
+  test.each(["0", "-1", "1.5", "42seconds", `${MAX_CACHE_TTL_SECONDS + 1}`])(
+    "rejects invalid cache TTL %s",
+    (value) => {
+      expect(
+        getCacheTtlSecondsFromEnv(makeProcessEnv({
+          REDIS_CACHE_TTL_SECONDS: value,
+        })),
+      ).toBe(DEFAULT_GITHUB_CACHE_TTL_SECONDS);
+    },
+  );
+
+  test("falls through to the TTL alias when the preferred value is invalid", () => {
+    expect(
+      getCacheTtlSecondsFromEnv(makeProcessEnv({
+        REDIS_CACHE_TTL_SECONDS: "invalid",
+        CACHE_TTL_SECONDS: "1800",
+      })),
+    ).toBe(1800);
+  });
+
+  test("accepts the maximum cache TTL", () => {
+    expect(
+      getCacheTtlSecondsFromEnv(makeProcessEnv({
+        REDIS_CACHE_TTL_SECONDS: `${MAX_CACHE_TTL_SECONDS}`,
+      })),
+    ).toBe(MAX_CACHE_TTL_SECONDS);
+  });
+
+  test("reads, trims, and validates cache namespace aliases", () => {
+    expect(
+      getCacheNamespaceFromEnv(makeProcessEnv({
+        REDIS_CACHE_NAMESPACE: "  deployment:v2  ",
+        CACHE_NAMESPACE: "fallback:v1",
+      })),
+    ).toBe("deployment:v2");
+    expect(
+      getCacheNamespaceFromEnv(makeProcessEnv({
+        REDIS_CACHE_NAMESPACE: "   ",
+        CACHE_NAMESPACE: "  fallback:v1  ",
+      })),
+    ).toBe("fallback:v1");
+    expect(
+      getCacheNamespaceFromEnv(makeProcessEnv({
+        REDIS_CACHE_NAMESPACE: "   ",
+        CACHE_NAMESPACE: "",
+      })),
+    ).toBe(DEFAULT_CACHE_NAMESPACE);
   });
 });

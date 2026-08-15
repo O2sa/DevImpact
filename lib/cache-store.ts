@@ -2,6 +2,7 @@ import { createClient } from "redis";
 
 export const DEFAULT_GITHUB_CACHE_TTL_SECONDS = 604_800;
 export const DEFAULT_CACHE_NAMESPACE = "devimpact:v1";
+export const MAX_CACHE_TTL_SECONDS = 31_536_000;
 
 type CacheLogger = Pick<Console, "info" | "warn">;
 type AppRedisClient = ReturnType<typeof createClient>;
@@ -29,13 +30,38 @@ function parseBoolean(value: string | undefined): boolean | undefined {
   return undefined;
 }
 
-function parsePositiveInt(value: string | undefined): number | undefined {
-  if (!value) return undefined;
-  const parsed = Number.parseInt(value, 10);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
+function parsePositiveInt(
+  value: string | undefined,
+  max = Number.MAX_SAFE_INTEGER,
+): number | undefined {
+  const normalized = value?.trim();
+  if (!normalized || !/^\d+$/.test(normalized)) return undefined;
+
+  const parsed = Number(normalized);
+  if (!Number.isSafeInteger(parsed) || parsed <= 0 || parsed > max) {
     return undefined;
   }
   return parsed;
+}
+
+export function getCacheTtlSecondsFromEnv(
+  env: NodeJS.ProcessEnv = process.env,
+): number {
+  return (
+    parsePositiveInt(env.REDIS_CACHE_TTL_SECONDS, MAX_CACHE_TTL_SECONDS) ??
+    parsePositiveInt(env.CACHE_TTL_SECONDS, MAX_CACHE_TTL_SECONDS) ??
+    DEFAULT_GITHUB_CACHE_TTL_SECONDS
+  );
+}
+
+export function getCacheNamespaceFromEnv(
+  env: NodeJS.ProcessEnv = process.env,
+): string {
+  return (
+    env.REDIS_CACHE_NAMESPACE?.trim() ||
+    env.CACHE_NAMESPACE?.trim() ||
+    DEFAULT_CACHE_NAMESPACE
+  );
 }
 
 export function getCacheConfigFromEnv(
@@ -48,14 +74,8 @@ export function getCacheConfigFromEnv(
   return {
     enabled,
     redisUrl,
-    namespace:
-      env.REDIS_CACHE_NAMESPACE?.trim() ||
-      env.CACHE_NAMESPACE?.trim() ||
-      DEFAULT_CACHE_NAMESPACE,
-    ttlSeconds:
-      parsePositiveInt(env.REDIS_CACHE_TTL_SECONDS) ??
-      parsePositiveInt(env.CACHE_TTL_SECONDS) ??
-      DEFAULT_GITHUB_CACHE_TTL_SECONDS,
+    namespace: getCacheNamespaceFromEnv(env),
+    ttlSeconds: getCacheTtlSecondsFromEnv(env),
     connectTimeoutMs: parsePositiveInt(env.REDIS_CONNECT_TIMEOUT_MS) ?? 1_500,
   };
 }
