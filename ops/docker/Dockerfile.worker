@@ -1,0 +1,37 @@
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Enable pnpm via corepack
+RUN corepack enable
+
+# Copy dependency manifests first for layer caching
+COPY package.json pnpm-lock.yaml ./
+
+# Configure workspace policy for native dependencies if required
+RUN printf "packages:\n  - '.'\n\nallowBuilds:\n  esbuild: true\n  sharp: true\n  unrs-resolver: true\n" > pnpm-workspace.yaml
+
+# Install dependencies using frozen lockfile
+RUN pnpm install --frozen-lockfile
+
+# Copy application source code
+COPY . .
+
+# Install Supercronic cron runner
+RUN wget -O /usr/local/bin/supercronic \
+  https://github.com/aptible/supercronic/releases/download/v0.2.29/supercronic-linux-amd64 \
+  && chmod +x /usr/local/bin/supercronic
+
+# Copy entrypoint script and initial leaderboard cron job definition
+COPY ops/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY ops/cron/leaderboard.cron /etc/leaderboard.cron
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Build-time argument for version identification
+ARG GIT_COMMIT_SHA=development
+ENV DEVIMPACT_VERSION=${GIT_COMMIT_SHA}
+
+# Default cron schedule environment variable (daily execution at midnight)
+ENV LEADERBOARD_CRON_SCHEDULE="0 0 * * *"
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

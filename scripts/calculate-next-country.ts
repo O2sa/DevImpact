@@ -23,10 +23,22 @@ import { getDatabaseStore } from "@/lib/db-store";
 import { calculateLeaderboard } from "@/lib/calculate-leaderboard";
 import { logger } from "@/lib/logger";
 
+let activeCountrySlug: string | null = null;
+let isCalculating = false;
+
+const handleShutdownSignal = (signal: string) => {
+  logger.warn(`Received ${signal}. Graceful shutdown initiated. Waiting for active calculation (${activeCountrySlug ?? "none"}) to finish...`);
+};
+
+process.on("SIGTERM", () => handleShutdownSignal("SIGTERM"));
+process.on("SIGINT", () => handleShutdownSignal("SIGINT"));
+
 async function main() {
   const overallStartTime = performance.now();
+  const workerVersion = process.env.DEVIMPACT_VERSION || process.env.GIT_COMMIT_SHA || "development";
   logger.info("=== DevImpact Leaderboard Calculator Start ===");
-  logger.info(`DB:  ${(process.env.DATABASE_URL ?? "").slice(0, 40)}...`);
+  logger.info(`Version: ${workerVersion}`);
+  logger.info(`DB:      ${(process.env.DATABASE_URL ?? "").slice(0, 40)}...`);
 
   const db = getDatabaseStore();
   await db.initializeSchema();
@@ -39,6 +51,9 @@ async function main() {
     logger.info("No countries to calculate. All are up-to-date or running.");
     process.exit(0);
   }
+
+  activeCountrySlug = next.slug;
+  isCalculating = true;
 
   logger.info(`Selected: ${next.title} (${next.slug})`);
 

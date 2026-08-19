@@ -161,57 +161,59 @@ Final Score =
 
 ## 🚀 Getting Started
 
-### 1. Clone the repo
+### ⚡ Option A: Run Full Platform via Docker (Fastest)
+
+Run the entire platform (Web App UI + PostgreSQL + Redis + Worker) in 2 simple steps:
 
 ```bash
-git clone https://github.com/O2sa/DevImpact.git
-cd DevImpact
+# 1. Copy environment template and set GITHUB_TOKEN
+cp .env.example .env
+
+# 2. Start full platform
+docker compose -f ops/docker/docker-compose.yml up -d --build
 ```
+Then open `http://localhost:3000` in your browser!
 
 ---
 
-### 2. Install dependencies
+### 📦 Option B: Run Locally with Node.js & pnpm
+
+1. **Install dependencies**:
+   ```bash
+   pnpm install
+   ```
+
+2. **Configure environment**:
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Start local database & Redis**:
+   ```bash
+   pnpm db:up && pnpm redis:up
+   ```
+
+4. **Run development server**:
+   ```bash
+   pnpm run dev
+   ```
+
+5. **Calculate leaderboard scores manually**:
+   ```bash
+   pnpm leaderboard:calculate
+   ```
+
+### Leaderboard Worker & Infrastructure
+
+The leaderboard score updates run via a dedicated background worker container using Docker & Supercronic.
+
+For complete local setup, Docker Compose instructions, GHCR publishing, and VPS deployment documentation, see **[ops/README.md](file:///c:/Users/msii/Documents/DevImpact/ops/README.md)**.
 
 ```bash
-pnpm install
-```
-
----
-
-### 3. Set up environment variables
-
-Create a `.env` file:
-
-```
-GITHUB_TOKEN=your_github_token
-NEXT_PUBLIC_GITHUB_REPO_URL=your_github_repo_url
-GITHUB_REPO_COUNT=30
-GITHUB_PR_COUNT=80
-GITHUB_ISSUE_COUNT=20
-GITHUB_DISCUSSION_COUNT=10
-REDIS_URL=redis://localhost:6379
-REDIS_ENABLED=false
-REDIS_CACHE_NAMESPACE=devimpact:v1
-REDIS_CACHE_TTL_SECONDS=604800
-```
-
-`CACHE_NAMESPACE` and `CACHE_TTL_SECONDS` are accepted as aliases for the
-Redis-prefixed cache settings. The namespace must be non-empty. Cache TTL must
-be a positive integer no greater than `31536000` seconds (one year); invalid or
-missing values fall back to `devimpact:v1` and `604800` seconds (seven days).
-
----
-
-### 4. Run the app
-
-```bash
-pnpm run dev
-```
-
-To calculate the next leaderboard country from the script, run:
-
-```bash
-pnpm run calculate-next-country
+# Quick worker setup (pulls & runs published image)
+cp .env.example .env
+docker compose -f ops/docker/leaderboard-compose.yml pull
+docker compose -f ops/docker/leaderboard-compose.yml up -d
 ```
 
 ---

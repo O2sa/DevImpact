@@ -1,0 +1,28 @@
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Enable pnpm via corepack
+RUN corepack enable
+
+# Copy dependency manifests first for layer caching
+COPY package.json pnpm-lock.yaml ./
+
+# Configure workspace policy for native dependencies if required
+RUN printf "packages:\n  - '.'\n\nallowBuilds:\n  esbuild: true\n  sharp: true\n  unrs-resolver: true\n" > pnpm-workspace.yaml
+
+# Install dependencies using frozen lockfile
+RUN pnpm install --frozen-lockfile
+
+# Copy application source code
+COPY . .
+
+# Build Next.js application
+RUN pnpm build
+
+EXPOSE 3000
+
+ENV PORT=3000
+ENV NODE_ENV=production
+
+CMD ["pnpm", "start"]

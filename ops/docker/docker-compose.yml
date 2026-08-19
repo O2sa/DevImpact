@@ -3,25 +3,20 @@ services:
     image: postgres:16-alpine
     container_name: devimpact-postgres
     restart: unless-stopped
-
     environment:
       POSTGRES_DB: devimpact
       POSTGRES_USER: devimpact
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devimpact}
-
     ports:
       - "5432:5432"
-
     volumes:
       - postgres-data:/var/lib/postgresql/data
-
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U devimpact -d devimpact"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
-
     logging:
       driver: json-file
       options:
@@ -32,7 +27,6 @@ services:
     image: redis:7-alpine
     container_name: devimpact-redis
     restart: unless-stopped
-
     command:
       [
         "redis-server",
@@ -45,13 +39,10 @@ services:
         "--maxmemory-policy",
         "allkeys-lru"
       ]
-
     ports:
       - "6379:6379"
-
     volumes:
       - redis-data:/data
-
     healthcheck:
       test:
         [
@@ -65,12 +56,32 @@ services:
       timeout: 3s
       retries: 5
       start_period: 10s
-
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "5"
+
+  web:
+    build:
+      context: ../..
+      dockerfile: ops/docker/Dockerfile.web
+    container_name: devimpact-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: ${ENV_FILE:-../../.env}
+        required: false
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://devimpact:devimpact@postgres:5432/devimpact?sslmode=disable}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      REDIS_ENABLED: ${REDIS_ENABLED:-false}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres-data:
