@@ -30,9 +30,7 @@ export function normalizeSelectedLanguages(languages?: string[]): string[] {
   return unique;
 }
 
-export function getLanguageDistribution(
-  languages?: RepoLanguages,
-): Record<string, number> {
+export function getLanguageDistribution(languages?: RepoLanguages): Record<string, number> {
   const edges = languages?.edges ?? [];
   if (edges.length === 0) {
     return {};
@@ -82,10 +80,7 @@ export function getLanguageMatch(
   return Math.max(0, Math.min(1, match));
 }
 
-export function getLanguageFactor(
-  languageMatch: number,
-  minFactor = 0.25,
-): number {
+export function getLanguageFactor(languageMatch: number, minFactor = 0.25): number {
   const boundedMatch = Math.max(0, Math.min(1, languageMatch));
   const boundedMinFactor = Math.max(0, Math.min(1, minFactor));
   return boundedMinFactor + (1 - boundedMinFactor) * boundedMatch;

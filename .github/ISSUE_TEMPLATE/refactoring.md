@@ -1,10 +1,9 @@
 ---
 name: Refactoring Request
 about: Suggest refactoring or code quality improvements
-title: ''
+title: ""
 labels: refactoring, good first issue
-assignees: ''
-
+assignees: ""
 ---
 
 ## Area to Refactor
@@ -20,9 +19,7 @@ assignees: ''
 
 - describe the refactoring approach in bullet points
 
-
 > [!NOTE]
 > **CONTRIBUTIONS ARE WELCOME!**
 > If you want to get this issue assigned to you, just comment `assign this issue to me`.
 > You will be assigned to the issue instantly via GitHub-actions bot.
-

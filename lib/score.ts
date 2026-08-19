@@ -1,9 +1,4 @@
-import type {
-  DiscussionNode,
-  IssueNode,
-  PullRequestNode,
-  RepoNode,
-} from "@/types/github";
+import type { DiscussionNode, IssueNode, PullRequestNode, RepoNode } from "@/types/github";
 import type {
   CommunityContributionDetail,
   PullRequestScoreDetail,
@@ -111,10 +106,7 @@ function getDaysSince(dateValue: string, referenceDate: Date): number | null {
   return Math.max(0, diff / MS_PER_DAY);
 }
 
-function getRepoActivityFactor(
-  pushedAt: string | undefined,
-  referenceDate: Date,
-): number {
+function getRepoActivityFactor(pushedAt: string | undefined, referenceDate: Date): number {
   if (!pushedAt) {
     return 0.8;
   }
@@ -275,9 +267,7 @@ function calculatePRScore(
   };
 }
 
-function calculateCommunityItemScore(
-  item: IssueNode | DiscussionNode,
-): number {
+function calculateCommunityItemScore(item: IssueNode | DiscussionNode): number {
   const repoStars = Math.max(0, item.repository.stargazerCount);
   const comments = Math.max(0, item.comments.totalCount);
   let score = safeLog(repoStars) * safeLog(comments);
@@ -324,9 +314,7 @@ function calculateContributionScore(
   }
 
   for (const discussion of discussions) {
-    if (
-      discussion.repository.owner.login.toLowerCase() === normalizedUsername
-    ) {
+    if (discussion.repository.owner.login.toLowerCase() === normalizedUsername) {
       continue;
     }
 
@@ -424,10 +412,7 @@ function calculateLanguagePRScore(
   >();
 
   for (const item of prDetails) {
-    const languageMatch = getLanguageMatch(
-      item.pr.repository.languages,
-      selectedLanguages,
-    );
+    const languageMatch = getLanguageMatch(item.pr.repository.languages, selectedLanguages);
     const languageFactor = getLanguageFactor(languageMatch);
     const score = sanitizeNumber(item.score * languageFactor);
     const key = item.pr.repository.nameWithOwner;
@@ -614,42 +599,28 @@ export function calculateUserScore(
   );
 
   let contributionScore = communityScore.total;
-  contributionScore = Math.min(
-    contributionScore,
-    0.3 * (repoScore.total + prScore.total),
-  );
+  contributionScore = Math.min(contributionScore, 0.3 * (repoScore.total + prScore.total));
   contributionScore = sanitizeNumber(contributionScore);
 
-  const finalScore =
-    repoScore.total * 0.45 + prScore.total * 0.45 + contributionScore * 0.1;
+  const finalScore = repoScore.total * 0.45 + prScore.total * 0.45 + contributionScore * 0.1;
 
   const normalizedRepoScore = normalizeScore(repoScore.total, 100);
   const normalizedPRScore = normalizeScore(prScore.total, 300);
   const normalizedContributionScore = normalizeScore(contributionScore, 100);
   const normalizedFinalScore =
-    normalizedRepoScore * 0.45 +
-    normalizedPRScore * 0.45 +
-    normalizedContributionScore * 0.1;
+    normalizedRepoScore * 0.45 + normalizedPRScore * 0.45 + normalizedContributionScore * 0.1;
 
   let languageScores: LanguageScores | undefined;
   let languageRepoSignals: Pick<
     ScoringSignals,
     "reposWithLanguageData" | "averageRepoLanguageMatch"
   > = {};
-  let languagePRSignals: Pick<
-    ScoringSignals,
-    "prsWithLanguageData" | "averagePRLanguageMatch"
-  > = {};
+  let languagePRSignals: Pick<ScoringSignals, "prsWithLanguageData" | "averagePRLanguageMatch"> =
+    {};
 
   if (hasSelectedLanguages) {
-    const languageRepoScore = calculateLanguageRepoScore(
-      repoScore.details,
-      selectedLanguages,
-    );
-    const languagePRScore = calculateLanguagePRScore(
-      prScore.details,
-      selectedLanguages,
-    );
+    const languageRepoScore = calculateLanguageRepoScore(repoScore.details, selectedLanguages);
+    const languagePRScore = calculateLanguagePRScore(prScore.details, selectedLanguages);
 
     let languageContributionScore = contributionScore;
     languageContributionScore = Math.min(
@@ -665,10 +636,7 @@ export function calculateUserScore(
 
     const normalizedLanguageRepoScore = normalizeScore(languageRepoScore.total, 100);
     const normalizedLanguagePRScore = normalizeScore(languagePRScore.total, 300);
-    const normalizedLanguageContributionScore = normalizeScore(
-      languageContributionScore,
-      100,
-    );
+    const normalizedLanguageContributionScore = normalizeScore(languageContributionScore, 100);
     const normalizedLanguageFinalScore =
       normalizedLanguageRepoScore * 0.45 +
       normalizedLanguagePRScore * 0.45 +

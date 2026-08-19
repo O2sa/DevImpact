@@ -1,12 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import { calculateUserScore } from "@/lib/score";
-import {
-  makeIssue,
-  makePullRequest,
-  makeRepo,
-  makeUserScoreInput,
-} from "@/test/fixtures/github";
+import { makeIssue, makePullRequest, makeRepo, makeUserScoreInput } from "@/test/fixtures/github";
 
 describe("calculateUserScore - final score behavior", () => {
   test("final score uses 45/45/10 weights", () => {
@@ -46,9 +41,7 @@ describe("calculateUserScore - final score behavior", () => {
     );
 
     expect(result.finalScore).toBeCloseTo(
-      result.repoScore * 0.45 +
-        result.prScore * 0.45 +
-        result.contributionScore * 0.1,
+      result.repoScore * 0.45 + result.prScore * 0.45 + result.contributionScore * 0.1,
       10,
     );
   });

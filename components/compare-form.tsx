@@ -2,13 +2,7 @@ import { useEffect, useRef } from "react";
 import { ArrowLeftRight, RefreshCw, X } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { useTranslation } from "./language-provider";
 import { cn } from "@/lib/utils";
 
@@ -89,9 +83,7 @@ export function CompareForm({
 
     if (exists) {
       setSelectedLanguages(
-        selectedLanguages.filter(
-          (selected) => selected.toLowerCase() !== language.toLowerCase(),
-        ),
+        selectedLanguages.filter((selected) => selected.toLowerCase() !== language.toLowerCase()),
       );
       return;
     }
@@ -229,9 +221,7 @@ export function CompareForm({
                     <button
                       type="button"
                       onClick={() =>
-                        setSelectedLanguages(
-                          selectedLanguages.filter((item) => item !== language),
-                        )
+                        setSelectedLanguages(selectedLanguages.filter((item) => item !== language))
                       }
                       aria-label={t("form.languages.remove", { language })}
                     >
@@ -249,35 +239,34 @@ export function CompareForm({
             {sameUsername ? (
               <p className="text-xs font-medium text-destructive">{t("error.sameUser")}</p>
             ) : null}
-      
 
             <div className="flex flex-wrap justify-end gap-3">
-            <Button
-              type="submit"
-              disabled={!canSubmit}
-              className="min-w-[160px] shadow-sm transition-transform hover:-translate-y-0.5"
-            >
-              {loading ? t("form.compare.ing") : t("form.compare")}
-            </Button>
-            <Button
-              onClick={swapUsers}
-              type="button"
-              variant="secondary"
-              disabled={isEmpty || Boolean(loading)}
-              title={t("form.swap")}
-            >
-              <ArrowLeftRight className="h-4 w-4" />
-            </Button>
-            <Button
-              onClick={reset}
-              title={t("form.reset")}
-              disabled={isEmpty || Boolean(loading)}
-              type="button"
-              variant="secondary"
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </div>
+              <Button
+                type="submit"
+                disabled={!canSubmit}
+                className="min-w-[160px] shadow-sm transition-transform hover:-translate-y-0.5"
+              >
+                {loading ? t("form.compare.ing") : t("form.compare")}
+              </Button>
+              <Button
+                onClick={swapUsers}
+                type="button"
+                variant="secondary"
+                disabled={isEmpty || Boolean(loading)}
+                title={t("form.swap")}
+              >
+                <ArrowLeftRight className="h-4 w-4" />
+              </Button>
+              <Button
+                onClick={reset}
+                title={t("form.reset")}
+                disabled={isEmpty || Boolean(loading)}
+                type="button"
+                variant="secondary"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

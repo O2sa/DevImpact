@@ -30,14 +30,12 @@ const NODE_HEIGHT = 95;
 const NODE_X = (FLOW_VIEWPORT.width - NODE_WIDTH) / 2;
 const NODE_GAP = 32;
 
-const FLOW_NODE_LAYOUTS: FlowNodeLayout[] = SCORING_FLOW_STEP_KEYS.map(
-  (_step, index) => ({
-    x: NODE_X,
-    y: 24 + index * (NODE_HEIGHT + NODE_GAP),
-    width: NODE_WIDTH,
-    height: NODE_HEIGHT,
-  }),
-);
+const FLOW_NODE_LAYOUTS: FlowNodeLayout[] = SCORING_FLOW_STEP_KEYS.map((_step, index) => ({
+  x: NODE_X,
+  y: 24 + index * (NODE_HEIGHT + NODE_GAP),
+  width: NODE_WIDTH,
+  height: NODE_HEIGHT,
+}));
 
 function toPercent(value: number, total: number): string {
   return `${(value / total) * 100}%`;
@@ -113,14 +111,10 @@ export function ScoringMethodologyFlow() {
                     height: toPercent(node.height, FLOW_VIEWPORT.height),
                   }}
                 >
-                  <p
-                    className="text-center text-xs font-semibold text-primary"
-                  >
+                  <p className="text-center text-xs font-semibold text-primary">
                     {t("methodology.flow.stepLabel", { number: index + 1 })}
                   </p>
-                  <p
-                    className="mt-1 line-clamp-2 text-center text-sm font-medium leading-snug text-foreground"
-                  >
+                  <p className="mt-1 line-clamp-2 text-center text-sm font-medium leading-snug text-foreground">
                     {t(key)}
                   </p>
                 </div>

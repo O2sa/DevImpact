@@ -49,22 +49,13 @@ describe("scoring methodology localization", () => {
   });
 
   test("result dashboard links to methodology page", () => {
-    const dashboardPath = resolve(
-      process.cwd(),
-      "components",
-      "result-dashboard.tsx",
-    );
+    const dashboardPath = resolve(process.cwd(), "components", "result-dashboard.tsx");
     const source = readFileSync(dashboardPath, "utf8");
     expect(source.includes("/scoring-methodology")).toBe(true);
   });
 
   test("methodology route file exists", () => {
-    const routePath = resolve(
-      process.cwd(),
-      "app",
-      "scoring-methodology",
-      "page.tsx",
-    );
+    const routePath = resolve(process.cwd(), "app", "scoring-methodology", "page.tsx");
     const source = readFileSync(routePath, "utf8");
     expect(source.includes("ScoringMethodologyPage")).toBe(true);
   });

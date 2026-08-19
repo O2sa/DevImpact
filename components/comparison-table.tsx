@@ -12,7 +12,7 @@ export function ComparisonTable({ user1, user2 }: ComparisonTableProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="grid md:grid-cols-2 gap-6">
+    <div className="grid gap-6 md:grid-cols-2">
       {[user1, user2].map((user, idx) => (
         <Card
           key={`${user.username}-${idx}`}
@@ -35,20 +35,18 @@ export function ComparisonTable({ user1, user2 }: ComparisonTableProps) {
                 <span>{user.name || user.username}</span>
               </div>
               {user.isWinner && (
-                <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">
+                <span className="rounded-full bg-primary/20 px-2 py-1 text-xs text-primary">
                   {t("banner.winner")}
                 </span>
               )}
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-6 space-y-4">
-            <div className="flex justify-between items-center border-b border-border pb-2">
-              <span className="text-muted-foreground">
-                {t("comparsion.final.score")}
-              </span>
+          <CardContent className="space-y-4 pt-6">
+            <div className="flex items-center justify-between border-b border-border pb-2">
+              <span className="text-muted-foreground">{t("comparsion.final.score")}</span>
               <span className="text-2xl font-bold">{user.finalScore}</span>
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t("comparsion.repo.score")}</span>
               <span
                 className={`font-semibold ${user.repoScore > (idx === 0 ? user2.repoScore : user1.repoScore) ? "text-primary" : ""}`}
@@ -56,7 +54,7 @@ export function ComparisonTable({ user1, user2 }: ComparisonTableProps) {
                 {user.repoScore}
               </span>
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t("comparsion.pr.score")}</span>
               <span
                 className={`font-semibold ${user.prScore > (idx === 0 ? user2.prScore : user1.prScore) ? "text-primary" : ""}`}
@@ -64,10 +62,8 @@ export function ComparisonTable({ user1, user2 }: ComparisonTableProps) {
                 {user.prScore}
               </span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">
-                {t("comparsion.contribution.score")}
-              </span>
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">{t("comparsion.contribution.score")}</span>
               <span
                 className={`font-semibold ${user.contributionScore > (idx === 0 ? user2.contributionScore : user1.contributionScore) ? "text-primary" : ""}`}
               >

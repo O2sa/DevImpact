@@ -256,7 +256,7 @@ describe("calculateUserScore - language scoring", () => {
 
     const top = result.languageScores?.topPullRequests ?? [];
     expect(top).toHaveLength(2);
-    expect((result.languageScores?.prScore ?? 0)).toBeLessThanOrEqual(result.prScore);
+    expect(result.languageScores?.prScore ?? 0).toBeLessThanOrEqual(result.prScore);
   });
 
   test("topLanguagePullRequests includes languageMatch and topLanguages", () => {

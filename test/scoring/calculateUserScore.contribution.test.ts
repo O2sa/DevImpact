@@ -244,9 +244,6 @@ describe("calculateUserScore - contribution scoring", () => {
       "octocat",
     );
 
-    expect(result.contributionScore).toBeCloseTo(
-      0.3 * (result.repoScore + result.prScore),
-      10,
-    );
+    expect(result.contributionScore).toBeCloseTo(0.3 * (result.repoScore + result.prScore), 10);
   });
 });

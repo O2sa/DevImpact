@@ -9,13 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { BarChart3 } from "lucide-react";
 import { UserResult } from "@/types/user-result";
 import { useTranslation } from "./language-provider";
@@ -41,8 +35,7 @@ function toChartScores(user: UserResult, mode: ScoreMode) {
       repo: user.languageScores.normalizedRepoScore ?? user.languageScores.repoScore,
       pr: user.languageScores.normalizedPRScore ?? user.languageScores.prScore,
       contribution:
-        user.languageScores.normalizedContributionScore ??
-        user.languageScores.contributionScore,
+        user.languageScores.normalizedContributionScore ?? user.languageScores.contributionScore,
       final: user.languageScores.normalizedFinalScore ?? user.languageScores.finalScore,
     };
   }

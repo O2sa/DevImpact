@@ -12,25 +12,32 @@ function makeEnv(values: Record<string, string>): NodeJS.ProcessEnv {
 
 describe("seo helpers", () => {
   test("getSiteUrl uses NEXT_PUBLIC_SITE_URL when valid", () => {
-    const result = getSiteUrl(makeEnv({
-      NEXT_PUBLIC_SITE_URL: "https://devimpact.example.com/",
-    }));
+    const result = getSiteUrl(
+      makeEnv({
+        NEXT_PUBLIC_SITE_URL: "https://devimpact.example.com/",
+      }),
+    );
 
     expect(result).toBe("https://devimpact.example.com");
   });
 
   test("getSiteUrl falls back when url is invalid", () => {
-    const result = getSiteUrl(makeEnv({
-      NEXT_PUBLIC_SITE_URL: "invalid-url",
-    }));
+    const result = getSiteUrl(
+      makeEnv({
+        NEXT_PUBLIC_SITE_URL: "invalid-url",
+      }),
+    );
 
     expect(result).toBe("http://localhost:3000");
   });
 
   test("toAbsoluteUrl builds absolute path", () => {
-    const result = toAbsoluteUrl("/scoring-methodology", makeEnv({
-      NEXT_PUBLIC_SITE_URL: "https://devimpact.example.com",
-    }));
+    const result = toAbsoluteUrl(
+      "/scoring-methodology",
+      makeEnv({
+        NEXT_PUBLIC_SITE_URL: "https://devimpact.example.com",
+      }),
+    );
 
     expect(result).toBe("https://devimpact.example.com/scoring-methodology");
   });

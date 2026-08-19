@@ -13,16 +13,8 @@ export function AppFooter() {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_top,rgba(30,185,229,0.12),transparent_70%)] dark:bg-[radial-gradient(circle_at_top,rgba(30,185,229,0.18),transparent_72%)]" />
 
       <div className="container relative mx-auto max-w-7xl px-4">
-        <div
-          className={cn(
-            "flex flex-col gap-8 md:items-end md:justify-between md:flex-row",
-          )}
-        >
-          <div
-            className={cn(
-              "space-y-3 text-center md:text-start",
-            )}
-          >
+        <div className={cn("flex flex-col gap-8 md:flex-row md:items-end md:justify-between")}>
+          <div className={cn("space-y-3 text-center md:text-start")}>
             <span className="inline-block text-[11px] font-semibold uppercase tracking-[0.34em] text-muted-foreground/75">
               {t("footer.eyebrow")}
             </span>
@@ -35,17 +27,13 @@ export function AppFooter() {
                   Impact
                 </span>
               </span>
-              <p className="max-w-xl text-sm leading-6 text-muted-foreground ">
+              <p className="max-w-xl text-sm leading-6 text-muted-foreground">
                 {t("footer.description")}
               </p>
             </div>
           </div>
 
-          <div
-            className={cn(
-              "flex flex-col items-center gap-3 md:items-end",
-            )}
-          >
+          <div className={cn("flex flex-col items-center gap-3 md:items-end")}>
             <span className="rounded-full border border-border/70 bg-background/75 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground shadow-sm backdrop-blur">
               {t("footer.tag")}
             </span>
@@ -60,14 +48,13 @@ export function AppFooter() {
           </div>
         </div>
 
-
         <div
           className={cn(
-            "mt-8 flex flex-col gap-3 border-t border-border/70 pt-4 text-[11px] font-medium uppercase tracking-[0.24em] text-muted-foreground/75 items-center md:justify-between md:flex-row",
+            "mt-8 flex flex-col items-center gap-3 border-t border-border/70 pt-4 text-[11px] font-medium uppercase tracking-[0.24em] text-muted-foreground/75 md:flex-row md:justify-between",
           )}
         >
-            <span>{t("footer.summary")}</span>
-            <span>{t("footer.tagline")}</span>
+          <span>{t("footer.summary")}</span>
+          <span>{t("footer.tagline")}</span>
         </div>
       </div>
     </footer>

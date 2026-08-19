@@ -44,22 +44,15 @@ type ComparedUserResult = {
   normalizedFinalScore: number;
   topRepos: ReturnType<typeof calculateUserScore>["topRepos"];
   topPullRequests: ReturnType<typeof calculateUserScore>["topPullRequests"];
-  topCommunityContributions: ReturnType<
-    typeof calculateUserScore
-  >["topCommunityContributions"];
+  topCommunityContributions: ReturnType<typeof calculateUserScore>["topCommunityContributions"];
   languageScores: ReturnType<typeof calculateUserScore>["languageScores"];
   signals: ReturnType<typeof calculateUserScore>["signals"];
   explanations: ReturnType<typeof calculateUserScore>["explanations"];
 };
 
-type ClientSafeError = Pick<
-  SafeApiError,
-  "code" | "message" | "targetUsernames"
->;
+type ClientSafeError = Pick<SafeApiError, "code" | "message" | "targetUsernames">;
 
-function parseSelectedLanguagesFromSearchParams(
-  searchParams: URLSearchParams,
-): string[] {
+function parseSelectedLanguagesFromSearchParams(searchParams: URLSearchParams): string[] {
   const fromRepeated = searchParams.getAll("selectedLanguage");
   const fromCsv = searchParams
     .get("selectedLanguages")
@@ -67,10 +60,7 @@ function parseSelectedLanguagesFromSearchParams(
     .map((language) => language.trim())
     .filter(Boolean);
 
-  return normalizeSelectedLanguages([
-    ...(fromRepeated ?? []),
-    ...(fromCsv ?? []),
-  ]);
+  return normalizeSelectedLanguages([...(fromRepeated ?? []), ...(fromCsv ?? [])]);
 }
 
 function calculateWinner(users: ComparedUserResult[]): {
@@ -92,8 +82,7 @@ function calculateWinner(users: ComparedUserResult[]): {
 
   const [userA, userB] = users;
   const overallWinner = userA.finalScore >= userB.finalScore ? userA : userB;
-  const overallLoser =
-    overallWinner.username === userA.username ? userB : userA;
+  const overallLoser = overallWinner.username === userA.username ? userB : userA;
   const overallDifference = Math.abs(userA.finalScore - userB.finalScore);
   const overallPercentage = calculatePercentageDifference(
     overallDifference,
@@ -116,18 +105,14 @@ function calculateWinner(users: ComparedUserResult[]): {
     winner: {
       username: overallWinner.username,
       finalScoreDifference: Math.round(overallDifference),
-      percentageDifference:
-        overallPercentage === null ? null : Math.round(overallPercentage),
+      percentageDifference: overallPercentage === null ? null : Math.round(overallPercentage),
     },
   };
 
   if (userA.languageScores && userB.languageScores) {
     const languageWinner =
-      userA.languageScores.finalScore >= userB.languageScores.finalScore
-        ? userA
-        : userB;
-    const languageLoser =
-      languageWinner.username === userA.username ? userB : userA;
+      userA.languageScores.finalScore >= userB.languageScores.finalScore ? userA : userB;
+    const languageLoser = languageWinner.username === userA.username ? userB : userA;
     const winnerLanguageScores = languageWinner.languageScores!;
     const loserLanguageScores = languageLoser.languageScores!;
     const languageDifference = Math.abs(
@@ -141,8 +126,7 @@ function calculateWinner(users: ComparedUserResult[]): {
     result.languageWinner = {
       username: languageWinner.username,
       finalScoreDifference: Math.round(languageDifference),
-      percentageDifference:
-        languagePercentage === null ? null : Math.round(languagePercentage),
+      percentageDifference: languagePercentage === null ? null : Math.round(languagePercentage),
       selectedLanguages: winnerLanguageScores.selectedLanguages,
     };
   }
@@ -150,10 +134,7 @@ function calculateWinner(users: ComparedUserResult[]): {
   return result;
 }
 
-function calculatePercentageDifference(
-  difference: number,
-  baseline: number,
-): number | null {
+function calculatePercentageDifference(difference: number, baseline: number): number | null {
   if (baseline <= 0) {
     return difference > 0 ? null : 0;
   }
@@ -179,8 +160,7 @@ function createComparisonInsights(
 
   const repoLeader = user1.repoScore >= user2.repoScore ? user1 : user2;
   const prLeader = user1.prScore >= user2.prScore ? user1 : user2;
-  const contributionLeader =
-    user1.contributionScore >= user2.contributionScore ? user1 : user2;
+  const contributionLeader = user1.contributionScore >= user2.contributionScore ? user1 : user2;
 
   const user1Strengths: string[] = [];
   const user2Strengths: string[] = [];
@@ -317,11 +297,7 @@ function resolveLocale(request: Request): Locale {
     return localeFromCookie;
   }
 
-  return parseAcceptLanguage(
-    request.headers.get("accept-language"),
-    ["en", "ar"],
-    DEFAULT_LOCALE,
-  );
+  return parseAcceptLanguage(request.headers.get("accept-language"), ["en", "ar"], DEFAULT_LOCALE);
 }
 
 async function compareUsers(
@@ -361,9 +337,7 @@ async function compareUsers(
       finalScore: Math.round(score.finalScore),
       normalizedRepoScore: Math.round(score.normalizedRepoScore),
       normalizedPRScore: Math.round(score.normalizedPRScore),
-      normalizedContributionScore: Math.round(
-        score.normalizedContributionScore,
-      ),
+      normalizedContributionScore: Math.round(score.normalizedContributionScore),
       normalizedFinalScore: Math.round(score.normalizedFinalScore),
       topRepos: score.topRepos,
       topPullRequests: score.topPullRequests,
@@ -376,10 +350,7 @@ async function compareUsers(
     // ── Fire-and-forget: detect country & upsert into DB ──────────────
     const country = detectCountry(data.location);
     if (country) {
-      const staleDays = parseInt(
-        process.env.GITHUB_USER_STALE_DAYS ?? "14",
-        10,
-      );
+      const staleDays = parseInt(process.env.GITHUB_USER_STALE_DAYS ?? "14", 10);
 
       const db = getDatabaseStore();
       db.upsertUser({
@@ -414,9 +385,7 @@ async function compareUsers(
   return results;
 }
 
-function toApiErrorStatus(
-  code: ReturnType<typeof toSafeApiError>["code"],
-): number {
+function toApiErrorStatus(code: ReturnType<typeof toSafeApiError>["code"]): number {
   switch (code) {
     case "RATE_LIMITED":
     case "TEMPORARY_THROTTLE":
@@ -458,8 +427,7 @@ export async function GET(request: Request) {
 
   try {
     const locale = resolveLocale(request);
-    const selectedLanguages =
-      parseSelectedLanguagesFromSearchParams(searchParams);
+    const selectedLanguages = parseSelectedLanguagesFromSearchParams(searchParams);
     const users = await compareUsers(usernames, selectedLanguages);
     const winnerData = calculateWinner(users);
     const insights = createComparisonInsights(users, locale);
@@ -473,8 +441,7 @@ export async function GET(request: Request) {
       const mappedCause = toSafeApiError(error.causeError);
       if (
         mappedCause.code === "GITHUB_NOT_FOUND" ||
-        (error.causeError instanceof Error &&
-          error.causeError.message === "User not found")
+        (error.causeError instanceof Error && error.causeError.message === "User not found")
       ) {
         safeError = {
           code: "GITHUB_NOT_FOUND",

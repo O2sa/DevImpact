@@ -28,7 +28,9 @@ describe("comparison request identity", () => {
   test("keeps true user and language changes distinct", () => {
     const original = createComparisonRequest("alice", "bob", ["TypeScript"]);
 
-    expect(createComparisonRequest("alice", "carol", ["TypeScript"]).fetchKey).not.toBe(original.fetchKey);
+    expect(createComparisonRequest("alice", "carol", ["TypeScript"]).fetchKey).not.toBe(
+      original.fetchKey,
+    );
     expect(createComparisonRequest("alice", "bob", ["Rust"]).fetchKey).not.toBe(original.fetchKey);
   });
 
@@ -46,9 +48,13 @@ describe("comparison request identity", () => {
   });
 
   test("keeps sanitizer limits and case-insensitive deduplication", () => {
-    expect(
-      sanitizeSelectedLanguages([" A ", "a", "B", "C", "D", "E", "F"]),
-    ).toEqual(["A", "B", "C", "D", "E"]);
+    expect(sanitizeSelectedLanguages([" A ", "a", "B", "C", "D", "E", "F"])).toEqual([
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+    ]);
   });
 
   test("two swaps restore the original presentation and identity", () => {
@@ -62,10 +68,10 @@ describe("comparison request identity", () => {
     const original = createComparisonRequest("alice", "bob", ["Go"]);
     const swapped = swapComparisonRequest(original);
 
-    expect(isComparisonFetchDuplicate(swapped.fetchKey, original.fetchKey, null, true)).toBe(
-      true,
-    );
-    expect(isComparisonFetchDuplicate(swapped.fetchKey, original.fetchKey, original.fetchKey, false)).toBe(true);
+    expect(isComparisonFetchDuplicate(swapped.fetchKey, original.fetchKey, null, true)).toBe(true);
+    expect(
+      isComparisonFetchDuplicate(swapped.fetchKey, original.fetchKey, original.fetchKey, false),
+    ).toBe(true);
     expect(isComparisonFetchDuplicate(swapped.fetchKey, null, null, false)).toBe(false);
   });
 });
@@ -122,11 +128,23 @@ describe("comparison response reconciliation", () => {
     expect(source).toMatch(
       /reconcileComparisonData\(\s*nextData,\s*fetchKey,\s*latestRequestRef\.current/,
     );
-    expect(source).toMatch(/if \(!body\.success \|\| !users\) \{\s*if \(latestRequestRef\.current\.fetchKey !== fetchKey\)/);
-    expect(source).toMatch(/const reset = \(\) => \{[\s\S]*?latestRequestRef\.current = createComparisonRequest\("", "", \[\]\)/);
-    expect(source).toMatch(/if \(!res\.ok\) \{\s*if \(latestRequestRef\.current\.fetchKey !== fetchKey\)/);
-    expect(source).toMatch(/catch \(err: unknown\) \{\s*if \(latestRequestRef\.current\.fetchKey !== fetchKey\)/);
-    expect(source).toMatch(/applyApiError\(latestRequestRef\.current\.user1, latestRequestRef\.current\.user2, body\)/);
-    expect(source).toMatch(/if \(!reconciled\) \{\s*if \(latestRequestRef\.current\.fetchKey === fetchKey\) \{\s*setData\(null\);\s*setGeneralError\(t\("error\.generic"\)\)/);
+    expect(source).toMatch(
+      /if \(!body\.success \|\| !users\) \{\s*if \(latestRequestRef\.current\.fetchKey !== fetchKey\)/,
+    );
+    expect(source).toMatch(
+      /const reset = \(\) => \{[\s\S]*?latestRequestRef\.current = createComparisonRequest\("", "", \[\]\)/,
+    );
+    expect(source).toMatch(
+      /if \(!res\.ok\) \{\s*if \(latestRequestRef\.current\.fetchKey !== fetchKey\)/,
+    );
+    expect(source).toMatch(
+      /catch \(err: unknown\) \{\s*if \(latestRequestRef\.current\.fetchKey !== fetchKey\)/,
+    );
+    expect(source).toMatch(
+      /applyApiError\(latestRequestRef\.current\.user1, latestRequestRef\.current\.user2, body\)/,
+    );
+    expect(source).toMatch(
+      /if \(!reconciled\) \{\s*if \(latestRequestRef\.current\.fetchKey === fetchKey\) \{\s*setData\(null\);\s*setGeneralError\(t\("error\.generic"\)\)/,
+    );
   });
 });

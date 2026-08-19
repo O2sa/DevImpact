@@ -1,9 +1,4 @@
-import type {
-  DiscussionNode,
-  IssueNode,
-  PullRequestNode,
-  RepoNode,
-} from "@/types/github";
+import type { DiscussionNode, IssueNode, PullRequestNode, RepoNode } from "@/types/github";
 
 const MS_PER_DAY = 86_400_000;
 const DEFAULT_REFERENCE_DATE = new Date("2026-05-10T00:00:00.000Z");
@@ -38,10 +33,7 @@ function getDaysSince(pushedAt: string, referenceDate: Date): number | null {
   return Math.max(0, (referenceDate.getTime() - pushed.getTime()) / MS_PER_DAY);
 }
 
-function getRepoActivityFactor(
-  pushedAt: string | undefined,
-  referenceDate: Date,
-): number {
+function getRepoActivityFactor(pushedAt: string | undefined, referenceDate: Date): number {
   if (!pushedAt) {
     return 0.8;
   }
@@ -57,10 +49,7 @@ function getRepoActivityFactor(
   return 0.4;
 }
 
-function getPRActivityFactor(
-  pushedAt: string | undefined,
-  referenceDate: Date,
-): number {
+function getPRActivityFactor(pushedAt: string | undefined, referenceDate: Date): number {
   if (!pushedAt) {
     return 0.9;
   }
@@ -174,9 +163,7 @@ export function sumPRScores(
   return total;
 }
 
-export function expectedCommunityScore(
-  item: IssueNode | DiscussionNode,
-): number {
+export function expectedCommunityScore(item: IssueNode | DiscussionNode): number {
   const comments = Math.max(0, item.comments.totalCount);
   let score = safeLog(item.repository.stargazerCount) * safeLog(comments);
 

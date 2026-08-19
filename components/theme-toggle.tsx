@@ -6,7 +6,7 @@ import { useSyncExternalStore } from "react";
 import { useTranslation } from "./language-provider";
 import { Button } from "./ui/button";
 
-const emptySubscribe = () => () => { };
+const emptySubscribe = () => () => {};
 
 type ViewTransitionDocument = Document & {
   startViewTransition?: (callback: () => void) => { finished: Promise<void> };
@@ -15,7 +15,11 @@ type ViewTransitionDocument = Document & {
 export function ThemeToggle() {
   const { t } = useTranslation();
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
   const getThemeTransitionMs = () => {
     if (typeof window === "undefined") {
       return 420;

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import { calculateUserScore } from "@/lib/score";
-import {  makeRepo, makeUserScoreInput } from "@/test/fixtures/github";
+import { makeRepo, makeUserScoreInput } from "@/test/fixtures/github";
 import { expectedRepoScore, sumRepoScores } from "@/test/helpers/score";
 
 describe("calculateUserScore - repository scoring", () => {
@@ -70,10 +70,7 @@ describe("calculateUserScore - repository scoring", () => {
       }),
     );
 
-    const result = calculateUserScore(
-      makeUserScoreInput({ repos, pullRequests: [] }),
-      "octocat",
-    );
+    const result = calculateUserScore(makeUserScoreInput({ repos, pullRequests: [] }), "octocat");
 
     expect(result.repoScore).toBeCloseTo(sumRepoScores(repos), 10);
   });
@@ -88,10 +85,7 @@ describe("calculateUserScore - repository scoring", () => {
       }),
     );
 
-    const result = calculateUserScore(
-      makeUserScoreInput({ repos, pullRequests: [] }),
-      "octocat",
-    );
+    const result = calculateUserScore(makeUserScoreInput({ repos, pullRequests: [] }), "octocat");
 
     expect(result.repoScore).toBeCloseTo(sumRepoScores(repos), 10);
   });

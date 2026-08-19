@@ -11,12 +11,7 @@ import { BrandLogo } from "@/components/brand-logo";
 import { AppHeader } from "@/components/app-header";
 import { AppFooter } from "@/components/app-footer";
 import { useTranslation } from "@/components/language-provider";
-import {
-  ApiResponse,
-  CompareInsights,
-  CompareWinner,
-  SafeApiError,
-} from "@/types/api-response";
+import { ApiResponse, CompareInsights, CompareWinner, SafeApiError } from "@/types/api-response";
 import { cn } from "@/lib/utils";
 import {
   createComparisonQuery,
@@ -78,9 +73,7 @@ export function HomePageClient() {
   });
   const [username1, setUsername1] = useState(initialUsername1);
   const [username2, setUsername2] = useState(initialUsername2);
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
-    initialSelectedLanguages,
-  );
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(initialSelectedLanguages);
   const [data, setData] = useState<ComparisonData | null>(null);
   const [displayData, setDisplayData] = useState<ComparisonData | null>(null);
   const [disableDuplicateFetch, setDisableDuplicateFetch] = useState(false);
@@ -149,11 +142,7 @@ export function HomePageClient() {
     });
   };
 
-  const applyApiError = (
-    requestUser1: string,
-    requestUser2: string,
-    body: ApiResponse,
-  ) => {
+  const applyApiError = (requestUser1: string, requestUser2: string, body: ApiResponse) => {
     const details = body.errorDetails;
     const localizedMessage = localizeErrorMessage(body.error, details);
 
@@ -196,11 +185,7 @@ export function HomePageClient() {
     setGeneralError(localizedMessage);
   };
 
-  const handleCompare = async (
-    u1: string,
-    u2: string,
-    options: CompareOptions,
-  ) => {
+  const handleCompare = async (u1: string, u2: string, options: CompareOptions) => {
     const request = createComparisonRequest(u1, u2, options.selectedLanguages);
     latestRequestRef.current = request;
     const fetchKey = request.fetchKey;
@@ -282,11 +267,7 @@ export function HomePageClient() {
           scoreVersion: body.scoreVersion,
         };
 
-        const reconciled = reconcileComparisonData(
-          nextData,
-          fetchKey,
-          latestRequestRef.current,
-        );
+        const reconciled = reconcileComparisonData(nextData, fetchKey, latestRequestRef.current);
         if (!reconciled) {
           if (latestRequestRef.current.fetchKey === fetchKey) {
             setData(null);
@@ -332,37 +313,31 @@ export function HomePageClient() {
     return requestPromise;
   };
 
-  const syncToUrl = useEffectEvent(
-    (u1: string, u2: string, languages: string[]) => {
-      setUsername1(u1);
-      setUsername2(u2);
-      setSelectedLanguages(languages);
+  const syncToUrl = useEffectEvent((u1: string, u2: string, languages: string[]) => {
+    setUsername1(u1);
+    setUsername2(u2);
+    setSelectedLanguages(languages);
 
-      if (!u1 || !u2) {
-        latestRequestRef.current = createComparisonRequest(u1, u2, languages);
-        lastFetchedKeyRef.current = null;
-        setData(null);
-        resetErrors();
-        setDisableDuplicateFetch(false);
-        return;
-      }
+    if (!u1 || !u2) {
+      latestRequestRef.current = createComparisonRequest(u1, u2, languages);
+      lastFetchedKeyRef.current = null;
+      setData(null);
+      resetErrors();
+      setDisableDuplicateFetch(false);
+      return;
+    }
 
-      void handleCompare(u1, u2, {
-        selectedLanguages: languages,
-        updateUrl: false,
-      });
-    },
-  );
+    void handleCompare(u1, u2, {
+      selectedLanguages: languages,
+      updateUrl: false,
+    });
+  });
 
   useEffect(() => {
     const params = searchParams.getAll("username");
     const urlLanguages = sanitizeSelectedLanguages(searchParams.getAll("selectedLanguage"));
     queueMicrotask(() => {
-      syncToUrl(
-        params[0] ?? "",
-        params[1] ?? "",
-        urlLanguages,
-      );
+      syncToUrl(params[0] ?? "", params[1] ?? "", urlLanguages);
     });
   }, [searchParams]);
 
@@ -396,7 +371,6 @@ export function HomePageClient() {
   const skeleton = useMemo(() => <DashboardSkeleton />, []);
   const isRefreshing = loading && Boolean(displayData);
   const isExiting = !loading && !data && Boolean(displayData);
-
 
   useEffect(() => {
     const currentFetchKey = createComparisonRequest(
@@ -448,11 +422,7 @@ export function HomePageClient() {
   const swapUsers = () => {
     const nextUsername1 = username2;
     const nextUsername2 = username1;
-    const nextRequest = createComparisonRequest(
-      nextUsername1,
-      nextUsername2,
-      selectedLanguages,
-    );
+    const nextRequest = createComparisonRequest(nextUsername1, nextUsername2, selectedLanguages);
     latestRequestRef.current = nextRequest;
 
     setUsername1(nextUsername1);
@@ -460,14 +430,10 @@ export function HomePageClient() {
     router.push(`/?${createComparisonQuery(nextRequest)}`, { scroll: false });
 
     setData((current) =>
-      current
-        ? reconcileComparisonData(current, nextRequest.fetchKey, nextRequest)
-        : current,
+      current ? reconcileComparisonData(current, nextRequest.fetchKey, nextRequest) : current,
     );
     setDisplayData((current) =>
-      current
-        ? reconcileComparisonData(current, nextRequest.fetchKey, nextRequest)
-        : current,
+      current ? reconcileComparisonData(current, nextRequest.fetchKey, nextRequest) : current,
     );
   };
 
@@ -475,7 +441,7 @@ export function HomePageClient() {
     <main className="flex min-h-screen flex-col">
       <AppHeader />
 
-      <div className="w-full flex-1 max-w-6xl mx-auto px-4 py-10 space-y-6">
+      <div className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-10">
         <CompareForm
           username1={username1}
           username2={username2}
@@ -499,7 +465,7 @@ export function HomePageClient() {
               className={cn(
                 "transition-all duration-300 ease-out",
                 isRefreshing
-                  ? "pointer-events-none scale-[0.99] opacity-55 blur-[1px] saturate-75"
+                  ? "saturate-75 pointer-events-none scale-[0.99] opacity-55 blur-[1px]"
                   : isExiting
                     ? "pointer-events-none -translate-y-2 scale-[0.99] opacity-0 blur-[2px]"
                     : "opacity-100",
@@ -516,9 +482,7 @@ export function HomePageClient() {
               />
             </div>
           ) : loading ? (
-            <div className="transition-all duration-300 ease-out">
-              {skeleton}
-            </div>
+            <div className="transition-all duration-300 ease-out">{skeleton}</div>
           ) : null}
 
           {loading && displayData ? (
@@ -530,7 +494,7 @@ export function HomePageClient() {
           ) : null}
 
           {!loading && !generalError && !displayData ? (
-            <div className="flex flex-col items-center justify-center gap-4 py-20 text-center text-muted-foreground animate-fadeIn">
+            <div className="flex animate-fadeIn flex-col items-center justify-center gap-4 py-20 text-center text-muted-foreground">
               <BrandLogo size="xl" />
               <p className="text-lg font-medium">{t("page.empty.title")}</p>
               <p className="text-sm opacity-70">{t("page.empty.description")}</p>

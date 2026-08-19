@@ -19,7 +19,10 @@ export function ScoreCard({
 }: ScoreCardProps) {
   const { t } = useTranslation();
   const displayValue = normalizedValue ?? rawValue;
-  const displayLabel = normalizedValue !== undefined ? `${Math.round(displayValue)} / 100` : Math.round(displayValue).toString();
+  const displayLabel =
+    normalizedValue !== undefined
+      ? `${Math.round(displayValue)} / 100`
+      : Math.round(displayValue).toString();
 
   return (
     <div

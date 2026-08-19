@@ -1,9 +1,7 @@
 import "dotenv/config";
 
-
-import {describe, expect, it} from "vitest";
-import {parseCountEnv} from "./github";
-
+import { describe, expect, it } from "vitest";
+import { parseCountEnv } from "./github";
 
 describe("parseCountEnv", () => {
   it("uses fallback for undefined", () => {

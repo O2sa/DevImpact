@@ -139,7 +139,10 @@ export async function seedNewUsers(
         continue;
       }
 
-      const { data, metrics } = await getUserData(user.login, { cacheInRedis: false, withMetrics: true });
+      const { data, metrics } = await getUserData(user.login, {
+        cacheInRedis: false,
+        withMetrics: true,
+      });
       fetchMetrics.push(metrics);
       const score = calculateUserScore(data, user.login);
       const countryDetected = detectCountry(data.location);
@@ -190,7 +193,10 @@ export async function refreshStaleUsers(
     }
 
     try {
-      const { data, metrics } = await getUserData(row.username, { cacheInRedis: false, withMetrics: true });
+      const { data, metrics } = await getUserData(row.username, {
+        cacheInRedis: false,
+        withMetrics: true,
+      });
       fetchMetrics.push(metrics);
       const score = calculateUserScore(data, row.username);
       const countryDetected = detectCountry(data.location);
@@ -301,13 +307,11 @@ export async function calculateLeaderboard(
   const refreshResult = await refreshStaleUsers(db, country, refreshLimit, staleDays);
 
   // 3. Build leaderboard result
-  const allErrors = [...seedResult.errors.map(e => e.username), ...refreshResult.errors.map(e => e.username)];
-  const { result, meta } = await buildLeaderboardResult(
-    db,
-    country,
-    sourceData,
-    allErrors,
-  );
+  const allErrors = [
+    ...seedResult.errors.map((e) => e.username),
+    ...refreshResult.errors.map((e) => e.username),
+  ];
+  const { result, meta } = await buildLeaderboardResult(db, country, sourceData, allErrors);
 
   meta.newUsers = seedResult.newUsersCount;
   meta.refreshedUsers = refreshResult.refreshedCount;
@@ -316,13 +320,18 @@ export async function calculateLeaderboard(
 
   const allFetchMetrics = [...seedResult.fetchMetrics, ...refreshResult.fetchMetrics];
   meta.totalFetchTime = allFetchMetrics.reduce((sum, m) => sum + m.duration, 0);
-  meta.successfulFetches = allFetchMetrics.filter(m => m.errors.length === 0).length;
+  meta.successfulFetches = allFetchMetrics.filter((m) => m.errors.length === 0).length;
 
-  const userFetchErrors: LeaderboardMeta['userFetchErrors'] = [];
-  seedResult.errors.forEach(e => userFetchErrors.push({ username: e.username, errors: [{ part: 'seed', reason: e.reason }] }));
-  refreshResult.errors.forEach(e => userFetchErrors.push({ username: e.username, errors: [{ part: 'refresh', reason: e.reason }] }));
+  const userFetchErrors: LeaderboardMeta["userFetchErrors"] = [];
+  seedResult.errors.forEach((e) =>
+    userFetchErrors.push({ username: e.username, errors: [{ part: "seed", reason: e.reason }] }),
+  );
+  refreshResult.errors.forEach((e) =>
+    userFetchErrors.push({ username: e.username, errors: [{ part: "refresh", reason: e.reason }] }),
+  );
   allFetchMetrics.forEach((m, i) => {
-    if (m.errors.length > 0) userFetchErrors.push({ username: allErrors[i] ?? 'unknown', errors: m.errors });
+    if (m.errors.length > 0)
+      userFetchErrors.push({ username: allErrors[i] ?? "unknown", errors: m.errors });
   });
   meta.userFetchErrors = userFetchErrors;
 

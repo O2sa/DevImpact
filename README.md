@@ -2,7 +2,6 @@
 
 # 🚀 DevImpact
 
-
 <p align="center">
   <a href="https://github.com/O2sa/DevImpact/blob/main/LICENSE">
     <img src="https://www.shieldcn.dev/github/license/O2sa/DevImpact.svg?variant=branded&size=sm" alt="License">
@@ -35,9 +34,6 @@
   <img src="https://www.shieldcn.dev/badge/Framework-Next.js-000000.svg?logo=nextdotjs&variant=branded&size=sm&mode=dark" alt="Framework · Next.js">
   <img src="https://www.shieldcn.dev/badge/CSS-Tailwind-06B6D4.svg?logo=tailwindcss&variant=branded&size=sm&theme=blue" alt="CSS · Tailwind">
 </p>
-
-
-
 
 **DevImpact** is an open-source platform that compares software developers based on their real impact in the open-source ecosystem — not just raw numbers.
 
@@ -141,7 +137,6 @@ Final Score =
 
 ---
 
-
 ## 🛠️ Tech Stack
 
 ### Frontend
@@ -172,6 +167,7 @@ cp .env.example .env
 # 2. Start full platform
 docker compose -f ops/docker/docker-compose.yml up -d --build
 ```
+
 Then open `http://localhost:3000` in your browser!
 
 ---
@@ -179,21 +175,25 @@ Then open `http://localhost:3000` in your browser!
 ### 📦 Option B: Run Locally with Node.js & pnpm
 
 1. **Install dependencies**:
+
    ```bash
    pnpm install
    ```
 
 2. **Configure environment**:
+
    ```bash
    cp .env.example .env
    ```
 
 3. **Start local database & Redis**:
+
    ```bash
    pnpm db:up && pnpm redis:up
    ```
 
 4. **Run development server**:
+
    ```bash
    pnpm run dev
    ```
@@ -217,7 +217,6 @@ docker compose -f ops/docker/leaderboard-compose.yml up -d
 ```
 
 ---
-
 
 ## 🌍 Localization
 

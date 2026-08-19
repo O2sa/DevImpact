@@ -7,9 +7,11 @@ This directory contains the infrastructure, Docker configuration, cron job defin
 ## Overview
 
 ### What is the Leaderboard Worker?
+
 The Leaderboard Worker is a standalone service that periodically fetches contributor metadata from the GitHub GraphQL/REST APIs, recalculates scores, and updates the shared PostgreSQL database and Redis cache.
 
 ### Why is it separate from the web application?
+
 Calculating leaderboard scores involves heavy API querying, rate limit tracking, and database bulk operations. Running this work asynchronously via a background worker ensures that the Next.js web application remains fast, responsive, and unaffected by calculation spikes.
 
 ---
@@ -117,6 +119,7 @@ bash ops/deploy/deploy-leaderboard.sh
 ```
 
 This script safely executes:
+
 1. `docker compose -f ops/docker/leaderboard-compose.yml pull`
 2. **Waits for any active calculation job to finish**: Checks if `devimpact-leaderboard-cron` is currently running a calculation job (`calculate-next-country`) and polls until the job completes naturally.
 3. `docker compose -f ops/docker/leaderboard-compose.yml up -d --remove-orphans` once no calculation is running.

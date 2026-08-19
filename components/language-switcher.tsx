@@ -42,7 +42,10 @@ export function LanguageSwitcher() {
     <div
       ref={wrapperRef}
       dir={dir}
-      className={cn("relative flex items-center gap-2 text-sm", dir === "rtl" && "flex-row-reverse")}
+      className={cn(
+        "relative flex items-center gap-2 text-sm",
+        dir === "rtl" && "flex-row-reverse",
+      )}
     >
       <button
         type="button"
@@ -52,7 +55,7 @@ export function LanguageSwitcher() {
         className={cn(
           "flex h-9 min-w-[78px] items-center justify-between rounded-lg border border-input bg-background px-2.5 text-sm text-foreground transition-colors sm:min-w-[140px] sm:px-3",
           "focus:outline-none focus:ring-2 focus:ring-primary/60",
-          open && "ring-2 ring-primary/60"
+          open && "ring-2 ring-primary/60",
         )}
         onClick={() => setOpen((prev) => !prev)}
       >
@@ -79,8 +82,8 @@ export function LanguageSwitcher() {
           role="listbox"
           aria-label="Language options"
           className={cn(
-            "absolute top-full z-30 mt-1 max-h-60 min-w-[140px] overflow-auto rounded-lg border border-input bg-background p-1 text-sm text-popover-foreground shadow-md flex flex-col gap-1",
-            dir === "rtl" ? "left-0" : "right-0"
+            "text-popover-foreground absolute top-full z-30 mt-1 flex max-h-60 min-w-[140px] flex-col gap-1 overflow-auto rounded-lg border border-input bg-background p-1 text-sm shadow-md",
+            dir === "rtl" ? "left-0" : "right-0",
           )}
         >
           {locales.map((item) => {
@@ -95,7 +98,7 @@ export function LanguageSwitcher() {
                     "flex w-full items-center rounded-md px-2 py-1.5 text-left transition-colors",
                     "hover:bg-accent hover:text-accent-foreground",
                     "focus:outline-none focus:ring-2 focus:ring-primary/40",
-                    isSelected && "bg-accent text-accent-foreground"
+                    isSelected && "bg-accent text-accent-foreground",
                   )}
                   onClick={() => onSelect(item.value)}
                 >

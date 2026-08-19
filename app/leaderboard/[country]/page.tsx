@@ -168,10 +168,7 @@ export default async function CountryLeaderboardPage({ params }: Props) {
             : [webPageSchema, breadcrumbSchema]
         }
       />
-      <CountryLeaderboardClient
-        countryTitle={countryInfo.title}
-        initialLeaderboard={leaderboard}
-      />
+      <CountryLeaderboardClient countryTitle={countryInfo.title} initialLeaderboard={leaderboard} />
     </>
   );
 }

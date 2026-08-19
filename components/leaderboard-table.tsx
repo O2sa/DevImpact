@@ -4,13 +4,7 @@ import { useState, useMemo } from "react";
 import { Search, AlertTriangle } from "lucide-react";
 import { Avatar } from "./avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { Input } from "./ui/input";
 import { useTranslation } from "./language-provider";
 import { cn } from "@/lib/utils";
@@ -52,9 +46,7 @@ export function LeaderboardTable({
     if (!search.trim()) return users;
     const q = search.trim().toLowerCase();
     return users.filter(
-      (u) =>
-        u.username.toLowerCase().includes(q) ||
-        (u.name && u.name.toLowerCase().includes(q)),
+      (u) => u.username.toLowerCase().includes(q) || (u.name && u.name.toLowerCase().includes(q)),
     );
   }, [users, search]);
 
@@ -77,7 +69,7 @@ export function LeaderboardTable({
             {failedUsers.length > 0 && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300 cursor-default">
+                  <span className="inline-flex cursor-default items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
                     <AlertTriangle className="h-3 w-3" />
                     {t("leaderboard.partialErrors", {
                       count: failedUsers.length,
@@ -154,11 +146,7 @@ export function LeaderboardTable({
                     </td>
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-2">
-                        <Avatar
-                          src={user.avatarUrl}
-                          alt={user.name || user.username}
-                          size={32}
-                        />
+                        <Avatar src={user.avatarUrl} alt={user.name || user.username} size={32} />
                         <div className="min-w-0">
                           <a
                             href={getGithubProfileUrl(user.username)}
@@ -168,23 +156,15 @@ export function LeaderboardTable({
                           >
                             {user.name || user.username}
                           </a>
-                          <p className="text-xs text-muted-foreground">
-                            {user.username}
-                          </p>
+                          <p className="text-xs text-muted-foreground">{user.username}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-3 py-3 text-start">
-                      <span className="font-bold text-primary">
-                        {user.finalScore}
-                      </span>
+                      <span className="font-bold text-primary">{user.finalScore}</span>
                     </td>
-                    <td className="px-3 py-3 text-start font-mono text-xs">
-                      {user.repoScore}
-                    </td>
-                    <td className="px-3 py-3 text-start font-mono text-xs">
-                      {user.prScore}
-                    </td>
+                    <td className="px-3 py-3 text-start font-mono text-xs">{user.repoScore}</td>
+                    <td className="px-3 py-3 text-start font-mono text-xs">{user.prScore}</td>
                     <td className="px-3 py-3 text-start font-mono text-xs">
                       {user.contributionScore}
                     </td>

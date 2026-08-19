@@ -15,7 +15,7 @@ export function isSupportedLocale(value: string | null | undefined): value is Lo
 export function parseAcceptLanguage<T extends string>(
   header: string | null | undefined,
   supported: readonly T[],
-  fallback: T
+  fallback: T,
 ): T {
   if (!header) return fallback;
 

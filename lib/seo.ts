@@ -25,10 +25,7 @@ export function getMetadataBase(env: NodeJS.ProcessEnv = process.env): URL {
   return new URL(getSiteUrl(env));
 }
 
-export function toAbsoluteUrl(
-  path: string,
-  env: NodeJS.ProcessEnv = process.env,
-): string {
+export function toAbsoluteUrl(path: string, env: NodeJS.ProcessEnv = process.env): string {
   const safePath = path.startsWith("/") ? path : `/${path}`;
   return new URL(safePath, getMetadataBase(env)).toString();
 }

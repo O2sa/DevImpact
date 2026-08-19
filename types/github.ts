@@ -1,4 +1,3 @@
-
 export type RepoLanguageEdge = {
   size: number;
   node: {
@@ -57,8 +56,6 @@ export type PullRequestNode = {
     languages?: RepoLanguages;
   };
 };
-
-
 
 export type GitHubUserData = {
   login: string;
