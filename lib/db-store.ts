@@ -147,6 +147,13 @@ export class DatabaseStore {
 
   async getNextCountryToCalculate(): Promise<{ slug: string; title: string } | null> {
     const client = getPool();
+    // Auto-recover calculations that were interrupted (e.g. by container deploy/restart)
+    await client.query(
+      `UPDATE leaderboard_calculation
+       SET status = 'failed', error_message = 'Interrupted by process restart or timeout', updated_at = NOW()
+       WHERE status = 'running' AND updated_at < NOW() - INTERVAL '6 hours'`,
+    );
+
     const result = await client.query(
       `SELECT country_slug, country_title FROM leaderboard_calculation
        WHERE status != 'running'

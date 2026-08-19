@@ -1,0 +1,1 @@
+0 0 * * * cd /app && pnpm leaderboard:calculate >> /proc/1/fd/1 2>> /proc/1/fd/2

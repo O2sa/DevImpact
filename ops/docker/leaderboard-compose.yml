@@ -1,0 +1,28 @@
+services:
+  leaderboard-cron:
+    image: ${LEADERBOARD_IMAGE:-ghcr.io/o2sa/devimpact-leaderboard:latest}
+    container_name: devimpact-leaderboard-cron
+    restart: unless-stopped
+    stop_grace_period: 10m
+    env_file:
+      - path: ${ENV_FILE:-../../.env}
+        required: false
+    environment:
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_ENABLED: ${REDIS_ENABLED:-false}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_CACHE_NAMESPACE: ${REDIS_CACHE_NAMESPACE:-devimpact:v1}
+      REDIS_CACHE_TTL_SECONDS: ${REDIS_CACHE_TTL_SECONDS:-604800}
+      REDIS_CONNECT_TIMEOUT_MS: ${REDIS_CONNECT_TIMEOUT_MS:-1500}
+      LEADERBOARD_CRON_SCHEDULE: ${LEADERBOARD_CRON_SCHEDULE:-0 0 * * *}
+      LEADERBOARD_SOURCE_URL_TEMPLATE: ${LEADERBOARD_SOURCE_URL_TEMPLATE:-https://raw.githubusercontent.com/ashkulz/committers.top/gh-pages/_data/locations/{country}.yml}
+      LEADERBOARD_SEED_LIMIT: ${LEADERBOARD_SEED_LIMIT:-256}
+      LEADERBOARD_REFRESH_LIMIT: ${LEADERBOARD_REFRESH_LIMIT:-500}
+      LEADERBOARD_USER_STALE_DAYS: ${LEADERBOARD_USER_STALE_DAYS:-30}
+      GITHUB_USER_STALE_DAYS: ${GITHUB_USER_STALE_DAYS:-14}
+      GITHUB_REPO_COUNT: ${GITHUB_REPO_COUNT:-30}
+      GITHUB_PR_COUNT: ${GITHUB_PR_COUNT:-80}
+      GITHUB_ISSUE_COUNT: ${GITHUB_ISSUE_COUNT:-20}
+      GITHUB_DISCUSSION_COUNT: ${GITHUB_DISCUSSION_COUNT:-10}
