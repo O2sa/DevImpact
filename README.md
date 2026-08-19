@@ -163,7 +163,7 @@ Final Score =
 
 ### ⚡ Option A: Run Full Platform via Docker (Fastest)
 
-Run the entire platform (Web App UI + PostgreSQL + Redis + Worker) in 2 simple steps:
+Run the entire platform (Web App UI + PostgreSQL + Redis) in 2 simple steps:
 
 ```bash
 # 1. Copy environment template and set GITHUB_TOKEN
