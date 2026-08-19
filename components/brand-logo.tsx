@@ -14,17 +14,13 @@ const sizeClasses = {
   xl: "h-24 w-24 sm:h-32 sm:w-32",
 } as const;
 
-export function BrandLogo({
-  size = "md",
-  className,
-  priority = true,
-}: BrandLogoProps) {
+export function BrandLogo({ size = "md", className, priority = true }: BrandLogoProps) {
   return (
     <span
       className={cn(
         "inline-flex items-center justify-center",
         "drop-shadow-[0_12px_24px_rgba(15,23,42,0.12)] dark:drop-shadow-[0_16px_26px_rgba(2,6,23,0.5)]",
-        className
+        className,
       )}
     >
       <Image

@@ -11,7 +11,8 @@ type GithubLinkProps = {
 export function GithubLink({ variant = "compact" }: GithubLinkProps) {
   const isProminent = variant === "prominent";
 
-  const githubRepoUrl= process.env.NEXT_PUBLIC_GITHUB_REPO_URL || "https://github.com/O2sa/DevImpact";
+  const githubRepoUrl =
+    process.env.NEXT_PUBLIC_GITHUB_REPO_URL || "https://github.com/O2sa/DevImpact";
   return (
     <a
       href={githubRepoUrl}

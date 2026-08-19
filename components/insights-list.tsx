@@ -25,13 +25,7 @@ function getDisplayName(user?: UserResult, fallback?: string): string {
   return normalizedName || user.username;
 }
 
-export function InsightsList({
-  insights,
-  user1,
-  user2,
-  user1Name,
-  user2Name,
-}: Props) {
+export function InsightsList({ insights, user1, user2, user1Name, user2Name }: Props) {
   const { t } = useTranslation();
 
   if (!insights || !user1 || !user2) {
@@ -49,8 +43,7 @@ export function InsightsList({
 
   const repoLeader = user1.repoScore >= user2.repoScore ? user1 : user2;
   const prLeader = user1.prScore >= user2.prScore ? user1 : user2;
-  const contributionLeader =
-    user1.contributionScore >= user2.contributionScore ? user1 : user2;
+  const contributionLeader = user1.contributionScore >= user2.contributionScore ? user1 : user2;
 
   const user1Strengths: string[] = [];
   const user2Strengths: string[] = [];
@@ -159,8 +152,9 @@ export function InsightsList({
             <ul className="mt-2 list-disc space-y-1 ps-5 text-muted-foreground">
               {(user1Strengths.length > 0 ? user1Strengths : [t("insights.strength.balanced")]).map(
                 (item, index) => (
-                <li key={`u1-strength-${index}`}>{item}</li>
-              ))}
+                  <li key={`u1-strength-${index}`}>{item}</li>
+                ),
+              )}
             </ul>
           </section>
           <section>
@@ -168,8 +162,9 @@ export function InsightsList({
             <ul className="mt-2 list-disc space-y-1 ps-5 text-muted-foreground">
               {(user2Strengths.length > 0 ? user2Strengths : [t("insights.strength.balanced")]).map(
                 (item, index) => (
-                <li key={`u2-strength-${index}`}>{item}</li>
-              ))}
+                  <li key={`u2-strength-${index}`}>{item}</li>
+                ),
+              )}
             </ul>
           </section>
         </div>
@@ -177,7 +172,9 @@ export function InsightsList({
         <div className="grid gap-4 md:grid-cols-2">
           <section>
             <h4 className="font-semibold">
-              {t("insights.recommendationsFor", { name: firstName || t("insights.user1Strengths") })}
+              {t("insights.recommendationsFor", {
+                name: firstName || t("insights.user1Strengths"),
+              })}
             </h4>
             <ul className="mt-2 list-disc space-y-1 ps-5 text-muted-foreground">
               {user1Recommendations.map((item, index) => (
@@ -187,7 +184,9 @@ export function InsightsList({
           </section>
           <section>
             <h4 className="font-semibold">
-              {t("insights.recommendationsFor", { name: secondName || t("insights.user2Strengths") })}
+              {t("insights.recommendationsFor", {
+                name: secondName || t("insights.user2Strengths"),
+              })}
             </h4>
             <ul className="mt-2 list-disc space-y-1 ps-5 text-muted-foreground">
               {user2Recommendations.map((item, index) => (

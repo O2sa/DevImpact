@@ -5,8 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: SITE_NAME,
     short_name: SITE_SHORT_NAME,
-    description:
-      "Compare GitHub developers with transparent open-source impact scoring.",
+    description: "Compare GitHub developers with transparent open-source impact scoring.",
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",

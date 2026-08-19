@@ -3,8 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 export function DashboardSkeleton() {
   return (
-    <div className="space-y-6 animate-fadeIn">
-      <Card className="border-2 border-primary/10 bg-gradient-to-r from-primary/5 via-primary/3 to-transparent">
+    <div className="animate-fadeIn space-y-6">
+      <Card className="via-primary/3 border-2 border-primary/10 bg-gradient-to-r from-primary/5 to-transparent">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">

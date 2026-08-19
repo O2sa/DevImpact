@@ -43,9 +43,7 @@ export function ScoringMethodologyPageClient() {
 
         <header className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">{t("methodology.title")}</h1>
-          <p className="max-w-3xl text-sm text-muted-foreground">
-            {t("methodology.intro")}
-          </p>
+          <p className="max-w-3xl text-sm text-muted-foreground">{t("methodology.intro")}</p>
         </header>
 
         <ScoringMethodologyFlow />

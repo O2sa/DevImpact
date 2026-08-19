@@ -174,7 +174,7 @@ export class DatabaseStore {
 
   async finishCalculation(countrySlug: string, errorMessage?: string): Promise<void> {
     const client = getPool();
-    const status = errorMessage ? 'failed' : 'done';
+    const status = errorMessage ? "failed" : "done";
     await client.query(
       `UPDATE leaderboard_calculation SET
         status = $1,
@@ -256,10 +256,7 @@ export class DatabaseStore {
 
   // ── Leaderboard operations ──────────────────────────────────────────
 
-  async getLeaderboard(
-    country: string,
-    limit: number = 500,
-  ): Promise<GitHubUserRow[]> {
+  async getLeaderboard(country: string, limit: number = 500): Promise<GitHubUserRow[]> {
     const client = getPool();
     const result = await client.query(
       `SELECT *
@@ -289,10 +286,7 @@ export class DatabaseStore {
    * Returns stale users in a country, ordered by score descending.
    * These are users whose data needs to be refreshed from GitHub.
    */
-  async getTopStaleUsers(
-    country: string,
-    limit: number = 500,
-  ): Promise<GitHubUserRow[]> {
+  async getTopStaleUsers(country: string, limit: number = 500): Promise<GitHubUserRow[]> {
     const client = getPool();
     const result = await client.query(
       `SELECT *
@@ -313,10 +307,7 @@ export class DatabaseStore {
    * Returns the top-scoring users in a country regardless of staleness.
    * Used to determine which users to check for refresh.
    */
-  async getTopUsers(
-    country: string,
-    limit: number = 500,
-  ): Promise<GitHubUserRow[]> {
+  async getTopUsers(country: string, limit: number = 500): Promise<GitHubUserRow[]> {
     const client = getPool();
     const result = await client.query(
       `SELECT *

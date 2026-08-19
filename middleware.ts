@@ -16,7 +16,7 @@ export function middleware(request: NextRequest) {
     const locale = parseAcceptLanguage(
       request.headers.get("accept-language"),
       supportedLocales,
-      DEFAULT_LOCALE
+      DEFAULT_LOCALE,
     );
 
     response.cookies.set(LOCALE_COOKIE, locale, { path: "/" });

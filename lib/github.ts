@@ -20,7 +20,7 @@ export type UserFetchMetrics = {
 
 type Logger = Pick<Console, "info" | "warn">;
 
-type GitHubRawUser = { 
+type GitHubRawUser = {
   login: string;
   name: string | null;
   avatarUrl: string;
@@ -74,7 +74,6 @@ const DEFAULT_GITHUB_PR_COUNT = 300;
 const DEFAULT_GITHUB_ISSUE_COUNT = 100;
 const DEFAULT_GITHUB_DISCUSSION_COUNT = 50;
 
-
 const MAX_GITHUB_REPO_COUNT = 100;
 const MAX_GITHUB_PR_COUNT = 1000;
 const MAX_GITHUB_ISSUE_COUNT = 100;
@@ -84,14 +83,12 @@ export function parseCountEnv(
   value: string | undefined,
   fallback: number,
   maxValue: number,
-): number{
-
+): number {
   const parsed = Number.parseInt(value ?? "", 10);
-  if(!Number.isInteger(parsed)|| parsed<=0){
+  if (!Number.isInteger(parsed) || parsed <= 0) {
     return fallback;
   }
   return Math.min(parsed, maxValue);
-
 }
 
 const USER_QUERY = /* GraphQL */ `
@@ -171,9 +168,21 @@ const PULL_REQUESTS_QUERY = /* GraphQL */ `
 `;
 
 const ISSUES_QUERY = /* GraphQL */ `
-  query FetchUserIssues($issueCount: Int = 100, $externalIssueQuery: String!, $issueCursor: String) {
-    issues: search(query: $externalIssueQuery, type: ISSUE, first: $issueCount, after: $issueCursor) {
-      pageInfo { hasNextPage endCursor }
+  query FetchUserIssues(
+    $issueCount: Int = 100
+    $externalIssueQuery: String!
+    $issueCursor: String
+  ) {
+    issues: search(
+      query: $externalIssueQuery
+      type: ISSUE
+      first: $issueCount
+      after: $issueCursor
+    ) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
       nodes {
         ... on Issue {
           title
@@ -206,7 +215,10 @@ const DISCUSSIONS_QUERY = /* GraphQL */ `
       first: $discussionCount
       after: $discussionCursor
     ) {
-      pageInfo { hasNextPage endCursor }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
       nodes {
         ... on Discussion {
           title
@@ -235,10 +247,12 @@ type SearchPaginateParams<TNode> = {
   operationName: string;
   query: string;
   buildVariables: (cursor: string | null, pageSize: number) => Record<string, unknown>;
-  extractField: (data: Record<string, unknown>) => {
-    nodes: Array<TNode | null>;
-    pageInfo: PageInfo;
-  } | undefined;
+  extractField: (data: Record<string, unknown>) =>
+    | {
+        nodes: Array<TNode | null>;
+        pageInfo: PageInfo;
+      }
+    | undefined;
   maxPages?: number;
   maxItems?: number;
 };
@@ -263,15 +277,10 @@ async function paginateSearch<TNode>(
     }
 
     const pageSize =
-      remainingItems === undefined
-        ? SEARCH_PAGE_SIZE
-        : Math.min(SEARCH_PAGE_SIZE, remainingItems);
+      remainingItems === undefined ? SEARCH_PAGE_SIZE : Math.min(SEARCH_PAGE_SIZE, remainingItems);
 
     const variables = params.buildVariables(cursor, pageSize);
-    const data = await executor.execute<
-      Record<string, unknown>,
-      Record<string, unknown>
-    >({
+    const data = await executor.execute<Record<string, unknown>, Record<string, unknown>>({
       operationName: params.operationName,
       query: params.query,
       variables,
@@ -321,7 +330,7 @@ function isGitHubUserData(value: unknown): value is GitHubUserData {
     !(typeof candidate.name === "string" || candidate.name === null) ||
     typeof candidate.avatarUrl !== "string" ||
     !Array.isArray(candidate.repos) ||
-    !Array.isArray(candidate.pullRequests) 
+    !Array.isArray(candidate.pullRequests)
   ) {
     return false;
   }
@@ -329,10 +338,7 @@ function isGitHubUserData(value: unknown): value is GitHubUserData {
   if (candidate.issues !== undefined && !Array.isArray(candidate.issues)) {
     return false;
   }
-  if (
-    candidate.discussions !== undefined &&
-    !Array.isArray(candidate.discussions)
-  ) {
+  if (candidate.discussions !== undefined && !Array.isArray(candidate.discussions)) {
     return false;
   }
 
@@ -361,14 +367,9 @@ export function normalizeGitHubUsername(username: string): string {
   return username.trim().toLowerCase();
 }
 
-export function buildGitHubUserCacheKey(
-  username: string,
-  namespace: string,
-): string {
+export function buildGitHubUserCacheKey(username: string, namespace: string): string {
   return `${namespace}:github-user:${normalizeGitHubUsername(username)}`;
 }
-
-
 
 // ---------------------------------------------------------------------------
 // Core data fetch
@@ -385,36 +386,32 @@ async function fetchUserDataFromGitHub(
   const startTime = performance.now();
   const fetchErrors: { part: string; reason: string }[] = [];
 
-  
-const repoCount = parseCountEnv(
-  process.env.GITHUB_REPO_COUNT,
-  DEFAULT_GITHUB_REPO_COUNT,
-  MAX_GITHUB_REPO_COUNT,
-);
+  const repoCount = parseCountEnv(
+    process.env.GITHUB_REPO_COUNT,
+    DEFAULT_GITHUB_REPO_COUNT,
+    MAX_GITHUB_REPO_COUNT,
+  );
 
-const prCount = parseCountEnv(
-  process.env.GITHUB_PR_COUNT,
-  DEFAULT_GITHUB_PR_COUNT,
-  MAX_GITHUB_PR_COUNT,
-);
+  const prCount = parseCountEnv(
+    process.env.GITHUB_PR_COUNT,
+    DEFAULT_GITHUB_PR_COUNT,
+    MAX_GITHUB_PR_COUNT,
+  );
 
-const issueCount = parseCountEnv(
-  process.env.GITHUB_ISSUE_COUNT,
-  DEFAULT_GITHUB_ISSUE_COUNT,
-  MAX_GITHUB_ISSUE_COUNT,
-);
+  const issueCount = parseCountEnv(
+    process.env.GITHUB_ISSUE_COUNT,
+    DEFAULT_GITHUB_ISSUE_COUNT,
+    MAX_GITHUB_ISSUE_COUNT,
+  );
 
-const discussionCount = parseCountEnv(
-  process.env.GITHUB_DISCUSSION_COUNT,
-  DEFAULT_GITHUB_DISCUSSION_COUNT,
-  MAX_GITHUB_DISCUSSION_COUNT,
-);
+  const discussionCount = parseCountEnv(
+    process.env.GITHUB_DISCUSSION_COUNT,
+    DEFAULT_GITHUB_DISCUSSION_COUNT,
+    MAX_GITHUB_DISCUSSION_COUNT,
+  );
 
   const [userResult, prResult, issuesResult, discussionsResult] = await Promise.allSettled([
-    executor.execute<
-      { user: GitHubRawUser | null },
-      { login: string; repoCount: number }
-    >({
+    executor.execute<{ user: GitHubRawUser | null }, { login: string; repoCount: number }>({
       operationName: "FetchUser",
       query: USER_QUERY,
       variables: { login: username, repoCount },
@@ -429,8 +426,7 @@ const discussionCount = parseCountEnv(
       }),
       extractField: (data) =>
         data.pullRequests as
-          | { nodes: Array<PullRequestNode | null>; pageInfo: PageInfo }
-          | undefined,
+          { nodes: Array<PullRequestNode | null>; pageInfo: PageInfo } | undefined,
       maxItems: prCount,
     }),
     paginateSearch<IssueNode>(executor, {
@@ -442,9 +438,7 @@ const discussionCount = parseCountEnv(
         issueCursor: cursor,
       }),
       extractField: (data) =>
-        data.issues as
-          | { nodes: Array<RawIssueNode | null>; pageInfo: PageInfo }
-          | undefined,
+        data.issues as { nodes: Array<RawIssueNode | null>; pageInfo: PageInfo } | undefined,
       maxItems: issueCount,
     }),
     paginateSearch<DiscussionNode>(executor, {
@@ -457,23 +451,34 @@ const discussionCount = parseCountEnv(
       }),
       extractField: (data) =>
         data.discussions as
-          | { nodes: Array<RawDiscussionNode | null>; pageInfo: PageInfo }
-          | undefined,
+          { nodes: Array<RawDiscussionNode | null>; pageInfo: PageInfo } | undefined,
       maxItems: discussionCount,
     }),
   ]);
 
   if (userResult.status === "rejected") {
-    fetchErrors.push({ part: "user", reason: userResult.reason?.message ?? String(userResult.reason) });
+    fetchErrors.push({
+      part: "user",
+      reason: userResult.reason?.message ?? String(userResult.reason),
+    });
   }
   if (prResult.status === "rejected") {
-    fetchErrors.push({ part: "pullRequests", reason: prResult.reason?.message ?? String(prResult.reason) });
+    fetchErrors.push({
+      part: "pullRequests",
+      reason: prResult.reason?.message ?? String(prResult.reason),
+    });
   }
   if (issuesResult.status === "rejected") {
-    fetchErrors.push({ part: "issues", reason: issuesResult.reason?.message ?? String(issuesResult.reason) });
+    fetchErrors.push({
+      part: "issues",
+      reason: issuesResult.reason?.message ?? String(issuesResult.reason),
+    });
   }
   if (discussionsResult.status === "rejected") {
-    fetchErrors.push({ part: "discussions", reason: discussionsResult.reason?.message ?? String(discussionsResult.reason) });
+    fetchErrors.push({
+      part: "discussions",
+      reason: discussionsResult.reason?.message ?? String(discussionsResult.reason),
+    });
   }
 
   if (userResult.status === "rejected") {
@@ -492,14 +497,14 @@ const discussionCount = parseCountEnv(
   const duration = performance.now() - startTime;
 
   const userData: GitHubUserData = {
-      login: user.login,
-      name: user.name,
-      avatarUrl: user.avatarUrl,
-      location: user.location,
-      repos: user.repositories.nodes.filter(isDefined),
-      pullRequests,
-      issues: issues.map(toIssueNode),
-      discussions: discussions.map(toDiscussionNode),
+    login: user.login,
+    name: user.name,
+    avatarUrl: user.avatarUrl,
+    location: user.location,
+    repos: user.repositories.nodes.filter(isDefined),
+    pullRequests,
+    issues: issues.map(toIssueNode),
+    discussions: discussions.map(toDiscussionNode),
   };
 
   const metrics: UserFetchMetrics = {
@@ -526,7 +531,10 @@ async function fetchUserDataFromGitHubWrapper(
 export function createGitHubUserDataFetcherWithMetrics(
   dependencies: GitHubFetcherDependencies,
 ): (username: string) => Promise<{ data: GitHubUserData; metrics: UserFetchMetrics }> {
-  const inFlightByCacheKey = new Map<string, Promise<{ data: GitHubUserData; metrics: UserFetchMetrics }>>();
+  const inFlightByCacheKey = new Map<
+    string,
+    Promise<{ data: GitHubUserData; metrics: UserFetchMetrics }>
+  >();
   const logger = dependencies.logger ?? console;
 
   return async (username: string): Promise<{ data: GitHubUserData; metrics: UserFetchMetrics }> => {
@@ -546,7 +554,12 @@ export function createGitHubUserDataFetcherWithMetrics(
         const cached = await dependencies.cacheStore.get<unknown>(cacheKey);
         if (cached !== undefined) {
           // A simple check to see if it's our object.
-          if (isObject(cached) && 'data' in cached && 'metrics' in cached && isGitHubUserData(cached.data)) {
+          if (
+            isObject(cached) &&
+            "data" in cached &&
+            "metrics" in cached &&
+            isGitHubUserData(cached.data)
+          ) {
             logger.info("cache-hit", { key: cacheKey });
             return cached as { data: GitHubUserData; metrics: UserFetchMetrics };
           }
@@ -570,10 +583,7 @@ export function createGitHubUserDataFetcherWithMetrics(
     }
 
     const request = (async () => {
-      const freshResult = await fetchUserDataFromGitHub(
-        dependencies.executor,
-        normalizedUsername,
-      );
+      const freshResult = await fetchUserDataFromGitHub(dependencies.executor, normalizedUsername);
 
       if (dependencies.cacheStore.enabled) {
         try {
@@ -649,18 +659,11 @@ export function createGitHubUserDataFetcher(
     }
 
     const request = (async () => {
-      const fresh = await fetchUserDataFromGitHubWrapper(
-        dependencies.executor,
-        normalizedUsername,
-      );
+      const fresh = await fetchUserDataFromGitHubWrapper(dependencies.executor, normalizedUsername);
 
       if (dependencies.cacheStore.enabled) {
         try {
-          await dependencies.cacheStore.set(
-            cacheKey,
-            fresh,
-            dependencies.cacheConfig.ttlSeconds,
-          );
+          await dependencies.cacheStore.set(cacheKey, fresh, dependencies.cacheConfig.ttlSeconds);
         } catch (error: unknown) {
           logger.warn("cache-set-fail", {
             key: cacheKey,

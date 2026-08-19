@@ -44,9 +44,7 @@ function getCachedLeaderboard(
   };
 }
 
-export async function getLeaderboardResult(
-  country: string,
-): Promise<LeaderboardResult> {
+export async function getLeaderboardResult(country: string): Promise<LeaderboardResult> {
   const displayLimit = getDisplayLimit();
   const cacheConfig = getCacheConfigFromEnv();
   const cacheStore = createCacheStore(cacheConfig);

@@ -8,13 +8,7 @@ import {
   MessageSquare,
   Star,
 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { UserResult } from "@/types/user-result";
 import { useTranslation } from "./language-provider";
 
@@ -61,15 +55,7 @@ function getLanguageColor(name: string): string {
   return "bg-slate-500";
 }
 
-function StatChip({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: number;
-}) {
+function StatChip({ icon, label, value }: { icon: ReactNode; label: string; value: number }) {
   return (
     <div className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-background/80 px-2.5 py-1 text-xs">
       <span className="text-muted-foreground">{icon}</span>
@@ -79,18 +65,12 @@ function StatChip({
   );
 }
 
-function LanguageBreakdown({
-  topLanguages,
-}: {
-  topLanguages?: LanguageEntry[];
-}) {
+function LanguageBreakdown({ topLanguages }: { topLanguages?: LanguageEntry[] }) {
   if (!topLanguages || topLanguages.length === 0) {
     return null;
   }
 
-  const normalized = topLanguages
-    .slice(0, 5)
-    .filter((language) => language.percentage > 0);
+  const normalized = topLanguages.slice(0, 5).filter((language) => language.percentage > 0);
 
   if (normalized.length === 0) {
     return null;
@@ -116,9 +96,7 @@ function LanguageBreakdown({
             key={`legend-${language.name}-${language.percentage}`}
             className="inline-flex items-center gap-1"
           >
-            <span
-              className={`h-2 w-2 rounded-full ${getLanguageColor(language.name)}`}
-            />
+            <span className={`h-2 w-2 rounded-full ${getLanguageColor(language.name)}`} />
             <span>
               {language.name} {language.percentage}%
             </span>
@@ -187,9 +165,7 @@ function findPrLanguageMeta(
   pr: UserResult["topPullRequests"][number],
 ): LanguageMeta {
   const languagePrs = user.languageScores?.topPullRequests ?? [];
-  const byUrl = pr.url
-    ? languagePrs.find((item) => item.url && item.url === pr.url)
-    : undefined;
+  const byUrl = pr.url ? languagePrs.find((item) => item.url && item.url === pr.url) : undefined;
   const byTitleAndRepo = languagePrs.find(
     (item) => item.title === pr.title && item.repo === pr.repo,
   );
@@ -275,7 +251,8 @@ export function TopList({ userResults, selectedLanguages = [] }: Props) {
 
                             {typeof languageMeta.languageMatch === "number" ? (
                               <p className="mt-2 text-xs text-muted-foreground">
-                                {t("language.match")}: {formatLanguageMatch(languageMeta.languageMatch)}
+                                {t("language.match")}:{" "}
+                                {formatLanguageMatch(languageMeta.languageMatch)}
                               </p>
                             ) : null}
                           </div>
@@ -358,7 +335,8 @@ export function TopList({ userResults, selectedLanguages = [] }: Props) {
 
                             {typeof languageMeta.languageMatch === "number" ? (
                               <p className="mt-2 text-xs text-muted-foreground">
-                                {t("language.match")}: {formatLanguageMatch(languageMeta.languageMatch)}
+                                {t("language.match")}:{" "}
+                                {formatLanguageMatch(languageMeta.languageMatch)}
                               </p>
                             ) : null}
                           </div>

@@ -5,13 +5,7 @@ import { Globe, Search, Users } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/components/language-provider";
 import { getCountryCode } from "@/lib/country-flags";
 import type { CountryInfo } from "@/types/leaderboard";
@@ -29,8 +23,7 @@ export function CountryGridClient({ countries }: Props) {
     if (!search.trim()) return countries;
     const q = search.trim().toLowerCase();
     return countries.filter(
-      (c) =>
-        c.slug.toLowerCase().includes(q) || c.title.toLowerCase().includes(q),
+      (c) => c.slug.toLowerCase().includes(q) || c.title.toLowerCase().includes(q),
     );
   }, [countries, search]);
 
@@ -41,9 +34,7 @@ export function CountryGridClient({ countries }: Props) {
           {t("leaderboard.header.eyebrow")}
         </p>
         <CardTitle>{t("leaderboard.header.title")}</CardTitle>
-        <CardDescription>
-          {t("leaderboard.header.description")}
-        </CardDescription>
+        <CardDescription>{t("leaderboard.header.description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {countries.length > 10 && (
@@ -59,7 +50,7 @@ export function CountryGridClient({ countries }: Props) {
         )}
 
         {filtered.length === 0 && (
-          <div className="flex flex-col items-center gap-3 py-12 text-center text-muted-foreground animate-fadeIn">
+          <div className="flex animate-fadeIn flex-col items-center gap-3 py-12 text-center text-muted-foreground">
             <Image
               src="/logo.svg"
               alt=""
@@ -69,9 +60,7 @@ export function CountryGridClient({ countries }: Props) {
               className="opacity-30"
             />
             <p className="text-lg font-medium">
-              {search
-                ? t("leaderboard.noCountriesSearch")
-                : t("leaderboard.empty.title")}
+              {search ? t("leaderboard.noCountriesSearch") : t("leaderboard.empty.title")}
             </p>
           </div>
         )}

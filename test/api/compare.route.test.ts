@@ -67,10 +67,7 @@ function makeLanguageScores(finalScore: number) {
   };
 }
 
-function makeScore(
-  finalScore: number,
-  languageScores?: ReturnType<typeof makeLanguageScores>,
-) {
+function makeScore(finalScore: number, languageScores?: ReturnType<typeof makeLanguageScores>) {
   return {
     repoScore: 10,
     prScore: 20,

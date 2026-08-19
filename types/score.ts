@@ -1,9 +1,4 @@
-import {
-  DiscussionNode,
-  IssueNode,
-  PullRequestNode,
-  RepoNode,
-} from "./github";
+import { DiscussionNode, IssueNode, PullRequestNode, RepoNode } from "./github";
 
 export type RepoScoreDetail = {
   repo: RepoNode;

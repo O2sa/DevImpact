@@ -44,9 +44,7 @@ function parsePositiveInt(
   return parsed;
 }
 
-export function getCacheTtlSecondsFromEnv(
-  env: NodeJS.ProcessEnv = process.env,
-): number {
+export function getCacheTtlSecondsFromEnv(env: NodeJS.ProcessEnv = process.env): number {
   return (
     parsePositiveInt(env.REDIS_CACHE_TTL_SECONDS, MAX_CACHE_TTL_SECONDS) ??
     parsePositiveInt(env.CACHE_TTL_SECONDS, MAX_CACHE_TTL_SECONDS) ??
@@ -54,19 +52,13 @@ export function getCacheTtlSecondsFromEnv(
   );
 }
 
-export function getCacheNamespaceFromEnv(
-  env: NodeJS.ProcessEnv = process.env,
-): string {
+export function getCacheNamespaceFromEnv(env: NodeJS.ProcessEnv = process.env): string {
   return (
-    env.REDIS_CACHE_NAMESPACE?.trim() ||
-    env.CACHE_NAMESPACE?.trim() ||
-    DEFAULT_CACHE_NAMESPACE
+    env.REDIS_CACHE_NAMESPACE?.trim() || env.CACHE_NAMESPACE?.trim() || DEFAULT_CACHE_NAMESPACE
   );
 }
 
-export function getCacheConfigFromEnv(
-  env: NodeJS.ProcessEnv = process.env,
-): CacheConfig {
+export function getCacheConfigFromEnv(env: NodeJS.ProcessEnv = process.env): CacheConfig {
   const redisUrl = env.REDIS_URL?.trim() || undefined;
   const enabledFromEnv = parseBoolean(env.REDIS_ENABLED);
   const enabled = enabledFromEnv ?? Boolean(redisUrl);

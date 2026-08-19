@@ -47,7 +47,6 @@ const defaultPullRequest: PullRequestNode = {
   },
 };
 
-
 const defaultIssue: IssueNode = {
   title: "Issue about improving docs",
   url: "https://example.com/external-owner/repo/issues/1",
@@ -79,15 +78,13 @@ export function makeRepo(overrides: Partial<RepoNode> = {}): RepoNode {
   };
 }
 
-export function makePullRequest(
-  overrides: Partial<PullRequestNode> = {},
-): PullRequestNode {
+export function makePullRequest(overrides: Partial<PullRequestNode> = {}): PullRequestNode {
   const repository = overrides.repository
     ? {
-      ...defaultPullRequest.repository,
-      ...overrides.repository,
-      languages: overrides.repository.languages ?? defaultPullRequest.repository.languages,
-    }
+        ...defaultPullRequest.repository,
+        ...overrides.repository,
+        languages: overrides.repository.languages ?? defaultPullRequest.repository.languages,
+      }
     : defaultPullRequest.repository;
 
   return {
@@ -97,9 +94,7 @@ export function makePullRequest(
   };
 }
 
-export function makeRepoLanguages(
-  edges: Array<{ size: number; name: string }>,
-): RepoLanguages {
+export function makeRepoLanguages(edges: Array<{ size: number; name: string }>): RepoLanguages {
   return {
     edges: edges.map((edge) => ({
       size: edge.size,
@@ -117,9 +112,7 @@ export function makeIssue(overrides: Partial<IssueNode> = {}): IssueNode {
   };
 }
 
-export function makeDiscussion(
-  overrides: Partial<DiscussionNode> = {},
-): DiscussionNode {
+export function makeDiscussion(overrides: Partial<DiscussionNode> = {}): DiscussionNode {
   return {
     ...defaultDiscussion,
     ...overrides,
@@ -128,11 +121,7 @@ export function makeDiscussion(
   };
 }
 
-
-
-export function makeUserScoreInput(
-  overrides: Partial<UserScoreInput> = {},
-): UserScoreInput {
+export function makeUserScoreInput(overrides: Partial<UserScoreInput> = {}): UserScoreInput {
   return {
     repos: overrides.repos ?? [makeRepo()],
     pullRequests: overrides.pullRequests ?? [makePullRequest()],

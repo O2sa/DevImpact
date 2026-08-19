@@ -28,7 +28,6 @@ type Props = {
   scoreVersion?: string;
 };
 
-
 function formatPercentage(value?: number) {
   if (typeof value !== "number") return "N/A";
   return `${Math.round(value * 100)}%`;
@@ -42,10 +41,7 @@ function getGithubProfileUrl(username: string): string {
   return `https://github.com/${username}`;
 }
 
-function getPercentageDifference(
-  winnerScore: number,
-  loserScore: number,
-): number | null {
+function getPercentageDifference(winnerScore: number, loserScore: number): number | null {
   if (loserScore <= 0) {
     return winnerScore > loserScore ? null : 0;
   }
@@ -70,10 +66,7 @@ export function ResultDashboard({
   }, [searchParams]);
   const hasLanguageScores = Boolean(user1.languageScores && user2.languageScores);
   const selectedLanguages = useMemo(
-    () =>
-      user1.languageScores?.selectedLanguages ??
-      user2.languageScores?.selectedLanguages ??
-      [],
+    () => user1.languageScores?.selectedLanguages ?? user2.languageScores?.selectedLanguages ?? [],
     [user1.languageScores, user2.languageScores],
   );
   const userByUsername = useMemo(
@@ -181,31 +174,31 @@ export function ResultDashboard({
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
-          <ScoreCard
-            title={t("comparsion.final.score")}
-            rawValue={scoreData.final}
-            normalizedValue={scoreData.finalNormalized}
-            highlight={isWinner}
-            helperText={t("tooltip.final")}
-          />
-          <ScoreCard
-            title={t("comparsion.repo.score")}
-            rawValue={scoreData.repo}
-            normalizedValue={scoreData.repoNormalized}
-            helperText={t("tooltip.repo")}
-          />
-          <ScoreCard
-            title={t("comparsion.pr.score")}
-            rawValue={scoreData.pr}
-            normalizedValue={scoreData.prNormalized}
-            helperText={t("tooltip.pr")}
-          />
-          <ScoreCard
-            title={t("comparsion.contribution.score")}
-            rawValue={scoreData.contribution}
-            normalizedValue={scoreData.contributionNormalized}
-            helperText={t("tooltip.contribution")}
-          />
+            <ScoreCard
+              title={t("comparsion.final.score")}
+              rawValue={scoreData.final}
+              normalizedValue={scoreData.finalNormalized}
+              highlight={isWinner}
+              helperText={t("tooltip.final")}
+            />
+            <ScoreCard
+              title={t("comparsion.repo.score")}
+              rawValue={scoreData.repo}
+              normalizedValue={scoreData.repoNormalized}
+              helperText={t("tooltip.repo")}
+            />
+            <ScoreCard
+              title={t("comparsion.pr.score")}
+              rawValue={scoreData.pr}
+              normalizedValue={scoreData.prNormalized}
+              helperText={t("tooltip.pr")}
+            />
+            <ScoreCard
+              title={t("comparsion.contribution.score")}
+              rawValue={scoreData.contribution}
+              normalizedValue={scoreData.contributionNormalized}
+              helperText={t("tooltip.contribution")}
+            />
           </div>
           {languageScore ? (
             <div className="rounded-lg border border-cyan-500/25 bg-cyan-500/5 p-3">
@@ -213,9 +206,7 @@ export function ResultDashboard({
                 {t("comparsion.language.final.score")}
               </p>
               <p className="mt-1 text-xl font-bold">
-                {Math.round(
-                  languageScore.normalizedFinalScore ?? languageScore.finalScore,
-                )}
+                {Math.round(languageScore.normalizedFinalScore ?? languageScore.finalScore)}
                 {languageScore.normalizedFinalScore !== undefined ? " / 100" : ""}
               </p>
               <p className="text-xs text-muted-foreground">
@@ -311,7 +302,7 @@ export function ResultDashboard({
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="animate-fadeIn space-y-6">
       <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
@@ -468,9 +459,7 @@ export function ResultDashboard({
       />
 
       <details className="rounded-xl border border-border bg-card p-4">
-        <summary className="cursor-pointer text-sm font-semibold">
-          {t("signals.title")}
-        </summary>
+        <summary className="cursor-pointer text-sm font-semibold">{t("signals.title")}</summary>
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
           {renderSignalStats(user1, 1)}
           {renderSignalStats(user2, 2)}

@@ -1,10 +1,7 @@
 import "dotenv/config";
 
 import { afterEach, describe, expect, test, vi } from "vitest";
-import {
-  createGitHubUserDataFetcher,
-  type GitHubFetcherDependencies,
-} from "@/lib/github";
+import { createGitHubUserDataFetcher, type GitHubFetcherDependencies } from "@/lib/github";
 import {
   DEFAULT_CACHE_NAMESPACE,
   DEFAULT_GITHUB_CACHE_TTL_SECONDS,
@@ -20,16 +17,11 @@ type ExecuteCall = {
   operationName: string;
 };
 
-function makeProcessEnv(
-  values: Record<string, string> = {},
-): NodeJS.ProcessEnv {
+function makeProcessEnv(values: Record<string, string> = {}): NodeJS.ProcessEnv {
   return { NODE_ENV: "test", ...values };
 }
 
-function makeExecutor(
-  calls: ExecuteCall[],
-  delayMs = 0,
-): GitHubFetcherDependencies["executor"] {
+function makeExecutor(calls: ExecuteCall[], delayMs = 0): GitHubFetcherDependencies["executor"] {
   return {
     async execute<TData, TVariables extends Record<string, unknown>>(params: {
       operationName: string;
@@ -277,10 +269,7 @@ describe("GitHub user data caching", () => {
     }> = [];
     const fetcher = createGitHubUserDataFetcher({
       executor: {
-        async execute<
-          TData,
-          TVariables extends Record<string, unknown>,
-        >(params: {
+        async execute<TData, TVariables extends Record<string, unknown>>(params: {
           operationName: string;
           query: string;
           variables: TVariables;
@@ -427,12 +416,9 @@ describe("GitHub user data caching", () => {
     const result = await fetcher("testuser");
 
     expect(result.pullRequests).toHaveLength(2);
+    expect(calls.filter((call) => call.operationName === "FetchUserPullRequests")).toHaveLength(1);
     expect(
-      calls.filter((call) => call.operationName === "FetchUserPullRequests"),
-    ).toHaveLength(1);
-    expect(
-      calls.find((call) => call.operationName === "FetchUserPullRequests")
-        ?.variables.prCount,
+      calls.find((call) => call.operationName === "FetchUserPullRequests")?.variables.prCount,
     ).toBe(2);
   });
 
@@ -493,10 +479,7 @@ describe("GitHub user data caching", () => {
       },
     });
 
-    const [first, second] = await Promise.all([
-      fetcher("testuser"),
-      fetcher("TestUser"),
-    ]);
+    const [first, second] = await Promise.all([fetcher("testuser"), fetcher("TestUser")]);
 
     expect(first.avatarUrl).toBe(second.avatarUrl);
     expect(calls).toHaveLength(4);
@@ -509,15 +492,19 @@ describe("GitHub user data caching", () => {
 
   test("reads cache TTL aliases with Redis-specific precedence", () => {
     expect(
-      getCacheTtlSecondsFromEnv(makeProcessEnv({
-        REDIS_CACHE_TTL_SECONDS: "3600",
-        CACHE_TTL_SECONDS: "7200",
-      })),
+      getCacheTtlSecondsFromEnv(
+        makeProcessEnv({
+          REDIS_CACHE_TTL_SECONDS: "3600",
+          CACHE_TTL_SECONDS: "7200",
+        }),
+      ),
     ).toBe(3600);
     expect(
-      getCacheTtlSecondsFromEnv(makeProcessEnv({
-        CACHE_TTL_SECONDS: "7200",
-      })),
+      getCacheTtlSecondsFromEnv(
+        makeProcessEnv({
+          CACHE_TTL_SECONDS: "7200",
+        }),
+      ),
     ).toBe(7200);
   });
 
@@ -525,48 +512,60 @@ describe("GitHub user data caching", () => {
     "rejects invalid cache TTL %s",
     (value) => {
       expect(
-        getCacheTtlSecondsFromEnv(makeProcessEnv({
-          REDIS_CACHE_TTL_SECONDS: value,
-        })),
+        getCacheTtlSecondsFromEnv(
+          makeProcessEnv({
+            REDIS_CACHE_TTL_SECONDS: value,
+          }),
+        ),
       ).toBe(DEFAULT_GITHUB_CACHE_TTL_SECONDS);
     },
   );
 
   test("falls through to the TTL alias when the preferred value is invalid", () => {
     expect(
-      getCacheTtlSecondsFromEnv(makeProcessEnv({
-        REDIS_CACHE_TTL_SECONDS: "invalid",
-        CACHE_TTL_SECONDS: "1800",
-      })),
+      getCacheTtlSecondsFromEnv(
+        makeProcessEnv({
+          REDIS_CACHE_TTL_SECONDS: "invalid",
+          CACHE_TTL_SECONDS: "1800",
+        }),
+      ),
     ).toBe(1800);
   });
 
   test("accepts the maximum cache TTL", () => {
     expect(
-      getCacheTtlSecondsFromEnv(makeProcessEnv({
-        REDIS_CACHE_TTL_SECONDS: `${MAX_CACHE_TTL_SECONDS}`,
-      })),
+      getCacheTtlSecondsFromEnv(
+        makeProcessEnv({
+          REDIS_CACHE_TTL_SECONDS: `${MAX_CACHE_TTL_SECONDS}`,
+        }),
+      ),
     ).toBe(MAX_CACHE_TTL_SECONDS);
   });
 
   test("reads, trims, and validates cache namespace aliases", () => {
     expect(
-      getCacheNamespaceFromEnv(makeProcessEnv({
-        REDIS_CACHE_NAMESPACE: "  deployment:v2  ",
-        CACHE_NAMESPACE: "fallback:v1",
-      })),
+      getCacheNamespaceFromEnv(
+        makeProcessEnv({
+          REDIS_CACHE_NAMESPACE: "  deployment:v2  ",
+          CACHE_NAMESPACE: "fallback:v1",
+        }),
+      ),
     ).toBe("deployment:v2");
     expect(
-      getCacheNamespaceFromEnv(makeProcessEnv({
-        REDIS_CACHE_NAMESPACE: "   ",
-        CACHE_NAMESPACE: "  fallback:v1  ",
-      })),
+      getCacheNamespaceFromEnv(
+        makeProcessEnv({
+          REDIS_CACHE_NAMESPACE: "   ",
+          CACHE_NAMESPACE: "  fallback:v1  ",
+        }),
+      ),
     ).toBe("fallback:v1");
     expect(
-      getCacheNamespaceFromEnv(makeProcessEnv({
-        REDIS_CACHE_NAMESPACE: "   ",
-        CACHE_NAMESPACE: "",
-      })),
+      getCacheNamespaceFromEnv(
+        makeProcessEnv({
+          REDIS_CACHE_NAMESPACE: "   ",
+          CACHE_NAMESPACE: "",
+        }),
+      ),
     ).toBe(DEFAULT_CACHE_NAMESPACE);
   });
 });

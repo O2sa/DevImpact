@@ -81,7 +81,7 @@ export function useI18nProvider(initialLocale: Locale = DEFAULT_LOCALE) {
     (next: Locale) => {
       changeLocale(next);
     },
-    [changeLocale]
+    [changeLocale],
   );
 
   const t = useCallback(
@@ -93,16 +93,16 @@ export function useI18nProvider(initialLocale: Locale = DEFAULT_LOCALE) {
       if (!params) return template;
       return Object.keys(params).reduce(
         (acc, k) => acc.replace(`{${k}}`, String(params[k])),
-        template
+        template,
       );
     },
-    [messages, locale, ready]
+    [messages, locale, ready],
   );
 
   const dir = useMemo(() => localeMeta[locale]?.dir ?? "ltr", [locale]);
   const locales = useMemo(
     () => supportedLocales.map((lc) => ({ value: lc, label: localeMeta[lc].label })),
-    []
+    [],
   );
 
   return { locale, setLocale, t, dir, locales, ready };

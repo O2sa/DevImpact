@@ -38,9 +38,7 @@ export function CountryLeaderboardClient({
             <p className="text-lg font-semibold tracking-tight text-foreground">
               {t("leaderboard.error.title")}
             </p>
-            <p className="max-w-xl text-sm leading-7 text-muted-foreground">
-              {failed}
-            </p>
+            <p className="max-w-xl text-sm leading-7 text-muted-foreground">{failed}</p>
             <Link href="/leaderboard">
               <Button variant="ghost">{t("leaderboard.back")}</Button>
             </Link>
@@ -91,9 +89,7 @@ export function CountryLeaderboardClient({
         ) : loading ? (
           <div className="flex items-center justify-center gap-2 py-20">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
-            <span className="text-sm text-muted-foreground">
-              {t("leaderboard.loading")}
-            </span>
+            <span className="text-sm text-muted-foreground">{t("leaderboard.loading")}</span>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4 py-20 text-center">

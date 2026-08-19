@@ -13,13 +13,7 @@ type AvatarProps = {
  * Reusable avatar image component.
  *
  */
-export function Avatar({
-  src,
-  alt,
-  size = 32,
-  unoptimized = true,
-  className,
-}: AvatarProps) {
+export function Avatar({ src, alt, size = 32, unoptimized = true, className }: AvatarProps) {
   return (
     <Image
       src={src}

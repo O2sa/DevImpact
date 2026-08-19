@@ -40,9 +40,7 @@ export function createComparisonRequest(
 ): ComparisonPresentationRequest {
   const sanitizedLanguages = sanitizeSelectedLanguages(selectedLanguages);
   const canonicalUsers = [normalizeUsername(user1), normalizeUsername(user2)].sort();
-  const canonicalLanguages = sanitizedLanguages
-    .map((language) => language.toLowerCase())
-    .sort();
+  const canonicalLanguages = sanitizedLanguages.map((language) => language.toLowerCase()).sort();
   return {
     user1: user1.trim(),
     user2: user2.trim(),

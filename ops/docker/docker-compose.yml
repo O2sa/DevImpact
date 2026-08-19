@@ -37,21 +37,14 @@ services:
         "--maxmemory",
         "512mb",
         "--maxmemory-policy",
-        "allkeys-lru"
+        "allkeys-lru",
       ]
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
     healthcheck:
-      test:
-        [
-          "CMD",
-          "redis-cli",
-          "-a",
-          "${REDIS_PASSWORD}",
-          "ping"
-        ]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 3s
       retries: 5

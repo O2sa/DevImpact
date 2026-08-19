@@ -31,8 +31,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Compare GitHub Developers | DevImpact",
-    description:
-      "Compare open-source impact using repository, PR, and contribution analytics.",
+    description: "Compare open-source impact using repository, PR, and contribution analytics.",
     images: [toAbsoluteUrl("/og-image.svg")],
   },
 };
@@ -70,7 +69,7 @@ function HomePageFallback() {
     <main className="flex min-h-screen flex-col">
       <AppHeader />
 
-      <div className="w-full flex-1 max-w-6xl mx-auto px-4 py-10 space-y-6">
+      <div className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-10">
         <div className="rounded-2xl border border-border bg-card/90 p-6 shadow-lg backdrop-blur">
           <div className="space-y-4 pb-4">
             <Skeleton className="h-3 w-32 rounded-full" />

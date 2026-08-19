@@ -253,11 +253,7 @@ describe("calculateUserScore - pull request scoring", () => {
     );
 
     expect(result.topPullRequests).toHaveLength(3);
-    expect(result.topPullRequests[0].score).toBeGreaterThanOrEqual(
-      result.topPullRequests[1].score,
-    );
-    expect(result.topPullRequests[1].score).toBeGreaterThanOrEqual(
-      result.topPullRequests[2].score,
-    );
+    expect(result.topPullRequests[0].score).toBeGreaterThanOrEqual(result.topPullRequests[1].score);
+    expect(result.topPullRequests[1].score).toBeGreaterThanOrEqual(result.topPullRequests[2].score);
   });
 });

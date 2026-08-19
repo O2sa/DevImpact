@@ -41,8 +41,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Country Leaderboards by Impact | DevImpact",
-    description:
-      "Browse country leaderboards ranked by real open-source impact.",
+    description: "Browse country leaderboards ranked by real open-source impact.",
     images: [toAbsoluteUrl("/og-image.svg")],
   },
   robots: {
@@ -64,8 +63,7 @@ const collectionPageSchema = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   name: "Country Leaderboards by Impact",
-  description:
-    "Browse country leaderboards ranked by DevImpact impact scoring.",
+  description: "Browse country leaderboards ranked by DevImpact impact scoring.",
   url: toAbsoluteUrl("/leaderboard"),
 };
 

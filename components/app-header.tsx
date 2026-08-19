@@ -32,9 +32,7 @@ export function AppHeader() {
             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-cyan-500/15 text-cyan-700 dark:text-cyan-300">
               <Trophy className="h-3.5 w-3.5" aria-hidden="true" />
             </span>
-            <span className="max-w-[84px] truncate sm:max-w-none">
-              {t("nav.leaderboard")}
-            </span>
+            <span className="max-w-[84px] truncate sm:max-w-none">{t("nav.leaderboard")}</span>
           </Link>
 
           <LanguageSwitcher />

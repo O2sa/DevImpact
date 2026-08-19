@@ -55,7 +55,12 @@
 
 body {
   @apply bg-background text-foreground antialiased;
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   background-color: hsl(var(--background));
   min-height: 100vh;
   position: relative;
@@ -101,14 +106,15 @@ body::after {
 }
 
 .card {
-  @apply bg-card/90 text-card-foreground shadow-card rounded-2xl border border-border backdrop-blur;
-  transition: transform 180ms ease, box-shadow 180ms ease;
+  @apply rounded-2xl border border-border bg-card/90 text-card-foreground shadow-card backdrop-blur;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
   box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
 }
 
-
 .dark .card {
-  @apply bg-card/80 border-border;
+  @apply border-border bg-card/80;
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
 }
 
@@ -116,7 +122,8 @@ html.theme-transition,
 html.theme-transition *,
 html.theme-transition *::before,
 html.theme-transition *::after {
-  transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity, backdrop-filter;
+  transition-property:
+    background-color, border-color, color, fill, stroke, box-shadow, opacity, backdrop-filter;
   transition-duration: var(--theme-transition-duration);
   transition-timing-function: var(--theme-transition-ease);
 }

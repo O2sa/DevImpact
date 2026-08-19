@@ -102,20 +102,13 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const cookieLocale = cookieStore.get(LOCALE_COOKIE)?.value;
   const initialLocale = isSupportedLocale(cookieLocale)
     ? cookieLocale
-    : parseAcceptLanguage(
-        headerStore.get("accept-language"),
-        supportedLocales,
-        DEFAULT_LOCALE
-      );
+    : parseAcceptLanguage(headerStore.get("accept-language"), supportedLocales, DEFAULT_LOCALE);
   const dir = getLocaleDir(initialLocale);
 
   return (
     <html lang={initialLocale} dir={dir} suppressHydrationWarning>
       <head>
-        <script
-          id="theme-init"
-          dangerouslySetInnerHTML={{ __html: themeInitScript }}
-        />
+        <script id="theme-init" dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body>
         <Providers initialLocale={initialLocale}>{children}</Providers>

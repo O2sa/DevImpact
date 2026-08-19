@@ -24,10 +24,11 @@ import { calculateLeaderboard } from "@/lib/calculate-leaderboard";
 import { logger } from "@/lib/logger";
 
 let activeCountrySlug: string | null = null;
-let isCalculating = false;
 
 const handleShutdownSignal = (signal: string) => {
-  logger.warn(`Received ${signal}. Graceful shutdown initiated. Waiting for active calculation (${activeCountrySlug ?? "none"}) to finish...`);
+  logger.warn(
+    `Received ${signal}. Graceful shutdown initiated. Waiting for active calculation (${activeCountrySlug ?? "none"}) to finish...`,
+  );
 };
 
 process.on("SIGTERM", () => handleShutdownSignal("SIGTERM"));
@@ -35,7 +36,8 @@ process.on("SIGINT", () => handleShutdownSignal("SIGINT"));
 
 async function main() {
   const overallStartTime = performance.now();
-  const workerVersion = process.env.DEVIMPACT_VERSION || process.env.GIT_COMMIT_SHA || "development";
+  const workerVersion =
+    process.env.DEVIMPACT_VERSION || process.env.GIT_COMMIT_SHA || "development";
   logger.info("=== DevImpact Leaderboard Calculator Start ===");
   logger.info(`Version: ${workerVersion}`);
   logger.info(`DB:      ${(process.env.DATABASE_URL ?? "").slice(0, 40)}...`);
@@ -53,7 +55,6 @@ async function main() {
   }
 
   activeCountrySlug = next.slug;
-  isCalculating = true;
 
   logger.info(`Selected: ${next.title} (${next.slug})`);
 
@@ -77,7 +78,8 @@ async function main() {
     const overallDuration = (performance.now() - overallStartTime) / 1000;
     const totalFetchTime = result._meta.totalFetchTime ?? 0;
     const successfulFetches = result._meta.successfulFetches ?? 0;
-    const averageFetchTime = successfulFetches > 0 ? (totalFetchTime / successfulFetches / 1000).toFixed(2) : "N/A";
+    const averageFetchTime =
+      successfulFetches > 0 ? (totalFetchTime / successfulFetches / 1000).toFixed(2) : "N/A";
 
     logger.info("=== Calculation Summary ===", {
       country: next.title,

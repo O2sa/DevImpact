@@ -1,9 +1,7 @@
 # DevImpact
 
-
-
-
 ### 🧠 Main
+
 ```
  compareUsers(user1, user2):
 
@@ -17,6 +15,7 @@
 ```
 
 ### 🧠 User Score
+
 ```
  calculateUserScore(user):
 
@@ -37,6 +36,7 @@
 ```
 
 ### 📦 Repository Score
+
 ```
  calculateRepoScore(repos):
 
@@ -65,8 +65,8 @@
     RETURN total
 ```
 
-
 ### 🔥 Pull Request Score
+
 ```
  calculatePRScore(prs, username):
 
@@ -119,8 +119,8 @@
     RETURN totalScore
 ```
 
-
 ### 🌍 Contribution Score (Activity)
+
 ```
  calculateContributionScore(contributions):
 
