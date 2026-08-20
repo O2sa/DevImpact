@@ -49,6 +49,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Validate Locales
+        run: pnpm validate-locales
+
+      - name: Check Formatting
+        run: pnpm format:check
+
       - name: Type check
         run: pnpm exec tsc --noEmit
 
