@@ -150,7 +150,6 @@ Final Score =
 
 - Node.js + Express
 - GitHub GraphQL API
-- Octokit
 
 ---
 
