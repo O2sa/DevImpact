@@ -35,4 +35,6 @@ jobs:
           port: ${{ env.VPS_SSH_PORT }}
           script: |
             cd ~/projects/DevImpact || cd /app || exit 1
+            git fetch origin main
+            git reset --hard origin/main
             bash ops/deploy/deploy-leaderboard.sh
