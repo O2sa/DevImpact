@@ -29,16 +29,19 @@ fi
 echo "[1/3] Pulling latest GHCR image..."
 docker compose --project-directory "${PROJECT_ROOT}" "${ENV_ARGS[@]}" -f "${COMPOSE_FILE}" pull
 
-# Check if worker container is running and an active calculation is in progress
+# Check if worker container exists and an active calculation is in progress
 CONTAINER_NAME="devimpact-leaderboard-cron"
-if docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
   echo "[2/3] Checking for active leaderboard calculation..."
   while docker exec "${CONTAINER_NAME}" pgrep -f "calculate-next-country" > /dev/null 2>&1 || \
-        docker exec "${CONTAINER_NAME}" sh -c 'ps aux | grep -v grep | grep -q "calculate-next-country"'; do
+        docker exec "${CONTAINER_NAME}" sh -c 'ps aux | grep -v grep | grep -q "calculate-next-country"' > /dev/null 2>&1; do
     echo "  >> A leaderboard calculation job is currently running. Waiting for it to finish..."
     sleep 10
   done
   echo "  >> No active calculation running (or active calculation completed)."
+  echo "  >> Removing previous container to prevent name conflicts..."
+  docker stop "${CONTAINER_NAME}" > /dev/null 2>&1 || true
+  docker rm -f "${CONTAINER_NAME}" > /dev/null 2>&1 || true
 else
   echo "[2/3] Worker container is not running yet."
 fi

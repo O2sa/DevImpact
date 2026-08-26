@@ -1,3 +1,5 @@
+name: devimpact-leaderboard
+
 services:
   leaderboard-cron:
     image: ${LEADERBOARD_IMAGE:-ghcr.io/o2sa/devimpact-leaderboard:latest}
