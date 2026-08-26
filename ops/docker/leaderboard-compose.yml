@@ -7,8 +7,8 @@ services:
     restart: unless-stopped
     stop_grace_period: 10m
     env_file:
-      - path: ${ENV_FILE:-../../.env}
-        required: false
+      - path: ${ENV_FILE:-.env}
+        required: true
     environment:
       LEADERBOARD_CRON_SCHEDULE: ${LEADERBOARD_CRON_SCHEDULE:-0 0 * * *}
       LEADERBOARD_SOURCE_URL_TEMPLATE: ${LEADERBOARD_SOURCE_URL_TEMPLATE:-https://raw.githubusercontent.com/ashkulz/committers.top/gh-pages/_data/locations/{country}.yml}
