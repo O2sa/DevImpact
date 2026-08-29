@@ -7,8 +7,19 @@ import { AppFooter } from "@/components/app-footer";
 import { getUserProfile } from "@/lib/user";
 import { toAbsoluteUrl } from "@/lib/seo";
 
+import countriesData from "@/data/countries.json";
+import { detectCountry } from "@/lib/location-detector";
+
+type CountryInfo = {
+  slug: string;
+  title: string;
+};
+
+const countries = countriesData as CountryInfo[];
+
 type Props = {
   params: Promise<{ username: string }>;
+  searchParams?: Promise<{ country?: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -74,10 +85,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function UserProfilePage({ params }: Props) {
+export default async function UserProfilePage({ params, searchParams }: Props) {
   const { username } = await params;
   const cleanUsername = decodeURIComponent(username.trim());
   const profileUrl = toAbsoluteUrl(`/user/${cleanUsername}`);
+
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const countryParam = resolvedSearchParams?.country;
 
   let profileData: Awaited<ReturnType<typeof getUserProfile>> | null = null;
   let fetchErrorMessage: string | null = null;
@@ -131,29 +145,52 @@ export default async function UserProfilePage({ params }: Props) {
     },
   };
 
+  const detectedSlug = (countryParam || detectCountry(location))?.trim().toLowerCase();
+  const countryInfo = detectedSlug
+    ? countries.find((c) => c.slug.toLowerCase() === detectedSlug)
+    : null;
+
+  const breadcrumbElements = [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: toAbsoluteUrl("/"),
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Leaderboards",
+      item: toAbsoluteUrl("/leaderboard"),
+    },
+  ];
+
+  if (countryInfo) {
+    breadcrumbElements.push({
+      "@type": "ListItem",
+      position: 3,
+      name: countryInfo.title,
+      item: toAbsoluteUrl(`/leaderboard/${countryInfo.slug}`),
+    });
+    breadcrumbElements.push({
+      "@type": "ListItem",
+      position: 4,
+      name: displayName,
+      item: profileUrl,
+    });
+  } else {
+    breadcrumbElements.push({
+      "@type": "ListItem",
+      position: 3,
+      name: displayName,
+      item: profileUrl,
+    });
+  }
+
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: toAbsoluteUrl("/"),
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Leaderboards",
-        item: toAbsoluteUrl("/leaderboard"),
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: displayName,
-        item: profileUrl,
-      },
-    ],
+    itemListElement: breadcrumbElements,
   };
 
   return (
@@ -163,7 +200,7 @@ export default async function UserProfilePage({ params }: Props) {
         <JsonLd data={profilePageSchema} />
         <JsonLd data={breadcrumbSchema} />
 
-        <UserProfileClient user={user} location={location} />
+        <UserProfileClient user={user} location={location} countryParam={countryParam} />
       </div>
       <AppFooter />
     </main>

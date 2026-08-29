@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import type { Route } from "next";
 import {
   ArrowLeft,
@@ -25,11 +26,20 @@ import { Progress } from "@/components/ui/progress";
 import { useTranslation } from "@/components/language-provider";
 import { getCountryCode } from "@/lib/country-flags";
 import { detectCountry } from "@/lib/location-detector";
+import countriesData from "@/data/countries.json";
 import type { UserResult } from "@/types/user-result";
+
+type CountryInfo = {
+  slug: string;
+  title: string;
+};
+
+const countries = countriesData as CountryInfo[];
 
 type Props = {
   user: UserResult;
   location?: string | null;
+  countryParam?: string | null;
 };
 
 type LanguageEntry = {
@@ -95,17 +105,35 @@ function LanguageBreakdown({ topLanguages }: { topLanguages?: LanguageEntry[] })
   );
 }
 
-export function UserProfileClient({ user, location }: Props) {
+export function UserProfileClient({ user, location, countryParam }: Props) {
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
   const [copied, setCopied] = useState(false);
 
   const displayName = user.name?.trim() || user.username;
   const githubUrl = `https://github.com/${user.username}`;
   const compareUrl = `/?user1=${encodeURIComponent(user.username)}`;
 
-  // Location & Country flag detection
+  // Location & Country detection
   const detectedSlug = detectCountry(location ?? null);
-  const flagCode = detectedSlug ? getCountryCode(detectedSlug) : null;
+  const rawCountry = (countryParam || searchParams.get("country") || detectedSlug || "")
+    .trim()
+    .toLowerCase();
+  const activeCountrySlug = rawCountry ? rawCountry.replace(/[^a-z0-9_-]/g, "") : null;
+
+  const activeCountryInfo = activeCountrySlug
+    ? (countries.find((c) => c.slug.toLowerCase() === activeCountrySlug) ?? {
+        slug: activeCountrySlug,
+        title: activeCountrySlug
+          .split("_")
+          .filter(Boolean)
+          .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+          .join(" "),
+      })
+    : null;
+
+  const flagSlug = activeCountryInfo?.slug || detectedSlug;
+  const flagCode = flagSlug ? getCountryCode(flagSlug) : null;
 
   const handleCopyLink = async () => {
     try {
@@ -170,14 +198,60 @@ export function UserProfileClient({ user, location }: Props) {
 
   return (
     <div className="animate-fadeIn space-y-6">
-      {/* ── Back Navigation ────────────────────────────────────────── */}
-      <div className="flex items-center gap-3">
-        <Link href="/leaderboard">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="mr-1 h-4 w-4 rtl:-scale-x-100" />
-            {t("leaderboard.back")}
-          </Button>
-        </Link>
+      {/* ── Breadcrumb & Back Navigation ────────────────────────────── */}
+      <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+        <div className="flex items-center gap-2">
+          {activeCountryInfo ? (
+            <Link href={`/leaderboard/${activeCountryInfo.slug}` as Route}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" />
+                <span>{t("profile.backToCountry", { country: activeCountryInfo.title })}</span>
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/leaderboard">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" />
+                <span>{t("profile.backToLeaderboard")}</span>
+              </Button>
+            </Link>
+          )}
+        </div>
+
+        {/* Breadcrumbs */}
+        <nav
+          aria-label="Breadcrumb"
+          className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex"
+        >
+          <Link href="/" className="transition-colors hover:text-foreground">
+            {t("profile.breadcrumbs.home")}
+          </Link>
+          <span>/</span>
+          <Link href="/leaderboard" className="transition-colors hover:text-foreground">
+            {t("profile.breadcrumbs.leaderboards")}
+          </Link>
+          {activeCountryInfo ? (
+            <>
+              <span>/</span>
+              <Link
+                href={`/leaderboard/${activeCountryInfo.slug}` as Route}
+                className="transition-colors hover:text-foreground"
+              >
+                {activeCountryInfo.title}
+              </Link>
+            </>
+          ) : null}
+          <span>/</span>
+          <span className="font-semibold text-foreground">@{user.username}</span>
+        </nav>
       </div>
 
       {/* ── Header Profile Hero Section ────────────────────────────── */}

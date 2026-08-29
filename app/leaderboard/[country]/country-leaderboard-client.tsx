@@ -12,12 +12,14 @@ import type { LeaderboardResult } from "@/lib/leaderboard";
 
 type Props = {
   countryTitle: string;
+  countrySlug?: string;
   initialLeaderboard: LeaderboardResult;
   initialError?: string | null;
 };
 
 export function CountryLeaderboardClient({
   countryTitle,
+  countrySlug,
   initialLeaderboard,
   initialError = null,
 }: Props) {
@@ -82,6 +84,7 @@ export function CountryLeaderboardClient({
               users={scored}
               failedUsers={errors}
               title={title}
+              countrySlug={countrySlug}
               totalFromSource={totalFromSource}
               usersProcessed={scored.length}
             />
