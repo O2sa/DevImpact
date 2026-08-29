@@ -1,7 +1,10 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
+import type { Route } from "next";
 import {
   ArrowDown,
   ArrowUp,
+  ExternalLink,
   Eye,
   GitFork,
   GitPullRequest,
@@ -185,8 +188,24 @@ export function TopList({ userResults, selectedLanguages = [] }: Props) {
       {userResults.map((user, idx) => (
         <Card key={`top-${user.username}-${idx}`}>
           <CardHeader>
-            <CardTitle className="text-lg">
-              {t("topwork.titleForUser", { username: user.name || user.username })}
+            <CardTitle className="flex items-center justify-between text-lg">
+              <div className="flex min-w-0 items-center gap-1.5">
+                <Link
+                  href={`/user/${user.username}` as Route}
+                  className="truncate font-semibold text-primary hover:underline"
+                >
+                  {t("topwork.titleForUser", { username: user.name || user.username })}
+                </Link>
+                <a
+                  href={`https://github.com/${encodeURIComponent(user.username.trim())}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex flex-shrink-0 items-center text-muted-foreground transition-colors hover:text-foreground"
+                  aria-label={t("a11y.openProfile", { name: user.name || user.username })}
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              </div>
             </CardTitle>
             <CardDescription>{t("topwork.desc")}</CardDescription>
           </CardHeader>

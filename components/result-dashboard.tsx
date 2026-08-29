@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, Copy, Trophy } from "lucide-react";
+import Link from "next/link";
+import type { Route } from "next";
+import { Check, Copy, ExternalLink, Trophy } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Avatar } from "@/components/avatar";
 import { ComparisonChart } from "./comparison-chart";
@@ -150,20 +152,31 @@ export function ResultDashboard({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center justify-between text-base">
             <div className="flex items-center gap-2">
-              <Avatar
-                src={user.avatarUrl}
-                alt={t("comparison.avatarAlt", { name: title })}
-                size={28}
-              />
-              <a
-                href={getGithubProfileUrl(user.username)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold text-primary hover:underline"
-                aria-label={t("a11y.openProfile", { name: title })}
-              >
-                {title}
-              </a>
+              <Link href={`/user/${user.username}` as Route}>
+                <Avatar
+                  src={user.avatarUrl}
+                  alt={t("comparison.avatarAlt", { name: title })}
+                  size={28}
+                  className="transition-transform hover:scale-105"
+                />
+              </Link>
+              <div className="flex items-center gap-1.5">
+                <Link
+                  href={`/user/${user.username}` as Route}
+                  className="font-semibold text-primary hover:underline"
+                >
+                  {title}
+                </Link>
+                <a
+                  href={getGithubProfileUrl(user.username)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-muted-foreground transition-colors hover:text-foreground"
+                  aria-label={t("a11y.openProfile", { name: title })}
+                >
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
             </div>
             {isWinner ? (
               <span className="rounded-full bg-primary/15 px-2 py-1 text-xs font-semibold text-primary">
@@ -214,6 +227,15 @@ export function ResultDashboard({
               </p>
             </div>
           ) : null}
+          <div className="flex justify-end pt-1">
+            <Link
+              href={`/user/${user.username}` as Route}
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
+              <span>{t("profile.viewFullStats")}</span>
+              <span>&rarr;</span>
+            </Link>
+          </div>
         </CardContent>
       </Card>
     );
@@ -270,20 +292,31 @@ export function ResultDashboard({
       <Card key={`signal-${user.username}-${idx}`}>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
-            <Avatar
-              src={user.avatarUrl}
-              alt={t("comparison.avatarAlt", { name: getDisplayName(user) })}
-              size={24}
-            />
-            <a
-              href={getGithubProfileUrl(user.username)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-primary hover:underline"
-              aria-label={t("a11y.openProfile", { name: getDisplayName(user) })}
-            >
-              {getDisplayName(user)}
-            </a>
+            <Link href={`/user/${user.username}` as Route}>
+              <Avatar
+                src={user.avatarUrl}
+                alt={t("comparison.avatarAlt", { name: getDisplayName(user) })}
+                size={24}
+                className="transition-transform hover:scale-105"
+              />
+            </Link>
+            <div className="flex items-center gap-1.5">
+              <Link
+                href={`/user/${user.username}` as Route}
+                className="font-semibold text-primary hover:underline"
+              >
+                {getDisplayName(user)}
+              </Link>
+              <a
+                href={getGithubProfileUrl(user.username)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center text-muted-foreground transition-colors hover:text-foreground"
+                aria-label={t("a11y.openProfile", { name: getDisplayName(user) })}
+              >
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="grid gap-3 sm:grid-cols-2">
@@ -314,17 +347,25 @@ export function ResultDashboard({
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">{t("banner.winner")}</p>
-                    <a
-                      href={getGithubProfileUrl(overallWinnerUser.username)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-3xl font-bold text-primary hover:underline"
-                      aria-label={t("a11y.openProfile", {
-                        name: getDisplayName(overallWinnerUser),
-                      })}
-                    >
-                      {getDisplayName(overallWinnerUser)}
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/user/${overallWinnerUser.username}` as Route}
+                        className="text-3xl font-bold text-primary hover:underline"
+                      >
+                        {getDisplayName(overallWinnerUser)}
+                      </Link>
+                      <a
+                        href={getGithubProfileUrl(overallWinnerUser.username)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center text-muted-foreground transition-colors hover:text-foreground"
+                        aria-label={t("a11y.openProfile", {
+                          name: getDisplayName(overallWinnerUser),
+                        })}
+                      >
+                        <ExternalLink className="h-5 w-5" />
+                      </a>
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
@@ -361,24 +402,33 @@ export function ResultDashboard({
               return (
                 <div className="flex items-center gap-2">
                   {winnerAvatar ? (
-                    <Avatar
-                      src={winnerAvatar}
-                      alt={t("comparison.avatarAlt", { name: winnerName })}
-                      size={20}
-                    />
+                    <Link href={`/user/${languageWinner.username}` as Route}>
+                      <Avatar
+                        src={winnerAvatar}
+                        alt={t("comparison.avatarAlt", { name: winnerName })}
+                        size={20}
+                        className="transition-transform hover:scale-105"
+                      />
+                    </Link>
                   ) : null}
-                  <p className="text-sm font-semibold text-cyan-700 dark:text-cyan-300">
-                    {t("banner.languageWinner")}:{" "}
+                  <div className="flex items-center gap-1.5 text-sm font-semibold text-cyan-700 dark:text-cyan-300">
+                    <span>{t("banner.languageWinner")}:</span>
+                    <Link
+                      href={`/user/${languageWinner.username}` as Route}
+                      className="hover:underline"
+                    >
+                      {winnerName}
+                    </Link>
                     <a
                       href={getGithubProfileUrl(languageWinner.username)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:underline"
+                      className="inline-flex items-center text-muted-foreground transition-colors hover:text-foreground"
                       aria-label={t("a11y.openProfile", { name: winnerName })}
                     >
-                      {winnerName}
+                      <ExternalLink className="h-3 w-3" />
                     </a>
-                  </p>
+                  </div>
                 </div>
               );
             })()}
