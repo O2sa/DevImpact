@@ -312,11 +312,11 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
           </div>
 
           {/* Actions */}
-          <div className="flex flex-wrap items-center gap-2.5 sm:justify-end">
-            <Link href={compareUrl as Route}>
-              <Button className="flex items-center gap-1.5 shadow-sm">
-                <Scale className="h-4 w-4" />
-                <span>{t("profile.compareWith")}</span>
+          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center sm:justify-end sm:gap-2.5">
+            <Link href={compareUrl as Route} className="w-full sm:w-auto">
+              <Button className="flex w-full items-center justify-center gap-1.5 px-3 text-xs shadow-sm sm:px-4 sm:text-sm">
+                <Scale className="h-4 w-4 shrink-0" />
+                <span className="truncate">{t("profile.compareWith")}</span>
               </Button>
             </Link>
 
@@ -324,18 +324,18 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
               variant="secondary"
               size="md"
               onClick={handleCopyLink}
-              className="flex items-center gap-1.5"
+              className="flex w-full items-center justify-center gap-1.5 px-3 text-xs sm:px-4 sm:text-sm"
               aria-label={t("profile.copyLink")}
             >
               {copied ? (
                 <>
-                  <Check className="h-4 w-4 text-green-500" />
-                  <span className="text-green-500">{t("profile.copied")}</span>
+                  <Check className="h-4 w-4 shrink-0 text-green-500" />
+                  <span className="truncate text-green-500">{t("profile.copied")}</span>
                 </>
               ) : (
                 <>
-                  <Copy className="h-4 w-4" />
-                  <span>{t("profile.copyLink")}</span>
+                  <Copy className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{t("profile.copyLink")}</span>
                 </>
               )}
             </Button>
