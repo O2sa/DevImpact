@@ -316,7 +316,8 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
             <Link href={compareUrl as Route} className="w-full sm:w-auto">
               <Button className="flex w-full items-center justify-center gap-1.5 px-3 text-xs shadow-sm sm:px-4 sm:text-sm">
                 <Scale className="h-4 w-4 shrink-0" />
-                <span className="truncate">{t("profile.compareWith")}</span>
+                <span className="truncate sm:hidden">{t("profile.compareShort")}</span>
+                <span className="hidden truncate sm:inline">{t("profile.compareWith")}</span>
               </Button>
             </Link>
 
@@ -330,12 +331,18 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
               {copied ? (
                 <>
                   <Check className="h-4 w-4 shrink-0 text-green-500" />
-                  <span className="truncate text-green-500">{t("profile.copied")}</span>
+                  <span className="truncate text-green-500 sm:hidden">
+                    {t("profile.copiedShort")}
+                  </span>
+                  <span className="hidden truncate text-green-500 sm:inline">
+                    {t("profile.copied")}
+                  </span>
                 </>
               ) : (
                 <>
                   <Copy className="h-4 w-4 shrink-0" />
-                  <span className="truncate">{t("profile.copyLink")}</span>
+                  <span className="truncate sm:hidden">{t("profile.shareShort")}</span>
+                  <span className="hidden truncate sm:inline">{t("profile.copyLink")}</span>
                 </>
               )}
             </Button>
