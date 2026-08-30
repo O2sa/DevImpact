@@ -76,6 +76,8 @@ export async function getUserProfile(
   const country = detectCountry(data.location);
   if (country && process.env.DATABASE_URL?.trim()) {
     const staleDays = parseInt(process.env.GITHUB_USER_STALE_DAYS ?? "14", 10);
+    const dbScore =
+      selectedLanguages.length > 0 ? calculateUserScore(data, normalizedUsername) : score;
 
     try {
       const db = getDatabaseStore();
@@ -86,11 +88,11 @@ export async function getUserProfile(
         location: data.location,
         country,
         rawData: data,
-        scores: score,
-        repoScore: Math.round(score.repoScore),
-        prScore: Math.round(score.prScore),
-        contributionScore: Math.round(score.contributionScore),
-        finalScore: Math.round(score.finalScore),
+        scores: dbScore,
+        repoScore: Math.round(dbScore.repoScore),
+        prScore: Math.round(dbScore.prScore),
+        contributionScore: Math.round(dbScore.contributionScore),
+        finalScore: Math.round(dbScore.finalScore),
         staleDays,
       })
         .then(() => {

@@ -349,36 +349,41 @@ async function compareUsers(
 
     // ── Fire-and-forget: detect country & upsert into DB ──────────────
     const country = detectCountry(data.location);
-    if (country) {
+    if (country && process.env.DATABASE_URL?.trim()) {
       const staleDays = parseInt(process.env.GITHUB_USER_STALE_DAYS ?? "14", 10);
+      const dbScore = selectedLanguages.length > 0 ? calculateUserScore(data, data.login) : score;
 
-      const db = getDatabaseStore();
-      db.upsertUser({
-        username: data.login,
-        name: data.name,
-        avatarUrl: data.avatarUrl,
-        location: data.location,
-        country,
-        rawData: data,
-        scores: score,
-        repoScore: Math.round(score.repoScore),
-        prScore: Math.round(score.prScore),
-        contributionScore: Math.round(score.contributionScore),
-        finalScore: Math.round(score.finalScore),
-        staleDays,
-      })
-        .then(() => {
-          // Invalidate Redis cache for this country
-          const cacheConfig = getCacheConfigFromEnv();
-          const cacheStore = createCacheStore(cacheConfig);
-          if (cacheStore.enabled && cacheStore.del) {
-            const key = `${cacheConfig.namespace}:leaderboard:${country}`;
-            cacheStore.del(key).catch(() => {});
-          }
+      try {
+        const db = getDatabaseStore();
+        db.upsertUser({
+          username: data.login,
+          name: data.name,
+          avatarUrl: data.avatarUrl,
+          location: data.location,
+          country,
+          rawData: data,
+          scores: dbScore,
+          repoScore: Math.round(dbScore.repoScore),
+          prScore: Math.round(dbScore.prScore),
+          contributionScore: Math.round(dbScore.contributionScore),
+          finalScore: Math.round(dbScore.finalScore),
+          staleDays,
         })
-        .catch((err: unknown) => {
-          console.warn("Failed to upsert user from compare:", err);
-        });
+          .then(() => {
+            // Invalidate Redis cache for this country
+            const cacheConfig = getCacheConfigFromEnv();
+            const cacheStore = createCacheStore(cacheConfig);
+            if (cacheStore.enabled && cacheStore.del) {
+              const key = `${cacheConfig.namespace}:leaderboard:${country.trim().toLowerCase()}`;
+              cacheStore.del(key).catch(() => {});
+            }
+          })
+          .catch((err: unknown) => {
+            console.warn("Failed to upsert user from compare:", err);
+          });
+      } catch {
+        // Ignore DB connection errors in environments without DB
+      }
     }
   }
 

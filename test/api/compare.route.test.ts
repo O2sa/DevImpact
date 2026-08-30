@@ -4,6 +4,7 @@ import { GitHubApiError } from "@/lib/github-graphql-client";
 const mocks = vi.hoisted(() => ({
   getUserData: vi.fn(),
   calculateUserScore: vi.fn(),
+  upsertUser: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("@/lib/github", () => ({
@@ -12,6 +13,12 @@ vi.mock("@/lib/github", () => ({
 
 vi.mock("@/lib/score", () => ({
   calculateUserScore: mocks.calculateUserScore,
+}));
+
+vi.mock("@/lib/db-store", () => ({
+  getDatabaseStore: () => ({
+    upsertUser: mocks.upsertUser,
+  }),
 }));
 
 import { GET } from "@/app/api/compare/route";
@@ -292,5 +299,62 @@ describe("GET /api/compare", () => {
     expect(body.success).toBe(false);
     expect(body.errorDetails?.code).toBe("GITHUB_NOT_FOUND");
     expect(body.errorDetails?.targetUsernames).toEqual(["missing-user"]);
+  });
+
+  test("persists canonical unfiltered score to db even when selectedLanguage is specified", async () => {
+    process.env.DATABASE_URL = "postgresql://test:test@localhost:5432/test";
+    mocks.upsertUser.mockClear();
+
+    const userA = makeUser("user-a", "User A");
+    const userB = makeUser("user-b", "User B");
+
+    mocks.getUserData.mockResolvedValueOnce({
+      data: userA,
+      metrics: { duration: 0, errors: [] },
+    });
+    mocks.getUserData.mockResolvedValueOnce({
+      data: userB,
+      metrics: { duration: 0, errors: [] },
+    });
+
+    const filteredScoreA = makeScore(20, makeLanguageScores(15));
+    const canonicalScoreA = makeScore(50);
+    const filteredScoreB = makeScore(10, makeLanguageScores(8));
+    const canonicalScoreB = makeScore(40);
+
+    mocks.calculateUserScore
+      .mockReturnValueOnce(filteredScoreA)
+      .mockReturnValueOnce(canonicalScoreA)
+      .mockReturnValueOnce(filteredScoreB)
+      .mockReturnValueOnce(canonicalScoreB);
+
+    const response = await GET(
+      makeRequest({
+        username: ["user-a", "user-b"],
+        selectedLanguage: "TypeScript",
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mocks.upsertUser).toHaveBeenCalledTimes(2);
+
+    expect(mocks.upsertUser).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        username: "user-a",
+        scores: canonicalScoreA,
+        finalScore: 50,
+      }),
+    );
+    expect(mocks.upsertUser).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        username: "user-b",
+        scores: canonicalScoreB,
+        finalScore: 40,
+      }),
+    );
+
+    delete process.env.DATABASE_URL;
   });
 });
