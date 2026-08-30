@@ -4,6 +4,7 @@ import { GitHubApiError } from "@/lib/github-graphql-client";
 const mocks = vi.hoisted(() => ({
   getUserData: vi.fn(),
   calculateUserScore: vi.fn(),
+  upsertUser: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("@/lib/github", () => ({
@@ -12,6 +13,12 @@ vi.mock("@/lib/github", () => ({
 
 vi.mock("@/lib/score", () => ({
   calculateUserScore: mocks.calculateUserScore,
+}));
+
+vi.mock("@/lib/db-store", () => ({
+  getDatabaseStore: () => ({
+    upsertUser: mocks.upsertUser,
+  }),
 }));
 
 import { GET } from "@/app/api/user/[username]/route";
@@ -208,5 +215,35 @@ describe("GET /api/user/[username]", () => {
     expect(result.location).toBe("Stockholm, Sweden");
     expect(result.user.topRepos.length).toBe(1);
     expect(result.user.signals?.reposAnalyzed).toBe(10);
+  });
+
+  test("persists canonical unfiltered score to db even when selectedLanguages is provided", async () => {
+    process.env.DATABASE_URL = "postgresql://test:test@localhost:5432/test";
+    mocks.upsertUser.mockClear();
+
+    const rawUser = makeUser("octocat", "The Octocat");
+    mocks.getUserData.mockResolvedValueOnce({
+      data: rawUser,
+      metrics: { duration: 50, errors: [] },
+    });
+
+    const filteredScore = makeScore(30);
+    const canonicalScore = makeScore(70);
+
+    mocks.calculateUserScore.mockReturnValueOnce(filteredScore).mockReturnValueOnce(canonicalScore);
+
+    const result = await getUserProfile("octocat", ["TypeScript"]);
+
+    expect(result.user.finalScore).toBe(30);
+    expect(mocks.upsertUser).toHaveBeenCalledTimes(1);
+    expect(mocks.upsertUser).toHaveBeenCalledWith(
+      expect.objectContaining({
+        username: "octocat",
+        scores: canonicalScore,
+        finalScore: 70,
+      }),
+    );
+
+    delete process.env.DATABASE_URL;
   });
 });
