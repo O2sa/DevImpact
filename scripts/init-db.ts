@@ -8,6 +8,7 @@
  *   - PostgreSQL must be running (e.g. `docker compose up -d postgres`)
  *   - DATABASE_URL must be set in .env or environment
  */
+import "dotenv/config";
 import { getDatabaseStore } from "../lib/db-store";
 
 async function main() {

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, AlertTriangle } from "lucide-react";
+import Link from "next/link";
+import type { Route } from "next";
+import { Search, AlertTriangle, ExternalLink } from "lucide-react";
 import { Avatar } from "./avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
@@ -24,6 +26,7 @@ type Props = {
   users: LeaderboardEntry[];
   failedUsers: string[];
   title: string;
+  countrySlug?: string;
   totalFromSource: number;
   usersProcessed: number;
 };
@@ -36,6 +39,7 @@ export function LeaderboardTable({
   users,
   failedUsers,
   title,
+  countrySlug,
   totalFromSource,
   usersProcessed,
 }: Props) {
@@ -145,20 +149,50 @@ export function LeaderboardTable({
                       </span>
                     </td>
                     <td className="px-3 py-3">
-                      <div className="flex items-center gap-2">
-                        <Avatar src={user.avatarUrl} alt={user.name || user.username} size={32} />
-                        <div className="min-w-0">
-                          <a
-                            href={getGithubProfileUrl(user.username)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-semibold text-primary hover:underline"
-                          >
-                            {user.name || user.username}
-                          </a>
-                          <p className="text-xs text-muted-foreground">{user.username}</p>
-                        </div>
-                      </div>
+                      {(() => {
+                        const profileUrl = (
+                          countrySlug
+                            ? `/user/${user.username}?country=${encodeURIComponent(countrySlug)}`
+                            : `/user/${user.username}`
+                        ) as Route;
+
+                        return (
+                          <div className="flex items-center gap-2">
+                            <Link href={profileUrl}>
+                              <Avatar
+                                src={user.avatarUrl}
+                                alt={user.name || user.username}
+                                size={32}
+                                className="transition-transform hover:scale-105"
+                              />
+                            </Link>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <Link
+                                  href={profileUrl}
+                                  className="truncate font-semibold text-primary hover:underline"
+                                >
+                                  {user.name || user.username}
+                                </Link>
+                                <a
+                                  href={getGithubProfileUrl(user.username)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center text-muted-foreground transition-colors hover:text-foreground"
+                                  aria-label={t("a11y.openProfile", {
+                                    name: user.name || user.username,
+                                  })}
+                                >
+                                  <ExternalLink className="h-3 w-3" />
+                                </a>
+                              </div>
+                              <p className="truncate text-xs text-muted-foreground">
+                                @{user.username}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td className="px-3 py-3 text-start">
                       <span className="font-bold text-primary">{user.finalScore}</span>

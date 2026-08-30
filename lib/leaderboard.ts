@@ -64,52 +64,62 @@ export async function getLeaderboardResult(country: string): Promise<Leaderboard
     }
   }
 
-  const db = getDatabaseStore();
-  await db.initializeSchema();
+  try {
+    const db = getDatabaseStore();
+    await db.initializeSchema();
 
-  const rows = await db.getLeaderboard(country, displayLimit);
-  const totalCount = await db.getLeaderboardCount(country);
+    const rows = await db.getLeaderboard(country, displayLimit);
+    const totalCount = await db.getLeaderboardCount(country);
 
-  if (rows.length === 0) {
+    if (rows.length === 0) {
+      return {
+        title: country,
+        totalFromSource: 0,
+        scored: [],
+        errors: [],
+      };
+    }
+
+    const scored: ScoredLeaderboardEntry[] = rows.map((row) => ({
+      username: row.username,
+      name: row.name,
+      avatarUrl: row.avatar_url,
+      repoScore: row.repo_score,
+      prScore: row.pr_score,
+      contributionScore: row.contribution_score,
+      finalScore: row.final_score,
+      impactRank: 0,
+    }));
+
+    scored.sort((a, b) => b.finalScore - a.finalScore);
+    scored.forEach((user, index) => {
+      user.impactRank = index + 1;
+    });
+
+    const result: LeaderboardResult = {
+      title: country,
+      totalFromSource: totalCount,
+      scored,
+      errors: [],
+    };
+
+    if (cacheStore.enabled) {
+      try {
+        const cacheKey = buildLeaderboardCacheKey(country, cacheConfig.namespace);
+        await cacheStore.set(cacheKey, result, cacheConfig.ttlSeconds);
+      } catch {
+        // Cache write failures should not block the page/API response.
+      }
+    }
+
+    return result;
+  } catch (err: unknown) {
+    console.warn("Leaderboard database query error:", err);
     return {
       title: country,
       totalFromSource: 0,
       scored: [],
-      errors: [],
+      errors: [err instanceof Error ? err.message : "Database unavailable"],
     };
   }
-
-  const scored: ScoredLeaderboardEntry[] = rows.map((row) => ({
-    username: row.username,
-    name: row.name,
-    avatarUrl: row.avatar_url,
-    repoScore: row.repo_score,
-    prScore: row.pr_score,
-    contributionScore: row.contribution_score,
-    finalScore: row.final_score,
-    impactRank: 0,
-  }));
-
-  scored.sort((a, b) => b.finalScore - a.finalScore);
-  scored.forEach((user, index) => {
-    user.impactRank = index + 1;
-  });
-
-  const result: LeaderboardResult = {
-    title: country,
-    totalFromSource: totalCount,
-    scored,
-    errors: [],
-  };
-
-  if (cacheStore.enabled) {
-    try {
-      const cacheKey = buildLeaderboardCacheKey(country, cacheConfig.namespace);
-      await cacheStore.set(cacheKey, result, cacheConfig.ttlSeconds);
-    } catch {
-      // Cache write failures should not block the page/API response.
-    }
-  }
-
-  return result;
 }

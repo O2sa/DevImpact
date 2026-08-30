@@ -55,13 +55,26 @@ function normalizeUsers(body: ApiResponse): { user1: UserResult; user2: UserResu
   return null;
 }
 
+function parseUsernamesFromSearchParams(searchParams: {
+  getAll: (name: string) => string[];
+  get: (name: string) => string | null;
+}): [string, string] {
+  const repeated = searchParams
+    .getAll("username")
+    .map((u) => u.trim())
+    .filter(Boolean);
+  const u1 =
+    repeated[0] || searchParams.get("username1")?.trim() || searchParams.get("user1")?.trim() || "";
+  const u2 =
+    repeated[1] || searchParams.get("username2")?.trim() || searchParams.get("user2")?.trim() || "";
+  return [u1, u2];
+}
+
 export function HomePageClient() {
   const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialUsernames = searchParams.getAll("username");
-  const initialUsername1 = initialUsernames[0] ?? "";
-  const initialUsername2 = initialUsernames[1] ?? "";
+  const [initialUsername1, initialUsername2] = parseUsernamesFromSearchParams(searchParams);
   const initialSelectedLanguages = sanitizeSelectedLanguages(
     searchParams.getAll("selectedLanguage"),
   );
@@ -334,10 +347,10 @@ export function HomePageClient() {
   });
 
   useEffect(() => {
-    const params = searchParams.getAll("username");
+    const [u1, u2] = parseUsernamesFromSearchParams(searchParams);
     const urlLanguages = sanitizeSelectedLanguages(searchParams.getAll("selectedLanguage"));
     queueMicrotask(() => {
-      syncToUrl(params[0] ?? "", params[1] ?? "", urlLanguages);
+      syncToUrl(u1, u2, urlLanguages);
     });
   }, [searchParams]);
 
