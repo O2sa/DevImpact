@@ -19,8 +19,8 @@
 // Load .env file for standalone execution. This must be the first import.
 import "dotenv/config";
 
-import { getDatabaseStore } from "@/lib/db-store";
-import { calculateLeaderboard } from "@/lib/calculate-leaderboard";
+import { getDatabaseStore } from "@/lib/db";
+import { calculateLeaderboard } from "@/features/leaderboard";
 import { logger } from "@/lib/logger";
 
 let activeCountrySlug: string | null = null;

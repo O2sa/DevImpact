@@ -9,7 +9,7 @@
  *   - DATABASE_URL must be set in .env or environment
  */
 import "dotenv/config";
-import { getDatabaseStore } from "../lib/db-store";
+import { getDatabaseStore } from "../src/lib/db";
 
 async function main() {
   console.log("Initializing database schema...");

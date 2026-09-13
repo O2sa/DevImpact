@@ -1,4 +1,7 @@
-# DevImpact
+# DevImpact Scoring Algorithm Specification
+
+> [!NOTE]
+> This document describes the mathematical algorithm pseudocode. The production implementation is located in [`src/features/scoring/services/score-engine.ts`](src/features/scoring/services/score-engine.ts) with corresponding unit tests in [`src/features/scoring/tests/`](src/features/scoring/tests/).
 
 ### 🧠 Main
 
