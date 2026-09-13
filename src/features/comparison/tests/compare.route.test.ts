@@ -1,0 +1,365 @@
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { GitHubApiError } from "@/lib/github";
+
+const mocks = vi.hoisted(() => ({
+  getUserData: vi.fn(),
+  calculateUserScore: vi.fn(),
+  upsertUser: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock("@/lib/github", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/github")>();
+  return {
+    ...actual,
+    getUserData: mocks.getUserData,
+  };
+});
+
+vi.mock("@/features/scoring", () => ({
+  calculateUserScore: mocks.calculateUserScore,
+  normalizeSelectedLanguages: (langs: string[]) => langs,
+}));
+
+vi.mock("@/lib/db", () => ({
+  getDatabaseStore: () => ({
+    upsertUser: mocks.upsertUser,
+  }),
+}));
+
+import { GET } from "@/app/api/compare/route";
+
+function makeRequest(params: Record<string, string | string[]>): Request {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        search.append(key, item);
+      }
+    } else {
+      search.append(key, value);
+    }
+  }
+
+  return new Request(`http://localhost/api/compare?${search.toString()}`, {
+    method: "GET",
+  });
+}
+
+function makeUser(login: string, name: string) {
+  return {
+    login,
+    name,
+    avatarUrl: `https://example.com/${login}.png`,
+    location: "Cairo, Egypt",
+    repos: [],
+    pullRequests: [],
+    contributions: {
+      totalCommitContributions: 0,
+      totalPullRequestContributions: 0,
+      totalIssueContributions: 0,
+    },
+    issues: [],
+    discussions: [],
+  };
+}
+
+function makeLanguageScores(finalScore: number) {
+  return {
+    selectedLanguages: ["TypeScript"],
+    repoScore: 0,
+    prScore: 0,
+    contributionScore: 0,
+    finalScore,
+    normalizedRepoScore: 0,
+    normalizedPRScore: 0,
+    normalizedContributionScore: 0,
+    normalizedFinalScore: 0,
+    topRepos: [],
+    topPullRequests: [],
+  };
+}
+
+function makeScore(finalScore: number, languageScores?: ReturnType<typeof makeLanguageScores>) {
+  return {
+    repoScore: 10,
+    prScore: 20,
+    contributionScore: 3,
+    finalScore,
+    normalizedRepoScore: 30,
+    normalizedPRScore: 40,
+    normalizedContributionScore: 5,
+    normalizedFinalScore: 35,
+    topRepos: [],
+    topPullRequests: [],
+    topCommunityContributions: [],
+    languageScores,
+    signals: {
+      reposAnalyzed: 1,
+      pullRequestsAnalyzed: 1,
+      mergedExternalPRs: 1,
+      ownRepoPRsIgnored: 0,
+      unmergedPRsIgnored: 0,
+      uniqueExternalPRRepos: 1,
+      issuesAnalyzed: 0,
+      externalIssuesCounted: 0,
+      discussionsAnalyzed: 0,
+      externalDiscussionsCounted: 0,
+    },
+    explanations: {
+      repo: [],
+      pr: [],
+      contribution: [],
+      overall: [],
+    },
+  };
+}
+
+describe("GET /api/compare", () => {
+  beforeEach(() => {
+    mocks.getUserData.mockReset();
+    mocks.calculateUserScore.mockReset();
+  });
+
+  test("returns structured friendly error when GitHub rate limit is hit", async () => {
+    mocks.getUserData.mockRejectedValueOnce(
+      new GitHubApiError({
+        message: "API rate limit exceeded for user.",
+        kind: "PRIMARY_RATE_LIMIT",
+        status: 200,
+        rateLimit: {
+          limit: 5000,
+          remaining: 0,
+          used: 5000,
+          resetAt: Math.floor(Date.now() / 1000) + 60,
+          resource: "graphql",
+        },
+        retryAfterMs: 60_000,
+      }),
+    );
+
+    const response = await GET(
+      makeRequest({
+        username: ["user-a", "user-b"],
+      }),
+    );
+    const body = (await response.json()) as {
+      success: boolean;
+      errorDetails?: { code?: string; retryAfterSeconds?: number; rateLimit?: unknown };
+    };
+
+    expect(response.status).toBe(429);
+    expect(body.success).toBe(false);
+    expect(body.errorDetails?.code).toBe("RATE_LIMITED");
+    expect(body.errorDetails?.retryAfterSeconds).toBeUndefined();
+    expect(body.errorDetails?.rateLimit).toBeUndefined();
+  });
+
+  test("returns resource-limit errors instead of masking them as not found", async () => {
+    mocks.getUserData.mockRejectedValueOnce(
+      new GitHubApiError({
+        message: "Resource limits for this query exceeded.",
+        kind: "RESOURCE_LIMIT",
+        status: 200,
+        rateLimit: {
+          limit: 5000,
+          remaining: 4993,
+          used: 7,
+          resetAt: Math.floor(Date.now() / 1000) + 60,
+          resource: "graphql",
+        },
+      }),
+    );
+
+    const response = await GET(
+      makeRequest({
+        username: ["petebacondarwin", "o2sa"],
+      }),
+    );
+    const body = (await response.json()) as {
+      success: boolean;
+      errorDetails?: { code?: string; targetUsernames?: string[] };
+    };
+
+    expect(response.status).toBe(503);
+    expect(body.success).toBe(false);
+    expect(body.errorDetails?.code).toBe("GITHUB_RESOURCE_LIMIT");
+    expect(body.errorDetails?.targetUsernames).toBeUndefined();
+  });
+
+  test("returns success payload when both users are processed", async () => {
+    mocks.getUserData.mockResolvedValueOnce({
+      data: makeUser("user-a", "User A"),
+      metrics: { duration: 0, errors: [] },
+    });
+    mocks.getUserData.mockResolvedValueOnce({
+      data: makeUser("user-b", "User B"),
+      metrics: { duration: 0, errors: [] },
+    });
+
+    mocks.calculateUserScore.mockReturnValueOnce(makeScore(20));
+    mocks.calculateUserScore.mockReturnValueOnce(makeScore(10));
+
+    const response = await GET(
+      makeRequest({
+        username: ["user-a", "user-b"],
+      }),
+    );
+    const body = (await response.json()) as {
+      success: boolean;
+      users?: Array<{ username: string }>;
+      winner?: { username: string };
+    };
+
+    expect(response.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.users).toHaveLength(2);
+    expect(body.winner?.username).toBe("user-a");
+  });
+
+  test("returns null percentage when the losing final score is zero", async () => {
+    mocks.getUserData.mockResolvedValueOnce({
+      data: makeUser("user-a", "User A"),
+      metrics: { duration: 0, errors: [] },
+    });
+    mocks.getUserData.mockResolvedValueOnce({
+      data: makeUser("user-b", "User B"),
+      metrics: { duration: 0, errors: [] },
+    });
+
+    mocks.calculateUserScore.mockReturnValueOnce(makeScore(20));
+    mocks.calculateUserScore.mockReturnValueOnce(makeScore(0));
+
+    const response = await GET(
+      makeRequest({
+        username: ["user-a", "user-b"],
+      }),
+    );
+    const body = (await response.json()) as {
+      winner?: {
+        username: string;
+        finalScoreDifference: number;
+        percentageDifference: number | null;
+      };
+    };
+
+    expect(response.status).toBe(200);
+    expect(body.winner).toEqual({
+      username: "user-a",
+      finalScoreDifference: 20,
+      percentageDifference: null,
+    });
+  });
+
+  test("returns null language winner percentage when language loser score is zero", async () => {
+    mocks.getUserData.mockResolvedValueOnce({
+      data: makeUser("user-a", "User A"),
+      metrics: { duration: 0, errors: [] },
+    });
+    mocks.getUserData.mockResolvedValueOnce({
+      data: makeUser("user-b", "User B"),
+      metrics: { duration: 0, errors: [] },
+    });
+
+    mocks.calculateUserScore.mockReturnValueOnce(makeScore(20, makeLanguageScores(12)));
+    mocks.calculateUserScore.mockReturnValueOnce(makeScore(10, makeLanguageScores(0)));
+
+    const response = await GET(
+      makeRequest({
+        username: ["user-a", "user-b"],
+        selectedLanguage: "TypeScript",
+      }),
+    );
+    const body = (await response.json()) as {
+      languageWinner?: {
+        username: string;
+        finalScoreDifference: number;
+        percentageDifference: number | null;
+        selectedLanguages: string[];
+      };
+    };
+
+    expect(response.status).toBe(200);
+    expect(body.languageWinner).toEqual({
+      username: "user-a",
+      finalScoreDifference: 12,
+      percentageDifference: null,
+      selectedLanguages: ["TypeScript"],
+    });
+  });
+
+  test("returns targeted username for not-found errors", async () => {
+    mocks.getUserData.mockRejectedValueOnce(new Error("User not found"));
+
+    const response = await GET(
+      makeRequest({
+        username: ["missing-user", "valid-user"],
+      }),
+    );
+    const body = (await response.json()) as {
+      success: boolean;
+      errorDetails?: { code?: string; targetUsernames?: string[] };
+    };
+
+    expect(response.status).toBe(404);
+    expect(body.success).toBe(false);
+    expect(body.errorDetails?.code).toBe("GITHUB_NOT_FOUND");
+    expect(body.errorDetails?.targetUsernames).toEqual(["missing-user"]);
+  });
+
+  test("persists canonical unfiltered score to db even when selectedLanguage is specified", async () => {
+    process.env.DATABASE_URL = "postgresql://test:test@localhost:5432/test";
+    mocks.upsertUser.mockClear();
+
+    const userA = makeUser("user-a", "User A");
+    const userB = makeUser("user-b", "User B");
+
+    mocks.getUserData.mockResolvedValueOnce({
+      data: userA,
+      metrics: { duration: 0, errors: [] },
+    });
+    mocks.getUserData.mockResolvedValueOnce({
+      data: userB,
+      metrics: { duration: 0, errors: [] },
+    });
+
+    const filteredScoreA = makeScore(20, makeLanguageScores(15));
+    const canonicalScoreA = makeScore(50);
+    const filteredScoreB = makeScore(10, makeLanguageScores(8));
+    const canonicalScoreB = makeScore(40);
+
+    mocks.calculateUserScore
+      .mockReturnValueOnce(filteredScoreA)
+      .mockReturnValueOnce(canonicalScoreA)
+      .mockReturnValueOnce(filteredScoreB)
+      .mockReturnValueOnce(canonicalScoreB);
+
+    const response = await GET(
+      makeRequest({
+        username: ["user-a", "user-b"],
+        selectedLanguage: "TypeScript",
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mocks.upsertUser).toHaveBeenCalledTimes(2);
+
+    expect(mocks.upsertUser).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        username: "user-a",
+        scores: canonicalScoreA,
+        finalScore: 50,
+      }),
+    );
+    expect(mocks.upsertUser).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        username: "user-b",
+        scores: canonicalScoreB,
+        finalScore: 40,
+      }),
+    );
+
+    delete process.env.DATABASE_URL;
+  });
+});

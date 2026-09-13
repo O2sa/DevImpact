@@ -2,7 +2,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const localesDir = path.join(__dirname, "..", "locales");
+const localesDir = path.join(__dirname, "..", "src", "locales");
 const enKeys = Object.keys(
   JSON.parse(fs.readFileSync(path.join(localesDir, "en.json"), "utf8")),
 ).sort();

@@ -95,7 +95,7 @@ docker logs -f devimpact-leaderboard-cron
 
 ## CI/CD & GHCR Publishing Workflow
 
-The GitHub Actions workflow at [.github/workflows/leaderboard-image.yml](file:///c:/Users/msii/Documents/DevImpact/.github/workflows/leaderboard-image.yml) triggers automatically on pushes to `main` when worker or scoring code changes.
+The GitHub Actions workflow at [.github/workflows/leaderboard-image.yml](../.github/workflows/leaderboard-image.yml) triggers automatically on pushes to `main` when worker or scoring code changes.
 
 ### Image Naming & Tagging Architecture
 

@@ -139,17 +139,21 @@ Final Score =
 
 ## 🛠️ Tech Stack
 
-### Frontend
+- **Framework**: [Next.js](https://nextjs.org/) (App Router, Server & Client Components)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Data & APIs**: GitHub GraphQL API via Octokit
+- **Database & Cache**: PostgreSQL & Redis (read-through cache)
+- **Visualizations**: [Recharts](https://recharts.org/)
+- **Testing**: [Vitest](https://vitest.dev/)
 
-- Next.js (App Router)
-- TypeScript
-- Tailwind CSS
-- Recharts
+---
 
-### API
+## 🏛️ Architecture & System Design
 
-- Node.js + Express
-- GitHub GraphQL API
+DevImpact is structured around a **Feature-Driven Scalable Architecture** (`src/features/*`, `src/lib/*`, `src/components/*`, `src/app/*`).
+
+For full details on the system design, directory structure, module boundaries, and step-by-step contributor guides, see the **[Architecture Guide (ARCHITECTURE.md)](ARCHITECTURE.md)**.
 
 ---
 
@@ -206,7 +210,7 @@ Then open `http://localhost:3000` in your browser!
 
 The leaderboard score updates run via a dedicated background worker container using Docker & Supercronic.
 
-For complete local setup, Docker Compose instructions, GHCR publishing, and VPS deployment documentation, see **[ops/README.md](file:///c:/Users/msii/Documents/DevImpact/ops/README.md)**.
+For complete local setup, Docker Compose instructions, GHCR publishing, and VPS deployment documentation, see **[ops/README.md](ops/README.md)**.
 
 ```bash
 # Quick worker setup (pulls & runs published image)
@@ -219,23 +223,24 @@ docker compose -f ops/docker/leaderboard-compose.yml up -d
 
 ## 🌍 Localization
 
-- Supported languages: English 🇺🇸, Arabic 🇸🇦
-- Automatically detects user language
-- Allows manual switching
-- Easy to add new languages via `/locales`
+- Supported languages: English 🇺🇸 (LTR), Arabic 🇸🇦 (RTL)
+- Automatically detects user language via browser & cookies
+- Allows manual switching with instant direction toggling
+- Easy to add new languages via `src/locales/` (validated with `pnpm validate-locales`)
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome!
+Contributions are welcome! Check out our **[Contributing Guide (CONTRIBUTING.md)](CONTRIBUTING.md)** and **[Architecture Guide (ARCHITECTURE.md)](ARCHITECTURE.md)** to get started.
 
 ### How to contribute:
 
 1. Fork the repository
 2. Create a feature branch
-3. Commit your changes
-4. Open a pull request
+3. Run tests and type checks (`pnpm test && npx tsc --noEmit`)
+4. Commit your changes
+5. Open a pull request
 
 ---
 

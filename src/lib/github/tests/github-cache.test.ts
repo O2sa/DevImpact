@@ -1,0 +1,571 @@
+import "dotenv/config";
+
+import { afterEach, describe, expect, test, vi } from "vitest";
+import { createGitHubUserDataFetcher, type GitHubFetcherDependencies } from "@/lib/github";
+import {
+  DEFAULT_CACHE_NAMESPACE,
+  DEFAULT_GITHUB_CACHE_TTL_SECONDS,
+  getCacheConfigFromEnv,
+  getCacheNamespaceFromEnv,
+  getCacheTtlSecondsFromEnv,
+  MAX_CACHE_TTL_SECONDS,
+  type CacheStore,
+} from "@/lib/cache";
+import type { GitHubUserData } from "@/lib/github";
+
+type ExecuteCall = {
+  operationName: string;
+};
+
+function makeProcessEnv(values: Record<string, string> = {}): NodeJS.ProcessEnv {
+  return { NODE_ENV: "test", ...values };
+}
+
+function makeExecutor(calls: ExecuteCall[], delayMs = 0): GitHubFetcherDependencies["executor"] {
+  return {
+    async execute<TData, TVariables extends Record<string, unknown>>(params: {
+      operationName: string;
+      query: string;
+      variables: TVariables;
+    }): Promise<TData> {
+      calls.push({
+        operationName: params.operationName,
+      });
+
+      if (delayMs > 0) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+
+      if (params.operationName === "FetchUser") {
+        return {
+          user: {
+            name: "User Name",
+            avatarUrl: "https://example.com/avatar.png",
+            repositories: {
+              nodes: [
+                {
+                  name: "repo",
+                  nameWithOwner: "owner/repo",
+                  url: "https://github.com/owner/repo",
+                  stargazerCount: 10,
+                  forkCount: 2,
+                  watchers: { totalCount: 5 },
+                  isFork: false,
+                  pushedAt: "2026-05-01T00:00:00.000Z",
+                  languages: {
+                    edges: [{ size: 100, node: { name: "TypeScript" } }],
+                  },
+                },
+              ],
+            },
+            contributionsCollection: {
+              totalCommitContributions: 0,
+              totalPullRequestContributions: 0,
+              totalIssueContributions: 0,
+            },
+          },
+        } as unknown as TData;
+      }
+
+      if (params.operationName === "FetchUserPullRequests") {
+        return {
+          pullRequests: {
+            nodes: [
+              {
+                merged: true,
+                additions: 10,
+                deletions: 3,
+                title: "Fix bug",
+                url: "https://github.com/ext/repo/pull/1",
+                repository: {
+                  nameWithOwner: "ext/repo",
+                  url: "https://github.com/ext/repo",
+                  stargazerCount: 40,
+                  pushedAt: "2026-05-01T00:00:00.000Z",
+                  owner: { login: "ext" },
+                  languages: {
+                    edges: [{ size: 80, node: { name: "TypeScript" } }],
+                  },
+                },
+              },
+            ],
+            pageInfo: { hasNextPage: false, endCursor: null },
+          },
+        } as unknown as TData;
+      }
+
+      if (params.operationName === "FetchUserIssues") {
+        return {
+          issues: {
+            nodes: [
+              {
+                title: "Issue",
+                url: "https://github.com/ext/repo/issues/1",
+                comments: { totalCount: 2 },
+                repository: {
+                  nameWithOwner: "ext/repo",
+                  stargazerCount: 40,
+                  owner: { login: "ext" },
+                },
+              },
+            ],
+            pageInfo: { hasNextPage: false, endCursor: null },
+          },
+        } as unknown as TData;
+      }
+
+      if (params.operationName === "FetchUserDiscussions") {
+        return {
+          discussions: {
+            nodes: [
+              {
+                title: "Discussion",
+                url: "https://github.com/ext/repo/discussions/1",
+                comments: { totalCount: 1 },
+                repository: {
+                  nameWithOwner: "ext/repo",
+                  stargazerCount: 40,
+                  owner: { login: "ext" },
+                },
+              },
+            ],
+            pageInfo: { hasNextPage: false, endCursor: null },
+          },
+        } as unknown as TData;
+      }
+
+      throw new Error(`Unexpected operation: ${params.operationName}`);
+    },
+  };
+}
+
+function makeMemoryCache(
+  options: {
+    getImpl?: (key: string) => Promise<unknown>;
+    setImpl?: (key: string, value: unknown, ttl?: number) => Promise<void>;
+    delImpl?: (key: string) => Promise<void>;
+    enabled?: boolean;
+  } = {},
+): CacheStore {
+  return {
+    enabled: options.enabled ?? true,
+    async get<T>(key: string): Promise<T | undefined> {
+      if (!options.getImpl) {
+        return undefined;
+      }
+      const value = await options.getImpl(key);
+      return value as T | undefined;
+    },
+    async set<T>(key: string, value: T, ttl?: number): Promise<void> {
+      if (options.setImpl) {
+        await options.setImpl(key, value, ttl);
+      }
+    },
+    async del(key: string): Promise<void> {
+      if (options.delImpl) {
+        await options.delImpl(key);
+      }
+    },
+  };
+}
+
+function isGitHubUserData(value: unknown): value is GitHubUserData {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "avatarUrl" in value &&
+    "repos" in value &&
+    "pullRequests" in value
+  );
+}
+
+describe("GitHub user data caching", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+  test("cache hit skips GitHub calls", async () => {
+    const cachedPayload: GitHubUserData = {
+      name: "Cached",
+      location: "any",
+      login: "Cached",
+      avatarUrl: "https://example.com/cached.png",
+      repos: [],
+      pullRequests: [],
+      issues: [],
+      discussions: [],
+    };
+
+    const calls: ExecuteCall[] = [];
+    const fetcher = createGitHubUserDataFetcher({
+      executor: makeExecutor(calls),
+      cacheStore: makeMemoryCache({
+        getImpl: async () => cachedPayload,
+      }),
+      cacheConfig: {
+        namespace: "devimpact:v1",
+        ttlSeconds: 604_800,
+      },
+    });
+
+    const result = await fetcher("TeStUser");
+    expect(result.name).toBe("Cached");
+    expect(calls).toHaveLength(0);
+  });
+
+  test("cache miss fetches and stores data", async () => {
+    const calls: ExecuteCall[] = [];
+    const setCalls: Array<{ key: string; ttl?: number; value: unknown }> = [];
+
+    const fetcher = createGitHubUserDataFetcher({
+      executor: makeExecutor(calls),
+      cacheStore: makeMemoryCache({
+        getImpl: async () => undefined,
+        setImpl: async (key, value, ttl) => {
+          setCalls.push({ key, value, ttl });
+        },
+      }),
+      cacheConfig: {
+        namespace: "devimpact:v1",
+        ttlSeconds: 604_800,
+      },
+    });
+
+    const result = await fetcher("TeStUser");
+    expect(isGitHubUserData(result)).toBe(true);
+    expect(calls).toHaveLength(4);
+    expect(setCalls).toHaveLength(1);
+    expect(setCalls[0]?.ttl).toBe(604_800);
+    expect(setCalls[0]?.key).toBe("devimpact:v1:github-user:testuser");
+  });
+
+  test("cache read failure falls back to GitHub fetch", async () => {
+    const calls: ExecuteCall[] = [];
+    const fetcher = createGitHubUserDataFetcher({
+      executor: makeExecutor(calls),
+      cacheStore: makeMemoryCache({
+        getImpl: async () => {
+          throw new Error("redis down");
+        },
+      }),
+      cacheConfig: {
+        namespace: "devimpact:v1",
+        ttlSeconds: 604_800,
+      },
+    });
+
+    const result = await fetcher("testuser");
+    expect(result.name).toBe("User Name");
+    expect(calls).toHaveLength(4);
+  });
+
+  test("uses configured counts as the total number of fetched search items", async () => {
+    vi.stubEnv("GITHUB_PR_COUNT", "2");
+    vi.stubEnv("GITHUB_ISSUE_COUNT", "2");
+    vi.stubEnv("GITHUB_DISCUSSION_COUNT", "2");
+
+    const calls: Array<{
+      operationName: string;
+      variables: Record<string, unknown>;
+    }> = [];
+    const fetcher = createGitHubUserDataFetcher({
+      executor: {
+        async execute<TData, TVariables extends Record<string, unknown>>(params: {
+          operationName: string;
+          query: string;
+          variables: TVariables;
+        }): Promise<TData> {
+          calls.push({
+            operationName: params.operationName,
+            variables: params.variables as Record<string, unknown>,
+          });
+
+          if (params.operationName === "FetchUser") {
+            return {
+              user: {
+                name: "User Name",
+                avatarUrl: "https://example.com/avatar.png",
+                repositories: { nodes: [] },
+                contributionsCollection: {
+                  totalCommitContributions: 0,
+                  totalPullRequestContributions: 0,
+                  totalIssueContributions: 0,
+                },
+              },
+            } as unknown as TData;
+          }
+
+          if (params.operationName === "FetchUserPullRequests") {
+            const hasCursor = Boolean(params.variables.prCursor);
+            return {
+              pullRequests: {
+                nodes: hasCursor
+                  ? [
+                      {
+                        merged: true,
+                        additions: 1,
+                        deletions: 0,
+                        title: "Second page",
+                        url: "https://github.com/ext/repo/pull/2",
+                        repository: {
+                          nameWithOwner: "ext/repo",
+                          url: "https://github.com/ext/repo",
+                          stargazerCount: 1,
+                          pushedAt: "2026-05-02T00:00:00.000Z",
+                          owner: { login: "ext" },
+                          languages: {
+                            edges: [{ size: 1, node: { name: "TypeScript" } }],
+                          },
+                        },
+                      },
+                    ]
+                  : [
+                      {
+                        merged: true,
+                        additions: 1,
+                        deletions: 0,
+                        title: "First page",
+                        url: "https://github.com/ext/repo/pull/1",
+                        repository: {
+                          nameWithOwner: "ext/repo",
+                          url: "https://github.com/ext/repo",
+                          stargazerCount: 1,
+                          pushedAt: "2026-05-01T00:00:00.000Z",
+                          owner: { login: "ext" },
+                          languages: {
+                            edges: [{ size: 1, node: { name: "TypeScript" } }],
+                          },
+                        },
+                      },
+                      {
+                        merged: false,
+                        additions: 0,
+                        deletions: 0,
+                        title: "Second item",
+                        url: "https://github.com/ext/repo/pull/2",
+                        repository: {
+                          nameWithOwner: "ext/repo",
+                          url: "https://github.com/ext/repo",
+                          stargazerCount: 1,
+                          pushedAt: "2026-05-02T00:00:00.000Z",
+                          owner: { login: "ext" },
+                          languages: {
+                            edges: [{ size: 1, node: { name: "TypeScript" } }],
+                          },
+                        },
+                      },
+                    ],
+                pageInfo: hasCursor
+                  ? { hasNextPage: false, endCursor: null }
+                  : { hasNextPage: true, endCursor: "next-page" },
+              },
+            } as unknown as TData;
+          }
+
+          if (params.operationName === "FetchUserIssues") {
+            return {
+              issues: {
+                nodes: [
+                  {
+                    title: "Issue",
+                    url: "https://github.com/ext/repo/issues/1",
+                    comments: { totalCount: 1 },
+                    repository: {
+                      nameWithOwner: "ext/repo",
+                      stargazerCount: 1,
+                      owner: { login: "ext" },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            } as unknown as TData;
+          }
+
+          if (params.operationName === "FetchUserDiscussions") {
+            return {
+              discussions: {
+                nodes: [
+                  {
+                    title: "Discussion",
+                    url: "https://github.com/ext/repo/discussions/1",
+                    comments: { totalCount: 1 },
+                    repository: {
+                      nameWithOwner: "ext/repo",
+                      stargazerCount: 1,
+                      owner: { login: "ext" },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            } as unknown as TData;
+          }
+
+          throw new Error(`Unexpected operation: ${params.operationName}`);
+        },
+      },
+      cacheStore: makeMemoryCache({
+        getImpl: async () => undefined,
+      }),
+      cacheConfig: {
+        namespace: "devimpact:v1",
+        ttlSeconds: 604_800,
+      },
+    });
+
+    const result = await fetcher("testuser");
+
+    expect(result.pullRequests).toHaveLength(2);
+    expect(calls.filter((call) => call.operationName === "FetchUserPullRequests")).toHaveLength(1);
+    expect(
+      calls.find((call) => call.operationName === "FetchUserPullRequests")?.variables.prCount,
+    ).toBe(2);
+  });
+
+  test("cache write failure does not fail request", async () => {
+    const calls: ExecuteCall[] = [];
+    const fetcher = createGitHubUserDataFetcher({
+      executor: makeExecutor(calls),
+      cacheStore: makeMemoryCache({
+        getImpl: async () => undefined,
+        setImpl: async () => {
+          throw new Error("write failed");
+        },
+      }),
+      cacheConfig: {
+        namespace: "devimpact:v1",
+        ttlSeconds: 604_800,
+      },
+    });
+
+    const result = await fetcher("testuser");
+    expect(result.pullRequests).toHaveLength(1);
+    expect(calls).toHaveLength(4);
+  });
+
+  test("corrupted cache payload is treated as miss", async () => {
+    const calls: ExecuteCall[] = [];
+    const deleted: string[] = [];
+    const fetcher = createGitHubUserDataFetcher({
+      executor: makeExecutor(calls),
+      cacheStore: makeMemoryCache({
+        getImpl: async () => ({ broken: true }),
+        delImpl: async (key) => {
+          deleted.push(key);
+        },
+      }),
+      cacheConfig: {
+        namespace: "devimpact:v1",
+        ttlSeconds: 604_800,
+      },
+    });
+
+    const result = await fetcher("testuser");
+    expect(result.name).toBe("User Name");
+    expect(calls).toHaveLength(4);
+    expect(deleted).toEqual(["devimpact:v1:github-user:testuser"]);
+  });
+
+  test("single-flight dedupe joins concurrent same-key fetches", async () => {
+    const calls: ExecuteCall[] = [];
+    const fetcher = createGitHubUserDataFetcher({
+      executor: makeExecutor(calls, 20),
+      cacheStore: makeMemoryCache({
+        getImpl: async () => undefined,
+      }),
+      cacheConfig: {
+        namespace: "devimpact:v1",
+        ttlSeconds: 604_800,
+      },
+    });
+
+    const [first, second] = await Promise.all([fetcher("testuser"), fetcher("TestUser")]);
+
+    expect(first.avatarUrl).toBe(second.avatarUrl);
+    expect(calls).toHaveLength(4);
+  });
+
+  test("default cache TTL is seven days", () => {
+    const config = getCacheConfigFromEnv({} as NodeJS.ProcessEnv);
+    expect(config.ttlSeconds).toBe(DEFAULT_GITHUB_CACHE_TTL_SECONDS);
+  });
+
+  test("reads cache TTL aliases with Redis-specific precedence", () => {
+    expect(
+      getCacheTtlSecondsFromEnv(
+        makeProcessEnv({
+          REDIS_CACHE_TTL_SECONDS: "3600",
+          CACHE_TTL_SECONDS: "7200",
+        }),
+      ),
+    ).toBe(3600);
+    expect(
+      getCacheTtlSecondsFromEnv(
+        makeProcessEnv({
+          CACHE_TTL_SECONDS: "7200",
+        }),
+      ),
+    ).toBe(7200);
+  });
+
+  test.each(["0", "-1", "1.5", "42seconds", `${MAX_CACHE_TTL_SECONDS + 1}`])(
+    "rejects invalid cache TTL %s",
+    (value) => {
+      expect(
+        getCacheTtlSecondsFromEnv(
+          makeProcessEnv({
+            REDIS_CACHE_TTL_SECONDS: value,
+          }),
+        ),
+      ).toBe(DEFAULT_GITHUB_CACHE_TTL_SECONDS);
+    },
+  );
+
+  test("falls through to the TTL alias when the preferred value is invalid", () => {
+    expect(
+      getCacheTtlSecondsFromEnv(
+        makeProcessEnv({
+          REDIS_CACHE_TTL_SECONDS: "invalid",
+          CACHE_TTL_SECONDS: "1800",
+        }),
+      ),
+    ).toBe(1800);
+  });
+
+  test("accepts the maximum cache TTL", () => {
+    expect(
+      getCacheTtlSecondsFromEnv(
+        makeProcessEnv({
+          REDIS_CACHE_TTL_SECONDS: `${MAX_CACHE_TTL_SECONDS}`,
+        }),
+      ),
+    ).toBe(MAX_CACHE_TTL_SECONDS);
+  });
+
+  test("reads, trims, and validates cache namespace aliases", () => {
+    expect(
+      getCacheNamespaceFromEnv(
+        makeProcessEnv({
+          REDIS_CACHE_NAMESPACE: "  deployment:v2  ",
+          CACHE_NAMESPACE: "fallback:v1",
+        }),
+      ),
+    ).toBe("deployment:v2");
+    expect(
+      getCacheNamespaceFromEnv(
+        makeProcessEnv({
+          REDIS_CACHE_NAMESPACE: "   ",
+          CACHE_NAMESPACE: "  fallback:v1  ",
+        }),
+      ),
+    ).toBe("fallback:v1");
+    expect(
+      getCacheNamespaceFromEnv(
+        makeProcessEnv({
+          REDIS_CACHE_NAMESPACE: "   ",
+          CACHE_NAMESPACE: "",
+        }),
+      ),
+    ).toBe(DEFAULT_CACHE_NAMESPACE);
+  });
+});
