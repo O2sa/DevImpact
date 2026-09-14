@@ -27,7 +27,7 @@ vi.mock("@/lib/db", () => ({
 }));
 
 import { GET } from "@/app/api/user/[username]/route";
-import { getUserProfile } from "@/features/developer";
+import { getUserProfile } from "@/features/developer/services";
 
 function makeUser(login: string, name: string) {
   return {

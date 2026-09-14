@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/seo/json-ld";
-import { UserProfileClient, UserNotFoundCard, getUserProfile } from "@/features/developer";
+import { UserProfileClient, UserNotFoundCard } from "@/features/developer";
+import { getUserProfile } from "@/features/developer/services";
 import { AppHeader } from "@/components/layout/app-header";
 import { AppFooter } from "@/components/layout/app-footer";
 import { toAbsoluteUrl } from "@/lib/seo";

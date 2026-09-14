@@ -1,8 +1,10 @@
+"use client";
+
 import { cn } from "@/utils/cn";
 import { useTranslation } from "@/components/providers/language-provider";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-type ScoreCardProps = {
+export type ScoreCardProps = {
   title: string;
   rawValue: number;
   normalizedValue?: number;

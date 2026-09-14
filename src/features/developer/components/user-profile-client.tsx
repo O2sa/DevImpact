@@ -9,7 +9,6 @@ import {
   Check,
   Copy,
   ExternalLink,
-  GitFork,
   GitPullRequest,
   MapPin,
   MessageSquare,
@@ -19,10 +18,15 @@ import {
   Trophy,
 } from "lucide-react";
 import { Avatar } from "@/components/layout/avatar";
-import { ScoreCard } from "./score-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import {
+  ScoreCard,
+  RepoCardItem,
+  PullRequestCardItem,
+  CommunityCardItem,
+} from "@/components/cards";
 import { useTranslation } from "@/components/providers/language-provider";
 import { getCountryCode, detectCountry } from "@/lib/geo";
 import countriesData from "@/data/countries.json";
@@ -40,69 +44,6 @@ type Props = {
   location?: string | null;
   countryParam?: string | null;
 };
-
-type LanguageEntry = {
-  name: string;
-  percentage: number;
-};
-
-function getLanguageColor(name: string): string {
-  const normalized = name.trim().toLowerCase();
-  if (normalized === "typescript") return "bg-sky-500";
-  if (normalized === "javascript") return "bg-amber-400";
-  if (normalized === "python") return "bg-blue-500";
-  if (normalized === "go") return "bg-cyan-500";
-  if (normalized === "rust") return "bg-orange-500";
-  if (normalized === "java") return "bg-red-500";
-  if (normalized === "c#") return "bg-violet-500";
-  if (normalized === "php") return "bg-indigo-500";
-  if (normalized === "ruby") return "bg-rose-500";
-  if (normalized === "swift") return "bg-orange-400";
-  if (normalized === "kotlin") return "bg-fuchsia-500";
-  if (normalized === "c++") return "bg-blue-700";
-  return "bg-slate-500";
-}
-
-function StatChip({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
-  return (
-    <div className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-background/80 px-2.5 py-1 text-xs">
-      <span className="text-muted-foreground">{icon}</span>
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-semibold text-foreground">{value}</span>
-    </div>
-  );
-}
-
-function LanguageBreakdown({ topLanguages }: { topLanguages?: LanguageEntry[] }) {
-  if (!topLanguages || topLanguages.length === 0) return null;
-
-  const normalized = topLanguages.slice(0, 4).filter((lang) => lang.percentage > 0);
-
-  if (normalized.length === 0) return null;
-
-  return (
-    <div className="mt-2 space-y-1.5">
-      <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-muted">
-        {normalized.map((lang, idx) => (
-          <div
-            key={`${lang.name}-${idx}`}
-            style={{ width: `${lang.percentage * 100}%` }}
-            className={getLanguageColor(lang.name)}
-            title={`${lang.name}: ${Math.round(lang.percentage * 100)}%`}
-          />
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground">
-        {normalized.map((lang, idx) => (
-          <span key={`${lang.name}-${idx}`} className="flex items-center gap-1">
-            <span className={`inline-block h-2 w-2 rounded-full ${getLanguageColor(lang.name)}`} />
-            {lang.name} {Math.round(lang.percentage * 100)}%
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export function UserProfileClient({ user, location, countryParam }: Props) {
   const { t } = useTranslation();
@@ -451,7 +392,7 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
           </h2>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Top Repositories */}
           <Card className="flex flex-col border border-border/80 shadow-sm">
             <CardHeader className="pb-3">
@@ -465,57 +406,16 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
               {user.topRepos.length === 0 ? (
                 <p className="text-sm text-muted-foreground">{t("empty.repos")}</p>
               ) : (
-                user.topRepos.slice(0, 3).map((repo, idx) => (
-                  <article
-                    key={`${user.username}-repo-${idx}`}
-                    className="rounded-xl border border-border/80 bg-gradient-to-br from-card via-card to-muted/25 p-4 transition-colors hover:border-primary/35"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-bold text-muted-foreground">
-                            #{idx + 1}
-                          </span>
-                          {repo.url ? (
-                            <a
-                              href={repo.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="truncate font-semibold text-primary hover:underline"
-                              aria-label={t("a11y.openRepo", {
-                                name: repo.name || t("untitled"),
-                              })}
-                            >
-                              {repo.name || t("untitled")}
-                            </a>
-                          ) : (
-                            <p className="truncate font-semibold">{repo.name || t("untitled")}</p>
-                          )}
-                        </div>
-
-                        <div className="mt-2.5 flex flex-wrap gap-1.5">
-                          <StatChip
-                            icon={<Star className="h-3 w-3" />}
-                            label={t("topwork.stars")}
-                            value={repo.stars ?? 0}
-                          />
-                          <StatChip
-                            icon={<GitFork className="h-3 w-3" />}
-                            label={t("topwork.forks")}
-                            value={repo.forks ?? 0}
-                          />
-                        </div>
-
-                        <LanguageBreakdown topLanguages={repo.topLanguages} />
-                      </div>
-
-                      <div className="rounded-lg border border-primary/25 bg-primary/5 px-2.5 py-1.5 text-right">
-                        <p className="text-lg font-bold text-primary">{repo.score ?? 0}</p>
-                        <p className="text-[10px] text-muted-foreground">{t("comparsion.score")}</p>
-                      </div>
-                    </div>
-                  </article>
-                ))
+                user.topRepos
+                  .slice(0, 3)
+                  .map((repo, idx) => (
+                    <RepoCardItem
+                      key={`${user.username}-repo-${idx}`}
+                      repo={repo}
+                      rankIndex={idx}
+                      showRank={true}
+                    />
+                  ))
               )}
             </CardContent>
           </Card>
@@ -533,73 +433,22 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
               {user.topPullRequests.length === 0 ? (
                 <p className="text-sm text-muted-foreground">{t("empty.pullRequests")}</p>
               ) : (
-                user.topPullRequests.slice(0, 3).map((pr, idx) => (
-                  <article
-                    key={`${user.username}-pr-${idx}`}
-                    className="rounded-xl border border-border/80 bg-gradient-to-br from-card via-card to-muted/25 p-4 transition-colors hover:border-primary/35"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-bold text-muted-foreground">
-                            #{idx + 1}
-                          </span>
-                          {pr.url ? (
-                            <a
-                              href={pr.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="truncate font-semibold text-primary hover:underline"
-                              aria-label={t("a11y.openPullRequest", {
-                                title: pr.title || t("untitled"),
-                              })}
-                            >
-                              {pr.title || t("untitled")}
-                            </a>
-                          ) : (
-                            <p className="truncate font-semibold">{pr.title || t("untitled")}</p>
-                          )}
-                        </div>
-
-                        <p className="mt-1 text-xs font-medium text-muted-foreground">
-                          {t("topwork.inRepo", {
-                            repo: pr.repo || t("unknown.repo"),
-                          })}
-                        </p>
-
-                        <div className="mt-2.5 flex flex-wrap gap-1.5">
-                          <StatChip
-                            icon={<Star className="h-3 w-3" />}
-                            label={t("topwork.pr.repo.stars")}
-                            value={pr.stars ?? 0}
-                          />
-                          <div className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-background/80 px-2.5 py-1 text-xs">
-                            <span className="font-semibold text-green-600 dark:text-green-400">
-                              +{pr.additions ?? 0}
-                            </span>
-                            <span className="text-muted-foreground">/</span>
-                            <span className="font-semibold text-red-600 dark:text-red-400">
-                              -{pr.deletions ?? 0}
-                            </span>
-                          </div>
-                        </div>
-
-                        <LanguageBreakdown topLanguages={pr.topLanguages} />
-                      </div>
-
-                      <div className="rounded-lg border border-primary/25 bg-primary/5 px-2.5 py-1.5 text-right">
-                        <p className="text-lg font-bold text-primary">{pr.score ?? 0}</p>
-                        <p className="text-[10px] text-muted-foreground">{t("comparsion.score")}</p>
-                      </div>
-                    </div>
-                  </article>
-                ))
+                user.topPullRequests
+                  .slice(0, 3)
+                  .map((pr, idx) => (
+                    <PullRequestCardItem
+                      key={`${user.username}-pr-${idx}`}
+                      pr={pr}
+                      rankIndex={idx}
+                      showRank={true}
+                    />
+                  ))
               )}
             </CardContent>
           </Card>
 
           {/* Top Community Contributions */}
-          <Card className="flex flex-col border border-border/80 shadow-sm">
+          <Card className="flex flex-col border border-border/80 shadow-sm md:col-span-2">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
                 <MessageSquare className="h-4 w-4 text-violet-500" />
@@ -609,65 +458,16 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
             </CardHeader>
             <CardContent className="flex-1 space-y-3">
               {user.topCommunityContributions && user.topCommunityContributions.length > 0 ? (
-                user.topCommunityContributions.slice(0, 3).map((item, idx) => (
-                  <article
-                    key={`${user.username}-comm-${idx}`}
-                    className="rounded-xl border border-border/80 bg-gradient-to-br from-card via-card to-muted/25 p-4 transition-colors hover:border-primary/35"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-bold text-muted-foreground">
-                            #{idx + 1}
-                          </span>
-                          <span className="inline-flex rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-secondary-foreground">
-                            {item.type === "issue"
-                              ? t("community.issue")
-                              : t("community.discussion")}
-                          </span>
-                        </div>
-
-                        {item.url ? (
-                          <a
-                            href={item.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="mt-1.5 block truncate font-semibold text-primary hover:underline"
-                            aria-label={t("a11y.openCommunityContribution", {
-                              title: item.title,
-                            })}
-                          >
-                            {item.title}
-                          </a>
-                        ) : (
-                          <p className="mt-1.5 truncate font-semibold">{item.title}</p>
-                        )}
-
-                        <p className="mt-1 text-xs font-medium text-muted-foreground">
-                          {item.repo}
-                        </p>
-
-                        <div className="mt-2.5 flex flex-wrap gap-1.5">
-                          <StatChip
-                            icon={<Star className="h-3 w-3" />}
-                            label={t("topwork.stars")}
-                            value={item.stars}
-                          />
-                          <StatChip
-                            icon={<MessageSquare className="h-3 w-3" />}
-                            label={t("community.comments")}
-                            value={item.comments}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="rounded-lg border border-primary/25 bg-primary/5 px-2.5 py-1.5 text-right">
-                        <p className="text-lg font-bold text-primary">{item.score}</p>
-                        <p className="text-[10px] text-muted-foreground">{t("comparsion.score")}</p>
-                      </div>
-                    </div>
-                  </article>
-                ))
+                user.topCommunityContributions
+                  .slice(0, 3)
+                  .map((item, idx) => (
+                    <CommunityCardItem
+                      key={`${user.username}-comm-${idx}`}
+                      item={item}
+                      rankIndex={idx}
+                      showRank={true}
+                    />
+                  ))
               ) : (
                 <p className="text-sm text-muted-foreground">{t("empty.community")}</p>
               )}

@@ -47,7 +47,7 @@ export function UserProfileSkeleton() {
       </Card>
 
       {/* Top Work Cards Skeleton */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle>
@@ -74,7 +74,7 @@ export function UserProfileSkeleton() {
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2 lg:col-span-1">
+        <Card className="md:col-span-2">
           <CardHeader className="pb-3">
             <CardTitle>
               <Skeleton className="h-5 w-36" />

@@ -20,7 +20,7 @@
 import "dotenv/config";
 
 import { getDatabaseStore } from "@/lib/db";
-import { calculateLeaderboard } from "@/features/leaderboard";
+import { calculateLeaderboard } from "@/features/leaderboard/services";
 import { logger } from "@/lib/logger";
 
 let activeCountrySlug: string | null = null;

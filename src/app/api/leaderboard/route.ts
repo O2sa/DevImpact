@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getLeaderboardResult } from "@/features/leaderboard";
+import { getLeaderboardResult } from "@/features/leaderboard/services";
 
 export const runtime = "nodejs";
 
