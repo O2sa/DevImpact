@@ -6,7 +6,7 @@ import {
   createComparisonInsights,
   parseSelectedLanguagesFromSearchParams,
   resolveLocale,
-} from "@/features/comparison";
+} from "@/features/comparison/services";
 import { toSafeApiError } from "@/lib/github";
 import type { ClientSafeError, SafeApiError } from "@/types/api";
 

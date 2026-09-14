@@ -9,7 +9,7 @@ import { Avatar } from "@/components/layout/avatar";
 import { ComparisonChart } from "./comparison-chart";
 import { TopList } from "./top-list";
 import { InsightsList } from "./insights-list";
-import { ScoreCard } from "@/features/developer/components/score-card";
+import { ScoreCard } from "@/components/cards";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { UserResult } from "@/features/developer";

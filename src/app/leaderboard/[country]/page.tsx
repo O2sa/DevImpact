@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import countriesData from "@/data/countries.json";
 import { JsonLd } from "@/components/seo/json-ld";
-import { getLeaderboardResult, CountryLeaderboardClient } from "@/features/leaderboard";
+import { CountryLeaderboardClient } from "@/features/leaderboard";
+import { getLeaderboardResult } from "@/features/leaderboard/services";
 import { toAbsoluteUrl } from "@/lib/seo";
 
 type CountryInfo = {

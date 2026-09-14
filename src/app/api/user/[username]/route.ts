@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUserProfile, UserFetchError } from "@/features/developer";
+import { getUserProfile, UserFetchError } from "@/features/developer/services";
 import { normalizeSelectedLanguages } from "@/features/scoring";
 import { toSafeApiError } from "@/lib/github";
 import type { SafeApiError } from "@/types/api";
