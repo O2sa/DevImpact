@@ -1,6 +1,5 @@
 import { calculateUserScore } from "@/features/scoring";
 import { getDatabaseStore } from "@/lib/db";
-import { createCacheStore, getCacheConfigFromEnv } from "@/lib/cache";
 import { detectCountry } from "@/lib/geo";
 import type { GitHubUserData } from "@/lib/github";
 import type { CalculateUserScoreResult } from "@/features/scoring/services";
@@ -14,11 +13,11 @@ export type PersistUserOptions = {
 };
 
 /**
- * Canonical service function to persist user score data to PostgreSQL
- * and invalidate country leaderboard cache in Redis.
+ * Canonical service function to persist user score data to PostgreSQL.
  *
  * Ensures that if selectedLanguages is provided, canonical unfiltered score
- * is always computed and persisted into the database.
+ * is always computed and persisted into the database without busting
+ * the country leaderboard cache.
  */
 export async function persistUserScores({
   data,
@@ -54,15 +53,6 @@ export async function persistUserScores({
       finalScore: Math.round(canonicalScore.finalScore),
       staleDays: resolvedStaleDays,
     });
-
-    if (country) {
-      const cacheConfig = getCacheConfigFromEnv();
-      const cacheStore = createCacheStore(cacheConfig);
-      if (cacheStore.enabled && cacheStore.del) {
-        const key = `${cacheConfig.namespace}:leaderboard:${country.trim().toLowerCase()}`;
-        await cacheStore.del(key).catch(() => {});
-      }
-    }
   } catch (err: unknown) {
     console.warn(`Failed to persist user score for ${data.login}:`, err);
   }
