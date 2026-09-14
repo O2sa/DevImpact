@@ -1,8 +1,6 @@
 import { getUserData } from "@/lib/github";
 import { calculateUserScore, normalizeSelectedLanguages } from "@/features/scoring";
-import { getDatabaseStore } from "@/lib/db";
-import { createCacheStore, getCacheConfigFromEnv } from "@/lib/cache";
-import { detectCountry } from "@/lib/geo";
+import { persistUserScores } from "@/features/developer/services";
 import {
   DEFAULT_LOCALE,
   LOCALE_COOKIE,
@@ -259,88 +257,53 @@ export async function compareUsers(
   usernames: string[],
   selectedLanguages: string[],
 ): Promise<ComparedUserResult[]> {
-  const results: ComparedUserResult[] = [];
-
-  for (const username of usernames) {
-    let data: Awaited<GitHubUserData>;
-    try {
-      const { data: userData, metrics } = await getUserData(username, {
-        cacheInRedis: true,
-        withMetrics: true,
-      });
-      data = userData;
-      console.log(metrics);
-    } catch (error: unknown) {
-      throw new CompareUserFetchError(username, error);
-    }
-
-    const score = calculateUserScore(
-      {
-        ...data,
-        selectedLanguages,
-      },
-      username,
-    );
-
-    results.push({
-      username: data.login,
-      name: data.name,
-      avatarUrl: data.avatarUrl,
-      repoScore: Math.round(score.repoScore),
-      prScore: Math.round(score.prScore),
-      contributionScore: Math.round(score.contributionScore),
-      finalScore: Math.round(score.finalScore),
-      normalizedRepoScore: Math.round(score.normalizedRepoScore),
-      normalizedPRScore: Math.round(score.normalizedPRScore),
-      normalizedContributionScore: Math.round(score.normalizedContributionScore),
-      normalizedFinalScore: Math.round(score.normalizedFinalScore),
-      topRepos: score.topRepos,
-      topPullRequests: score.topPullRequests,
-      topCommunityContributions: score.topCommunityContributions,
-      languageScores: score.languageScores,
-      signals: score.signals,
-      explanations: score.explanations,
-    });
-
-    // ── Fire-and-forget: detect country & upsert into DB ──────────────
-    const country = detectCountry(data.location);
-    if (country && process.env.DATABASE_URL?.trim()) {
-      const staleDays = parseInt(process.env.GITHUB_USER_STALE_DAYS ?? "14", 10);
-      const dbScore = selectedLanguages.length > 0 ? calculateUserScore(data, data.login) : score;
-
+  return Promise.all(
+    usernames.map(async (username) => {
+      let data: GitHubUserData;
       try {
-        const db = getDatabaseStore();
-        db.upsertUser({
-          username: data.login,
-          name: data.name,
-          avatarUrl: data.avatarUrl,
-          location: data.location,
-          country,
-          rawData: data,
-          scores: dbScore,
-          repoScore: Math.round(dbScore.repoScore),
-          prScore: Math.round(dbScore.prScore),
-          contributionScore: Math.round(dbScore.contributionScore),
-          finalScore: Math.round(dbScore.finalScore),
-          staleDays,
-        })
-          .then(() => {
-            // Invalidate Redis cache for this country
-            const cacheConfig = getCacheConfigFromEnv();
-            const cacheStore = createCacheStore(cacheConfig);
-            if (cacheStore.enabled && cacheStore.del) {
-              const key = `${cacheConfig.namespace}:leaderboard:${country.trim().toLowerCase()}`;
-              cacheStore.del(key).catch(() => {});
-            }
-          })
-          .catch((err: unknown) => {
-            console.warn("Failed to upsert user from compare:", err);
-          });
-      } catch {
-        // Ignore DB connection errors in environments without DB
+        const { data: userData } = await getUserData(username, {
+          cacheInRedis: true,
+          withMetrics: true,
+        });
+        data = userData;
+      } catch (error: unknown) {
+        throw new CompareUserFetchError(username, error);
       }
-    }
-  }
 
-  return results;
+      const score = calculateUserScore(
+        {
+          ...data,
+          selectedLanguages,
+        },
+        username,
+      );
+
+      // Fire-and-forget: detect country & persist canonical scores into DB
+      void persistUserScores({
+        data,
+        score,
+        selectedLanguages,
+      });
+
+      return {
+        username: data.login,
+        name: data.name,
+        avatarUrl: data.avatarUrl,
+        repoScore: Math.round(score.repoScore),
+        prScore: Math.round(score.prScore),
+        contributionScore: Math.round(score.contributionScore),
+        finalScore: Math.round(score.finalScore),
+        normalizedRepoScore: Math.round(score.normalizedRepoScore),
+        normalizedPRScore: Math.round(score.normalizedPRScore),
+        normalizedContributionScore: Math.round(score.normalizedContributionScore),
+        normalizedFinalScore: Math.round(score.normalizedFinalScore),
+        topRepos: score.topRepos,
+        topPullRequests: score.topPullRequests,
+        topCommunityContributions: score.topCommunityContributions,
+        languageScores: score.languageScores,
+        signals: score.signals,
+        explanations: score.explanations,
+      };
+    }),
+  );
 }

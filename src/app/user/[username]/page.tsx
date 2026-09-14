@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/seo/json-ld";
 import { UserProfileClient, UserNotFoundCard } from "@/features/developer";
@@ -8,6 +9,10 @@ import { toAbsoluteUrl } from "@/lib/seo";
 
 import countriesData from "@/data/countries.json";
 import { detectCountry } from "@/lib/geo";
+
+const getCachedUserProfile = cache(async (username: string) => {
+  return getUserProfile(username);
+});
 
 type CountryInfo = {
   slug: string;
@@ -27,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   let displayName = cleanUsername;
   try {
-    const { user } = await getUserProfile(cleanUsername);
+    const { user } = await getCachedUserProfile(cleanUsername);
     displayName = user.name?.trim() || cleanUsername;
   } catch {
     // Fallback if user cannot be fetched during metadata generation
@@ -96,7 +101,7 @@ export default async function UserProfilePage({ params, searchParams }: Props) {
   let fetchErrorMessage: string | null = null;
 
   try {
-    profileData = await getUserProfile(cleanUsername);
+    profileData = await getCachedUserProfile(cleanUsername);
   } catch (err: unknown) {
     fetchErrorMessage = err instanceof Error ? err.message : "Failed to load user profile";
   }

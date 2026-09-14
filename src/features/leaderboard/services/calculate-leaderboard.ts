@@ -1,9 +1,9 @@
 import yaml from "js-yaml";
 import { getUserData } from "@/lib/github";
 import { calculateUserScore } from "@/features/scoring";
+import { persistUserScores } from "@/features/developer/services";
 import { createCacheStore, getCacheConfigFromEnv } from "@/lib/cache";
 import { getDatabaseStore, type DatabaseStore } from "@/lib/db";
-import { detectCountry } from "@/lib/geo";
 import type {
   CalculateLeaderboardResponse,
   LeaderboardMeta,
@@ -119,20 +119,10 @@ export async function seedNewUsers(
       });
       fetchMetrics.push(metrics);
       const score = calculateUserScore(data, user.login);
-      const countryDetected = detectCountry(data.location);
 
-      await db.upsertUser({
-        username: data.login,
-        name: data.name,
-        avatarUrl: data.avatarUrl,
-        location: data.location,
-        country: countryDetected,
-        rawData: data,
-        scores: score,
-        repoScore: Math.round(score.repoScore),
-        prScore: Math.round(score.prScore),
-        contributionScore: Math.round(score.contributionScore),
-        finalScore: Math.round(score.finalScore),
+      await persistUserScores({
+        data,
+        score,
         staleDays,
       });
 
@@ -173,20 +163,10 @@ export async function refreshStaleUsers(
       });
       fetchMetrics.push(metrics);
       const score = calculateUserScore(data, row.username);
-      const countryDetected = detectCountry(data.location);
 
-      await db.upsertUser({
-        username: data.login,
-        name: data.name,
-        avatarUrl: data.avatarUrl,
-        location: data.location,
-        country: countryDetected,
-        rawData: data,
-        scores: score,
-        repoScore: Math.round(score.repoScore),
-        prScore: Math.round(score.prScore),
-        contributionScore: Math.round(score.contributionScore),
-        finalScore: Math.round(score.finalScore),
+      await persistUserScores({
+        data,
+        score,
         staleDays,
       });
 

@@ -1,16 +1,18 @@
 import { Pool, PoolConfig } from "pg";
 import countries from "@/data/countries.json";
+import type { GitHubUserData } from "@/lib/github";
+import type { CalculateUserScoreResult } from "@/features/scoring/services";
 
 // ─── Types ─────────────────────────────────────────────────────────────
 
-export type GitHubUserRow = {
+export type GitHubUserRow<TRaw = GitHubUserData, TScores = CalculateUserScoreResult> = {
   username: string;
   name: string | null;
   avatar_url: string;
   location: string | null;
   country: string | null;
-  raw_data: unknown;
-  scores: unknown;
+  raw_data: TRaw;
+  scores: TScores;
   repo_score: number;
   pr_score: number;
   contribution_score: number;
@@ -21,14 +23,14 @@ export type GitHubUserRow = {
   updated_at: Date;
 };
 
-export type UpsertUserParams = {
+export type UpsertUserParams<TRaw = GitHubUserData, TScores = CalculateUserScoreResult> = {
   username: string;
   name: string | null;
   avatarUrl: string;
   location: string | null;
   country: string | null;
-  rawData: unknown;
-  scores: unknown;
+  rawData: TRaw;
+  scores: TScores;
   repoScore: number;
   prScore: number;
   contributionScore: number;

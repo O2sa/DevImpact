@@ -84,7 +84,7 @@ export function useI18nProvider(initialLocale: Locale = DEFAULT_LOCALE) {
       }
       if (!params) return template;
       return Object.keys(params).reduce(
-        (acc, k) => acc.replace(`{${k}}`, String(params[k])),
+        (acc, k) => acc.split(`{${k}}`).join(String(params[k])),
         template,
       );
     },
