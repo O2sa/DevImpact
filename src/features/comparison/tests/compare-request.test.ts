@@ -120,10 +120,15 @@ describe("comparison response reconciliation", () => {
   });
 
   test("binds asynchronous completion to the latest presentation ref", () => {
-    const source = readFileSync(
-      resolve(process.cwd(), "src", "features", "comparison", "components", "home-page-client.tsx"),
-      "utf8",
+    const hookPath = resolve(
+      process.cwd(),
+      "src",
+      "features",
+      "comparison",
+      "hooks",
+      "use-comparison-controller.ts",
     );
+    const source = readFileSync(hookPath, "utf8");
 
     expect(source).toMatch(
       /reconcileComparisonData\(\s*nextData,\s*fetchKey,\s*latestRequestRef\.current/,

@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import { Check, Copy, ExternalLink, Trophy } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import { useClipboardCopy } from "@/hooks";
 import { Avatar } from "@/components/layout/avatar";
 import { ComparisonChart } from "./comparison-chart";
 import { TopList } from "./top-list";
@@ -61,7 +62,7 @@ export function ResultDashboard({
 }: Props) {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useClipboardCopy();
   const methodologyHref = useMemo(() => {
     const query = searchParams.toString();
     return query ? `/scoring-methodology?${query}` : "/scoring-methodology";
@@ -109,27 +110,21 @@ export function ResultDashboard({
       ? t("results.pointsLead", { points: winnerDiffPoints })
       : `${winnerDiffPct}%`;
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(
-        JSON.stringify(
-          {
-            user1,
-            user2,
-            winner,
-            languageWinner,
-            insights,
-            scoreVersion,
-          },
-          null,
-          2,
-        ),
-      );
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
-    }
+  const handleCopy = () => {
+    copy(
+      JSON.stringify(
+        {
+          user1,
+          user2,
+          winner,
+          languageWinner,
+          insights,
+          scoreVersion,
+        },
+        null,
+        2,
+      ),
+    );
   };
 
   const renderScoreGroup = (user: UserResult) => {

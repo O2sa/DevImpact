@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { Route } from "next";
+import { useClipboardCopy } from "@/hooks";
 import {
   ArrowLeft,
   Check,
@@ -48,7 +48,7 @@ type Props = {
 export function UserProfileClient({ user, location, countryParam }: Props) {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useClipboardCopy();
 
   const displayName = user.name?.trim() || user.username;
   const githubUrl = `https://github.com/${user.username}`;
@@ -75,15 +75,7 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
   const flagSlug = activeCountryInfo?.slug || detectedSlug;
   const flagCode = flagSlug ? getCountryCode(flagSlug) : null;
 
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
-    }
-  };
+  const handleCopyLink = () => copy(window.location.href);
 
   // Signal stats entries for transparency
   const signalEntries = user.signals

@@ -1,8 +1,6 @@
 import { getUserData } from "@/lib/github";
 import { calculateUserScore } from "@/features/scoring";
-import { getDatabaseStore } from "@/lib/db";
-import { createCacheStore, getCacheConfigFromEnv } from "@/lib/cache";
-import { detectCountry } from "@/lib/geo";
+import { persistUserScores } from "./user-persistence";
 import type { UserProfileResponse, UserResult } from "../types";
 import type { GitHubUserData } from "@/lib/github";
 
@@ -67,44 +65,12 @@ export async function getUserProfile(
     scoreVersion: process.env.DEVIMPACT_VERSION || undefined,
   };
 
-  // Fire-and-forget: detect country & upsert into DB if configured
-  const country = detectCountry(data.location);
-  if (country && process.env.DATABASE_URL?.trim()) {
-    const staleDays = parseInt(process.env.GITHUB_USER_STALE_DAYS ?? "14", 10);
-    const dbScore =
-      selectedLanguages.length > 0 ? calculateUserScore(data, normalizedUsername) : score;
-
-    try {
-      const db = getDatabaseStore();
-      db.upsertUser({
-        username: data.login,
-        name: data.name,
-        avatarUrl: data.avatarUrl,
-        location: data.location,
-        country,
-        rawData: data,
-        scores: dbScore,
-        repoScore: Math.round(dbScore.repoScore),
-        prScore: Math.round(dbScore.prScore),
-        contributionScore: Math.round(dbScore.contributionScore),
-        finalScore: Math.round(dbScore.finalScore),
-        staleDays,
-      })
-        .then(() => {
-          const cacheConfig = getCacheConfigFromEnv();
-          const cacheStore = createCacheStore(cacheConfig);
-          if (cacheStore.enabled && cacheStore.del) {
-            const key = `${cacheConfig.namespace}:leaderboard:${country.trim().toLowerCase()}`;
-            cacheStore.del(key).catch(() => {});
-          }
-        })
-        .catch((err: unknown) => {
-          console.warn("Failed to upsert user from user profile:", err);
-        });
-    } catch {
-      // Ignore in environments without DB
-    }
-  }
+  // Fire-and-forget: detect country & persist canonical scores into DB
+  void persistUserScores({
+    data,
+    score,
+    selectedLanguages,
+  });
 
   return {
     user,

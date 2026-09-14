@@ -51,7 +51,6 @@ export async function getLeaderboardResult(country: string): Promise<Leaderboard
 
   try {
     const db = getDatabaseStore();
-    await db.initializeSchema();
 
     const rows = await db.getLeaderboard(country, displayLimit);
     const totalCount = await db.getLeaderboardCount(country);

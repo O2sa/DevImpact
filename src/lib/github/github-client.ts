@@ -821,33 +821,6 @@ export async function getUserData(
     normalizedUsername,
   );
 
-  // Upsert into PostgreSQL
-  try {
-    const { getDatabaseStore: getDb } = await import("@/lib/db");
-    const { calculateUserScore: calcScore } =
-      await import("@/features/scoring/services/score-engine");
-
-    const db = getDb();
-    const score = calcScore(fresh, normalizedUsername);
-
-    await db.upsertUser({
-      username: fresh.login,
-      name: fresh.name,
-      avatarUrl: fresh.avatarUrl,
-      location: fresh.location,
-      country: null,
-      rawData: fresh,
-      scores: score,
-      repoScore: Math.round(score.repoScore),
-      prScore: Math.round(score.prScore),
-      contributionScore: Math.round(score.contributionScore),
-      finalScore: Math.round(score.finalScore),
-      staleDays,
-    });
-  } catch {
-    // Non-fatal: DB write failure
-  }
-
   // 4. Handle Redis cache
   if (cacheStoreSingleton.enabled && cacheStoreSingleton.del) {
     const cacheKey = buildUserCacheKey(normalizedUsername);
