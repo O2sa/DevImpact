@@ -23,6 +23,19 @@ export type GitHubUserRow<TRaw = GitHubUserData, TScores = CalculateUserScoreRes
   updated_at: Date;
 };
 
+export type LeaderboardUserRow = Pick<
+  GitHubUserRow,
+  | "username"
+  | "name"
+  | "avatar_url"
+  | "repo_score"
+  | "pr_score"
+  | "contribution_score"
+  | "final_score"
+>;
+
+export type TopStaleUserRow = Pick<GitHubUserRow, "username" | "stale_after" | "final_score">;
+
 export type UpsertUserParams<TRaw = GitHubUserData, TScores = CalculateUserScoreResult> = {
   username: string;
   name: string | null;
@@ -244,7 +257,12 @@ export class DatabaseStore {
   async getUser(username: string): Promise<GitHubUserRow | null> {
     const client = getPool();
     const result = await client.query(
-      "SELECT * FROM github_users WHERE LOWER(username) = LOWER($1)",
+      `SELECT
+        username, name, avatar_url, location, country,
+        raw_data, scores, repo_score, pr_score, contribution_score, final_score,
+        fetched_at, stale_after, created_at, updated_at
+       FROM github_users
+       WHERE LOWER(username) = LOWER($1)`,
       [username],
     );
     return result.rows[0] ?? null;
@@ -261,29 +279,34 @@ export class DatabaseStore {
 
   // ── Leaderboard operations ──────────────────────────────────────────
 
-  async getLeaderboard(country: string, limit: number = 500): Promise<GitHubUserRow[]> {
+  async getLeaderboard(country: string, limit: number = 500): Promise<LeaderboardUserRow[]> {
     const client = getPool();
-    const result = await client.query(
-      `SELECT *
-       FROM (
-         SELECT DISTINCT ON (LOWER(username)) *
-         FROM github_users
-         WHERE country = $1
-         ORDER BY LOWER(username), final_score DESC, updated_at DESC
-       ) deduped_users
-       ORDER BY final_score DESC
-       LIMIT $2`,
-      [country, limit],
-    );
+    const isWorldwide = country.trim().toLowerCase() === "worldwide";
+    const result = isWorldwide
+      ? await client.query(
+          `SELECT username, name, avatar_url, repo_score, pr_score, contribution_score, final_score
+           FROM github_users
+           ORDER BY final_score DESC
+           LIMIT $1`,
+          [limit],
+        )
+      : await client.query(
+          `SELECT username, name, avatar_url, repo_score, pr_score, contribution_score, final_score
+           FROM github_users
+           WHERE country = $1
+           ORDER BY final_score DESC
+           LIMIT $2`,
+          [country, limit],
+        );
     return result.rows;
   }
 
   async getLeaderboardCount(country: string): Promise<number> {
     const client = getPool();
-    const result = await client.query(
-      "SELECT COUNT(DISTINCT LOWER(username)) FROM github_users WHERE country = $1",
-      [country],
-    );
+    const isWorldwide = country.trim().toLowerCase() === "worldwide";
+    const result = isWorldwide
+      ? await client.query("SELECT COUNT(*) FROM github_users")
+      : await client.query("SELECT COUNT(*) FROM github_users WHERE country = $1", [country]);
     return Number(result.rows[0].count);
   }
 
@@ -291,16 +314,12 @@ export class DatabaseStore {
    * Returns stale users in a country, ordered by score descending.
    * These are users whose data needs to be refreshed from GitHub.
    */
-  async getTopStaleUsers(country: string, limit: number = 500): Promise<GitHubUserRow[]> {
+  async getTopStaleUsers(country: string, limit: number = 500): Promise<TopStaleUserRow[]> {
     const client = getPool();
     const result = await client.query(
-      `SELECT *
-       FROM (
-         SELECT DISTINCT ON (LOWER(username)) *
-         FROM github_users
-         WHERE country = $1 AND stale_after < NOW()
-         ORDER BY LOWER(username), final_score DESC, updated_at DESC
-       ) deduped_users
+      `SELECT username, stale_after, final_score
+       FROM github_users
+       WHERE country = $1 AND stale_after < NOW()
        ORDER BY final_score DESC
        LIMIT $2`,
       [country, limit],
@@ -312,16 +331,12 @@ export class DatabaseStore {
    * Returns the top-scoring users in a country regardless of staleness.
    * Used to determine which users to check for refresh.
    */
-  async getTopUsers(country: string, limit: number = 500): Promise<GitHubUserRow[]> {
+  async getTopUsers(country: string, limit: number = 500): Promise<TopStaleUserRow[]> {
     const client = getPool();
     const result = await client.query(
-      `SELECT *
-       FROM (
-         SELECT DISTINCT ON (LOWER(username)) *
-         FROM github_users
-         WHERE country = $1
-         ORDER BY LOWER(username), final_score DESC, updated_at DESC
-       ) deduped_users
+      `SELECT username, stale_after, final_score
+       FROM github_users
+       WHERE country = $1
        ORDER BY final_score DESC
        LIMIT $2`,
       [country, limit],
