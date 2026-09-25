@@ -112,6 +112,9 @@ export class DatabaseStore {
       CREATE INDEX IF NOT EXISTS idx_github_users_country_score
         ON github_users(country, final_score DESC);
 
+      CREATE INDEX IF NOT EXISTS idx_github_users_final_score
+        ON github_users(final_score DESC);
+
       CREATE INDEX IF NOT EXISTS idx_github_users_stale
         ON github_users(stale_after)
         WHERE country IS NOT NULL;
