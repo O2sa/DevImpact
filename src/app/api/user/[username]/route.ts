@@ -20,7 +20,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ user
 
   try {
     const { user, location } = await getUserProfile(trimmed, selectedLanguages);
-    return NextResponse.json({ success: true, user, location });
+    return NextResponse.json(
+      { success: true, user, location },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=86400",
+        },
+      },
+    );
   } catch (error: unknown) {
     console.error("User profile fetch error:", error);
     return formatApiErrorResponse(error);

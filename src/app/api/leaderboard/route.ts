@@ -16,7 +16,14 @@ export async function GET(request: Request) {
 
   try {
     const result = await getLeaderboardResult(country);
-    return NextResponse.json({ success: true, ...result });
+    return NextResponse.json(
+      { success: true, ...result },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+        },
+      },
+    );
   } catch (err) {
     console.error("Leaderboard DB query failed:", err);
 

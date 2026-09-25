@@ -67,10 +67,12 @@ function getPoolConfig(): PoolConfig {
     );
   }
 
+  const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+
   return {
     connectionString,
-    max: 10,
-    idleTimeoutMillis: 30_000,
+    max: isServerless ? 2 : 10,
+    idleTimeoutMillis: isServerless ? 10_000 : 30_000,
     connectionTimeoutMillis: 5_000,
   };
 }

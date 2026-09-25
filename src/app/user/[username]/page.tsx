@@ -21,6 +21,9 @@ type CountryInfo = {
 
 const countries = countriesData as CountryInfo[];
 
+export const revalidate = 1800; // Cache user profile on Edge CDN for 30 minutes via ISR
+export const dynamicParams = true;
+
 type Props = {
   params: Promise<{ username: string }>;
   searchParams?: Promise<{ country?: string }>;

@@ -99,7 +99,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const cookieStore = await cookies();
   const headerStore = await headers();
-  const cookieLocale = cookieStore.get(LOCALE_COOKIE)?.value;
+  const cookieLocale = cookieStore.get(LOCALE_COOKIE)?.value || headerStore.get("x-locale");
   const initialLocale = isSupportedLocale(cookieLocale)
     ? cookieLocale
     : parseAcceptLanguage(headerStore.get("accept-language"), supportedLocales, DEFAULT_LOCALE);

@@ -91,8 +91,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+export const revalidate = 3600; // Cache on Vercel Edge CDN for 1 hour via ISR
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
-  return countries.map((country) => ({ country: country.slug }));
+  // Pre-render the top 20 most visited countries at build time.
+  // Other countries are generated on-demand upon first visit and cached by ISR.
+  return countries.slice(0, 20).map((country) => ({ country: country.slug }));
 }
 
 export default async function CountryLeaderboardPage({ params }: Props) {
