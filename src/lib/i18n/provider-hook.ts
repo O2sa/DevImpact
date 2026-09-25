@@ -3,14 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import arMessages from "@/locales/ar.json";
 import enMessages from "@/locales/en.json";
-import {
-  DEFAULT_LOCALE,
-  LOCALE_COOKIE,
-  isSupportedLocale,
-  localeMeta,
-  supportedLocales,
-  type Locale,
-} from "./core";
+import { DEFAULT_LOCALE, LOCALE_COOKIE, localeMeta, supportedLocales, type Locale } from "./core";
 
 type Messages = Record<string, string>;
 
@@ -32,17 +25,8 @@ function persistLocale(locale: Locale) {
 }
 
 export function useI18nProvider(initialLocale: Locale = DEFAULT_LOCALE) {
-  const getInitialLocale = () => {
-    if (typeof window !== "undefined") {
-      const stored = window.localStorage.getItem(LOCALE_COOKIE);
-      if (isSupportedLocale(stored)) return stored;
-    }
-    return initialLocale;
-  };
-
-  const initialLoc = getInitialLocale();
-  const [locale, setLocaleState] = useState<Locale>(initialLoc);
-  const [messages, setMessages] = useState<Messages>(() => messagesByLocale[initialLoc]);
+  const [locale, setLocaleState] = useState<Locale>(initialLocale);
+  const [messages, setMessages] = useState<Messages>(() => messagesByLocale[initialLocale]);
   const [ready, setReady] = useState<boolean>(true);
 
   const changeLocale = useCallback((next: Locale) => {

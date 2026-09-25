@@ -9,7 +9,7 @@ import {
 } from "@/lib/i18n/core";
 
 export function middleware(request: NextRequest) {
-  const response = NextResponse.next();
+  const requestHeaders = new Headers(request.headers);
   const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value;
 
   if (!isSupportedLocale(cookieLocale)) {
@@ -18,11 +18,29 @@ export function middleware(request: NextRequest) {
       supportedLocales,
       DEFAULT_LOCALE,
     );
+    requestHeaders.set("x-locale", locale);
 
-    response.cookies.set(LOCALE_COOKIE, locale, { path: "/" });
+    const response = NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+
+    response.cookies.set(LOCALE_COOKIE, locale, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "lax",
+    });
+
+    return response;
   }
 
-  return response;
+  requestHeaders.set("x-locale", cookieLocale);
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 }
 
 // Run only on routes that produce HTML or read the cookie. Skip Next.js

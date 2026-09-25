@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/seo/json-ld";
 import { ScoringMethodologyPageClient } from "@/features/scoring";
@@ -68,7 +69,9 @@ export default function ScoringMethodologyPage() {
   return (
     <>
       <JsonLd data={faqSchema} />
-      <ScoringMethodologyPageClient />
+      <Suspense fallback={<div className="min-h-screen" />}>
+        <ScoringMethodologyPageClient />
+      </Suspense>
     </>
   );
 }
