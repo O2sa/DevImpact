@@ -73,7 +73,7 @@ function getPoolConfig(): PoolConfig {
     connectionString,
     max: isServerless ? 2 : 10,
     idleTimeoutMillis: isServerless ? 10_000 : 30_000,
-    connectionTimeoutMillis: 5_000,
+    connectionTimeoutMillis: 10_000,
   };
 }
 
@@ -277,6 +277,28 @@ export class DatabaseStore {
       [username],
     );
     return (result.rowCount ?? 0) > 0;
+  }
+
+  async getExistingUsernames(usernames: string[]): Promise<Set<string>> {
+    if (!usernames.length) {
+      return new Set();
+    }
+
+    const lowerUsernames = Array.from(
+      new Set(usernames.map((u) => u.trim().toLowerCase()).filter(Boolean)),
+    );
+
+    if (lowerUsernames.length === 0) {
+      return new Set();
+    }
+
+    const client = getPool();
+    const result = await client.query<{ username: string }>(
+      "SELECT LOWER(username) AS username FROM github_users WHERE LOWER(username) = ANY($1::text[])",
+      [lowerUsernames],
+    );
+
+    return new Set(result.rows.map((r) => r.username.toLowerCase()));
   }
 
   // ── Leaderboard operations ──────────────────────────────────────────

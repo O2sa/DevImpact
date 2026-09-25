@@ -54,6 +54,29 @@ function getRefreshLimit(): number {
   return getEnvInt("LEADERBOARD_REFRESH_LIMIT", 500);
 }
 
+function getConcurrency(): number {
+  return getEnvInt("LEADERBOARD_CONCURRENCY", 3);
+}
+
+async function runConcurrent<T>(
+  items: T[],
+  concurrency: number,
+  task: (item: T) => Promise<void>,
+): Promise<void> {
+  if (items.length === 0) return;
+  const limit = Math.max(1, Math.min(concurrency, items.length));
+  let currentIndex = 0;
+
+  const workers = Array.from({ length: limit }, async () => {
+    while (currentIndex < items.length) {
+      const index = currentIndex++;
+      await task(items[index]);
+    }
+  });
+
+  await Promise.all(workers);
+}
+
 function getSourceUrl(country: string): string {
   const template = process.env.LEADERBOARD_SOURCE_URL_TEMPLATE?.trim();
   if (!template) {
@@ -92,6 +115,7 @@ export async function seedNewUsers(
   users: LeaderboardSourceEntry[],
   seedLimit: number,
   staleDays: number,
+  concurrency: number = getConcurrency(),
 ): Promise<{
   newUsersCount: number;
   skippedExistingCount: number;
@@ -104,15 +128,19 @@ export async function seedNewUsers(
   const fetchMetrics: { duration: number; errors: { part: string; reason: string }[] }[] = [];
 
   const usersToSeed = users.slice(0, seedLimit);
+  const existingSet = await db.getExistingUsernames(usersToSeed.map((u) => u.login));
 
+  const usersToFetch: LeaderboardSourceEntry[] = [];
   for (const user of usersToSeed) {
-    try {
-      const exists = await db.userExists(user.login);
-      if (exists) {
-        skippedExistingCount += 1;
-        continue;
-      }
+    if (existingSet.has(user.login.toLowerCase())) {
+      skippedExistingCount += 1;
+    } else {
+      usersToFetch.push(user);
+    }
+  }
 
+  await runConcurrent(usersToFetch, concurrency, async (user) => {
+    try {
       const { data, metrics } = await getUserData(user.login, {
         cacheInRedis: false,
         withMetrics: true,
@@ -130,7 +158,7 @@ export async function seedNewUsers(
     } catch (e) {
       errors.push({ username: user.login, reason: e instanceof Error ? e.message : String(e) });
     }
-  }
+  });
 
   return { newUsersCount, skippedExistingCount, errors, fetchMetrics };
 }
@@ -140,6 +168,7 @@ export async function refreshStaleUsers(
   country: string,
   refreshLimit: number,
   staleDays: number,
+  concurrency: number = getConcurrency(),
 ): Promise<{
   refreshedCount: number;
   errors: { username: string; reason: string }[];
@@ -150,12 +179,10 @@ export async function refreshStaleUsers(
   const fetchMetrics: { duration: number; errors: { part: string; reason: string }[] }[] = [];
 
   const topUsers = await db.getTopUsers(country, refreshLimit);
+  const now = new Date();
+  const staleUsers = topUsers.filter((row) => row.stale_after < now);
 
-  for (const row of topUsers) {
-    if (row.stale_after >= new Date()) {
-      continue;
-    }
-
+  await runConcurrent(staleUsers, concurrency, async (row) => {
     try {
       const { data, metrics } = await getUserData(row.username, {
         cacheInRedis: false,
@@ -174,7 +201,7 @@ export async function refreshStaleUsers(
     } catch (e) {
       errors.push({ username: row.username, reason: e instanceof Error ? e.message : String(e) });
     }
-  }
+  });
 
   return { refreshedCount, errors, fetchMetrics };
 }
@@ -242,23 +269,24 @@ export async function calculateLeaderboard(
     refreshLimit?: number;
     staleDays?: number;
     displayLimit?: number;
+    concurrency?: number;
   },
 ): Promise<CalculateLeaderboardResponse> {
   const db = getDatabaseStore();
-  await db.initializeSchema();
 
   const staleDays = overrides?.staleDays ?? getStaleDays();
   const seedLimit = overrides?.seedLimit ?? getSeedLimit();
   const refreshLimit = overrides?.refreshLimit ?? getRefreshLimit();
+  const concurrency = overrides?.concurrency ?? getConcurrency();
 
   // 1. Fetch source users
   const sourceData = await fetchCommittersFromTop(country);
 
   // 2a. Seed new users
-  const seedResult = await seedNewUsers(db, sourceData.users, seedLimit, staleDays);
+  const seedResult = await seedNewUsers(db, sourceData.users, seedLimit, staleDays, concurrency);
 
   // 2b. Refresh stale users from DB top N
-  const refreshResult = await refreshStaleUsers(db, country, refreshLimit, staleDays);
+  const refreshResult = await refreshStaleUsers(db, country, refreshLimit, staleDays, concurrency);
 
   // 3. Build leaderboard result
   const allErrors = [
