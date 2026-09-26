@@ -839,6 +839,9 @@ export async function getUserData(
       // Delete stale cache entry (leaderboard calculation path)
       try {
         await cacheStoreSingleton.del(cacheKey);
+        await cacheStoreSingleton.del(
+          `${cacheConfigSingleton.namespace}:profile:${normalizedUsername.toLowerCase()}`,
+        );
       } catch {
         // Non-fatal
       }

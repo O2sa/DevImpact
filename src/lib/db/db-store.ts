@@ -34,6 +34,21 @@ export type LeaderboardUserRow = Pick<
   | "final_score"
 >;
 
+export type UserProfileRow = Pick<
+  GitHubUserRow,
+  | "username"
+  | "name"
+  | "avatar_url"
+  | "location"
+  | "country"
+  | "scores"
+  | "repo_score"
+  | "pr_score"
+  | "contribution_score"
+  | "final_score"
+  | "stale_after"
+>;
+
 export type TopStaleUserRow = Pick<GitHubUserRow, "username" | "stale_after" | "final_score">;
 
 export type UpsertUserParams<TRaw = GitHubUserData, TScores = CalculateUserScoreResult> = {
@@ -263,6 +278,20 @@ export class DatabaseStore {
         username, name, avatar_url, location, country,
         raw_data, scores, repo_score, pr_score, contribution_score, final_score,
         fetched_at, stale_after, created_at, updated_at
+       FROM github_users
+       WHERE LOWER(username) = LOWER($1)`,
+      [username],
+    );
+    return result.rows[0] ?? null;
+  }
+
+  async getUserProfile(username: string): Promise<UserProfileRow | null> {
+    const client = getPool();
+    const result = await client.query<UserProfileRow>(
+      `SELECT
+        username, name, avatar_url, location, country,
+        scores, repo_score, pr_score, contribution_score, final_score,
+        stale_after
        FROM github_users
        WHERE LOWER(username) = LOWER($1)`,
       [username],

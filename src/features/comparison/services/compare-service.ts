@@ -1,6 +1,5 @@
-import { getUserData } from "@/lib/github";
-import { calculateUserScore, normalizeSelectedLanguages } from "@/features/scoring";
-import { persistUserScores } from "@/features/developer/services";
+import { normalizeSelectedLanguages } from "@/features/scoring";
+import { getUserProfile, UserFetchError } from "@/features/developer/services";
 import {
   DEFAULT_LOCALE,
   LOCALE_COOKIE,
@@ -8,7 +7,6 @@ import {
   parseAcceptLanguage,
   type Locale,
 } from "@/lib/i18n/core";
-import type { GitHubUserData } from "@/lib/github";
 import type { ComparedUserResult, CompareInsights, CompareWinner, LanguageWinner } from "../types";
 
 export class CompareUserFetchError extends Error {
@@ -257,53 +255,36 @@ export async function compareUsers(
   usernames: string[],
   selectedLanguages: string[],
 ): Promise<ComparedUserResult[]> {
-  return Promise.all(
-    usernames.map(async (username) => {
-      let data: GitHubUserData;
-      try {
-        const { data: userData } = await getUserData(username, {
-          cacheInRedis: true,
-          withMetrics: true,
-        });
-        data = userData;
-      } catch (error: unknown) {
-        throw new CompareUserFetchError(username, error);
-      }
-
-      const score = calculateUserScore(
-        {
-          ...data,
-          selectedLanguages,
-        },
+  const results: ComparedUserResult[] = [];
+  for (const username of usernames) {
+    try {
+      const { user } = await getUserProfile(username, selectedLanguages);
+      results.push({
+        username: user.username,
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+        repoScore: user.repoScore,
+        prScore: user.prScore,
+        contributionScore: user.contributionScore,
+        finalScore: user.finalScore,
+        normalizedRepoScore: user.normalizedRepoScore ?? user.repoScore,
+        normalizedPRScore: user.normalizedPRScore ?? user.prScore,
+        normalizedContributionScore: user.normalizedContributionScore ?? user.contributionScore,
+        normalizedFinalScore: user.normalizedFinalScore ?? user.finalScore,
+        topRepos: user.topRepos as ComparedUserResult["topRepos"],
+        topPullRequests: user.topPullRequests as ComparedUserResult["topPullRequests"],
+        topCommunityContributions: (user.topCommunityContributions ??
+          []) as ComparedUserResult["topCommunityContributions"],
+        languageScores: user.languageScores as ComparedUserResult["languageScores"],
+        signals: user.signals,
+        explanations: user.explanations,
+      } as unknown as ComparedUserResult);
+    } catch (error: unknown) {
+      throw new CompareUserFetchError(
         username,
+        error instanceof UserFetchError ? error.causeError : error,
       );
-
-      // Fire-and-forget: detect country & persist canonical scores into DB
-      void persistUserScores({
-        data,
-        score,
-        selectedLanguages,
-      });
-
-      return {
-        username: data.login,
-        name: data.name,
-        avatarUrl: data.avatarUrl,
-        repoScore: Math.round(score.repoScore),
-        prScore: Math.round(score.prScore),
-        contributionScore: Math.round(score.contributionScore),
-        finalScore: Math.round(score.finalScore),
-        normalizedRepoScore: Math.round(score.normalizedRepoScore),
-        normalizedPRScore: Math.round(score.normalizedPRScore),
-        normalizedContributionScore: Math.round(score.normalizedContributionScore),
-        normalizedFinalScore: Math.round(score.normalizedFinalScore),
-        topRepos: score.topRepos,
-        topPullRequests: score.topPullRequests,
-        topCommunityContributions: score.topCommunityContributions,
-        languageScores: score.languageScores,
-        signals: score.signals,
-        explanations: score.explanations,
-      };
-    }),
-  );
+    }
+  }
+  return results;
 }
