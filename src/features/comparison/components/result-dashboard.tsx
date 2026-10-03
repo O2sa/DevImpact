@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useRef } from "react";
 import Link from "next/link";
 import type { Route } from "next";
-import { Check, Copy, ExternalLink, Trophy } from "lucide-react";
+import { Check, Copy, ExternalLink, Trophy, Share2, XCircle } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useClipboardCopy } from "@/hooks";
 import { Avatar } from "@/components/layout/avatar";
@@ -63,6 +63,34 @@ export function ResultDashboard({
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const { copied, copy } = useClipboardCopy();
+  const { copy: copyShare } = useClipboardCopy();
+  const [shareState, setShareState] = useState<"idle" | "success" | "error">("idle");
+  const shareTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const setShareFeedback = (state: "success" | "error") => {
+    setShareState(state);
+    if (shareTimerRef.current) clearTimeout(shareTimerRef.current);
+    shareTimerRef.current = setTimeout(() => setShareState("idle"), 2000);
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({ url });
+        setShareFeedback("success");
+      } else {
+        const success = await copyShare(url);
+        setShareFeedback(success ? "success" : "error");
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === "AbortError") {
+        return;
+      }
+      setShareFeedback("error");
+    }
+  };
+
   const methodologyHref = useMemo(() => {
     const query = searchParams.toString();
     return query ? `/scoring-methodology?${query}` : "/scoring-methodology";
@@ -454,7 +482,31 @@ export function ResultDashboard({
         </Card>
       ) : null}
 
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={handleShare}
+          className="flex items-center gap-2"
+          aria-label={t("results.shareAria")}
+        >
+          {shareState === "success" ? (
+            <>
+              <Check className="h-4 w-4 text-green-500" />
+              <span className="text-green-500">{t("results.shareSuccess")}</span>
+            </>
+          ) : shareState === "error" ? (
+            <>
+              <XCircle className="h-4 w-4 text-destructive" />
+              <span className="text-destructive">{t("results.shareError")}</span>
+            </>
+          ) : (
+            <>
+              <Share2 className="h-4 w-4" />
+              {t("results.share")}
+            </>
+          )}
+        </Button>
         <Button
           variant="secondary"
           size="sm"
