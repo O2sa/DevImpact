@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { UserResult } from "@/features/developer";
 import { useTranslation } from "@/components/providers/language-provider";
+import { formatComparisonToMarkdown } from "../format-comparison-to-markdown";
 import type { CompareInsights, CompareWinner } from "../types";
 
 type Props = {
@@ -63,6 +64,7 @@ export function ResultDashboard({
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const { copied, copy } = useClipboardCopy();
+  const { copied: markdownCopied, copy: copyMarkdown } = useClipboardCopy();
   const { copy: copyShare } = useClipboardCopy();
   const [shareState, setShareState] = useState<"idle" | "success" | "error">("idle");
   const shareTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -153,6 +155,10 @@ export function ResultDashboard({
         2,
       ),
     );
+  };
+
+  const handleCopyMarkdown = () => {
+    copyMarkdown(formatComparisonToMarkdown(user1, user2, winner));
   };
 
   const renderScoreGroup = (user: UserResult) => {
@@ -482,7 +488,7 @@ export function ResultDashboard({
         </Card>
       ) : null}
 
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-wrap justify-end gap-2">
         <Button
           variant="secondary"
           size="sm"
@@ -523,6 +529,25 @@ export function ResultDashboard({
             <>
               <Copy className="h-4 w-4" />
               {t("results.copy")}
+            </>
+          )}
+        </Button>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={handleCopyMarkdown}
+          className="flex items-center gap-2"
+          aria-label={t("results.copyMarkdownAria")}
+        >
+          {markdownCopied ? (
+            <>
+              <Check className="h-4 w-4 text-green-500" />
+              <span className="text-green-500">{t("results.copied")}</span>
+            </>
+          ) : (
+            <>
+              <Copy className="h-4 w-4" />
+              {t("results.copyMarkdown")}
             </>
           )}
         </Button>

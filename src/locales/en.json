@@ -171,6 +171,8 @@
   "results.copied": "Copied!",
   "results.copy": "Copy Result",
   "results.copyAria": "Copy comparison results to clipboard",
+  "results.copyMarkdown": "Copy as Markdown",
+  "results.copyMarkdownAria": "Copy comparison as Markdown",
   "results.pointsLead": "+{points} points",
   "results.share": "Share",
   "results.shareAria": "Share comparison link",

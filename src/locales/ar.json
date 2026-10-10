@@ -171,6 +171,8 @@
   "results.copied": "تم النسخ!",
   "results.copy": "نسخ النتيجة",
   "results.copyAria": "نسخ نتائج المقارنة إلى الحافظة",
+  "results.copyMarkdown": "نسخ كماركداون",
+  "results.copyMarkdownAria": "نسخ المقارنة كماركداون",
   "results.pointsLead": "+{points} نقطة",
   "results.share": "مشاركة",
   "results.shareAria": "مشاركة رابط المقارنة",
