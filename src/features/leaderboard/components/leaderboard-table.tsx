@@ -185,7 +185,7 @@ export function LeaderboardTable({
                       onClick={() => handleSort("finalScore")}
                       className="inline-flex items-center gap-2 hover:text-foreground"
                     >
-                      {t("comparsion.final.score")}
+                      {t("comparison.final.score")}
                       <SortIcon
                         field="finalScore"
                         sortField={sortField}
@@ -209,7 +209,7 @@ export function LeaderboardTable({
                       onClick={() => handleSort("repoScore")}
                       className="inline-flex items-center gap-2 hover:text-foreground"
                     >
-                      {t("comparsion.repo.score")}
+                      {t("comparison.repo.score")}
                       <SortIcon
                         field="repoScore"
                         sortField={sortField}
@@ -233,7 +233,7 @@ export function LeaderboardTable({
                       onClick={() => handleSort("prScore")}
                       className="inline-flex items-center gap-2 hover:text-foreground"
                     >
-                      {t("comparsion.pr.score")}
+                      {t("comparison.pr.score")}
                       <SortIcon
                         field="prScore"
                         sortField={sortField}
@@ -257,7 +257,7 @@ export function LeaderboardTable({
                       onClick={() => handleSort("contributionScore")}
                       className="inline-flex items-center gap-2 hover:text-foreground"
                     >
-                      {t("comparsion.contribution.score")}
+                      {t("comparison.contribution.score")}
                       <SortIcon
                         field="contributionScore"
                         sortField={sortField}
