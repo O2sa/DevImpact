@@ -45,11 +45,11 @@ export function ComparisonTable({ user1, user2 }: ComparisonTableProps) {
           </CardHeader>
           <CardContent className="space-y-4 pt-6">
             <div className="flex items-center justify-between border-b border-border pb-2">
-              <span className="text-muted-foreground">{t("comparsion.final.score")}</span>
+              <span className="text-muted-foreground">{t("comparison.final.score")}</span>
               <span className="text-2xl font-bold">{user.finalScore}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">{t("comparsion.repo.score")}</span>
+              <span className="text-muted-foreground">{t("comparison.repo.score")}</span>
               <span
                 className={`font-semibold ${user.repoScore > (idx === 0 ? user2.repoScore : user1.repoScore) ? "text-primary" : ""}`}
               >
@@ -57,7 +57,7 @@ export function ComparisonTable({ user1, user2 }: ComparisonTableProps) {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">{t("comparsion.pr.score")}</span>
+              <span className="text-muted-foreground">{t("comparison.pr.score")}</span>
               <span
                 className={`font-semibold ${user.prScore > (idx === 0 ? user2.prScore : user1.prScore) ? "text-primary" : ""}`}
               >
@@ -65,7 +65,7 @@ export function ComparisonTable({ user1, user2 }: ComparisonTableProps) {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">{t("comparsion.contribution.score")}</span>
+              <span className="text-muted-foreground">{t("comparison.contribution.score")}</span>
               <span
                 className={`font-semibold ${user.contributionScore > (idx === 0 ? user2.contributionScore : user1.contributionScore) ? "text-primary" : ""}`}
               >

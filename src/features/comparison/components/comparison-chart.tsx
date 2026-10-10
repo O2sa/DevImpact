@@ -25,10 +25,10 @@ type Props = {
 type ScoreMode = "overall" | "language";
 
 const metrics = [
-  { key: "repo", label: "comparsion.repo.score" },
-  { key: "pr", label: "comparsion.pr.score" },
-  { key: "contribution", label: "comparsion.contribution.score" },
-  { key: "final", label: "comparsion.final.score" },
+  { key: "repo", label: "comparison.repo.score" },
+  { key: "pr", label: "comparison.pr.score" },
+  { key: "contribution", label: "comparison.contribution.score" },
+  { key: "final", label: "comparison.final.score" },
 ] as const;
 
 function toChartScores(user: UserResult, mode: ScoreMode) {

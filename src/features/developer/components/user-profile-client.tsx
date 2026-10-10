@@ -357,7 +357,7 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <ScoreCard
-            title={t("comparsion.final.score")}
+            title={t("comparison.final.score")}
             rawValue={user.finalScore}
             normalizedValue={user.normalizedFinalScore}
             highlight={true}
@@ -365,21 +365,21 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
           />
 
           <ScoreCard
-            title={t("comparsion.repo.score")}
+            title={t("comparison.repo.score")}
             rawValue={user.repoScore}
             normalizedValue={user.normalizedRepoScore}
             helperText={t("tooltip.repo")}
           />
 
           <ScoreCard
-            title={t("comparsion.pr.score")}
+            title={t("comparison.pr.score")}
             rawValue={user.prScore}
             normalizedValue={user.normalizedPRScore}
             helperText={t("tooltip.pr")}
           />
 
           <ScoreCard
-            title={t("comparsion.contribution.score")}
+            title={t("comparison.contribution.score")}
             rawValue={user.contributionScore}
             normalizedValue={user.normalizedContributionScore}
             helperText={t("tooltip.contribution")}

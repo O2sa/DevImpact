@@ -211,26 +211,26 @@ export function ResultDashboard({
         <CardContent className="space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <ScoreCard
-              title={t("comparsion.final.score")}
+              title={t("comparison.final.score")}
               rawValue={scoreData.final}
               normalizedValue={scoreData.finalNormalized}
               highlight={isWinner}
               helperText={t("tooltip.final")}
             />
             <ScoreCard
-              title={t("comparsion.repo.score")}
+              title={t("comparison.repo.score")}
               rawValue={scoreData.repo}
               normalizedValue={scoreData.repoNormalized}
               helperText={t("tooltip.repo")}
             />
             <ScoreCard
-              title={t("comparsion.pr.score")}
+              title={t("comparison.pr.score")}
               rawValue={scoreData.pr}
               normalizedValue={scoreData.prNormalized}
               helperText={t("tooltip.pr")}
             />
             <ScoreCard
-              title={t("comparsion.contribution.score")}
+              title={t("comparison.contribution.score")}
               rawValue={scoreData.contribution}
               normalizedValue={scoreData.contributionNormalized}
               helperText={t("tooltip.contribution")}
@@ -239,14 +239,14 @@ export function ResultDashboard({
           {languageScore ? (
             <div className="rounded-lg border border-cyan-500/25 bg-cyan-500/5 p-3">
               <p className="text-xs font-semibold uppercase tracking-wide text-cyan-700 dark:text-cyan-300">
-                {t("comparsion.language.final.score")}
+                {t("comparison.language.final.score")}
               </p>
               <p className="mt-1 text-xl font-bold">
                 {Math.round(languageScore.normalizedFinalScore ?? languageScore.finalScore)}
                 {languageScore.normalizedFinalScore !== undefined ? " / 100" : ""}
               </p>
               <p className="text-xs text-muted-foreground">
-                {t("comparsion.score")}: {Math.round(languageScore.finalScore)}
+                {t("comparison.score")}: {Math.round(languageScore.finalScore)}
               </p>
             </div>
           ) : null}

@@ -25,10 +25,10 @@ vi.mock("@/components/providers/language-provider", () => ({
         "leaderboard.impactRank": "Impact Rank",
         "leaderboard.search": "Search",
         "leaderboard.partialErrors": "Partial Errors",
-        "comparsion.final.score": "Final Score",
-        "comparsion.repo.score": "Repo Score",
-        "comparsion.pr.score": "PR Score",
-        "comparsion.contribution.score": "Contribution Score",
+        "comparison.final.score": "Final Score",
+        "comparison.repo.score": "Repo Score",
+        "comparison.pr.score": "PR Score",
+        "comparison.contribution.score": "Contribution Score",
         "a11y.openProfile": "Open profile",
       };
 
