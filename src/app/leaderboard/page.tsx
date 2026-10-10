@@ -106,7 +106,9 @@ export default function LeaderboardPage() {
       <main className="flex min-h-screen flex-col">
         <AppHeader />
         <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-10">
-          <LeaderboardHero countryCount={countries.length} />
+          <LeaderboardHero
+            countryCount={countries.filter((country) => country.slug !== "worldwide").length}
+          />
 
           <CountryGridClient countries={countries} />
         </div>

@@ -4,6 +4,7 @@ import { calculateUserScore } from "@/features/scoring";
 import { persistUserScores } from "@/features/developer/services";
 import { createCacheStore, getCacheConfigFromEnv } from "@/lib/cache";
 import { getDatabaseStore, type DatabaseStore } from "@/lib/db";
+import { getDisplayLimit } from "./display-limit";
 import type {
   CalculateLeaderboardResponse,
   LeaderboardMeta,
@@ -212,7 +213,7 @@ export async function buildLeaderboardResult(
   sourceData: { title: string },
   errors: string[],
 ): Promise<{ result: LeaderboardResult; meta: LeaderboardMeta }> {
-  const allUsers = await db.getLeaderboard(country, getEnvInt("LEADERBOARD_DISPLAY_LIMIT", 500));
+  const allUsers = await db.getLeaderboard(country, getDisplayLimit(country));
   const totalCount = await db.getLeaderboardCount(country);
 
   const scored: ScoredEntry[] = allUsers.map((row) => ({

@@ -206,6 +206,10 @@ Then open `http://localhost:3000` in your browser!
    pnpm leaderboard:calculate
    ```
 
+### Worldwide Leaderboard
+
+`/leaderboard/worldwide` ranks users from every country together. The number of users shown is controlled at runtime by `WORLDWIDE_LEADERBOARD_DISPLAY_LIMIT` (default `100`; missing, non-numeric, zero or negative values fall back to the default). Country leaderboards keep using `LEADERBOARD_DISPLAY_LIMIT` (default `500`).
+
 ### Leaderboard Worker & Infrastructure
 
 The leaderboard score updates run via a dedicated background worker container using Docker & Supercronic.

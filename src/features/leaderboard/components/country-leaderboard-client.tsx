@@ -30,6 +30,7 @@ export function CountryLeaderboardClient({
   const [errors] = useState(initialLeaderboard.errors);
   const [failed] = useState<string | null>(initialError);
   const [loading] = useState(false);
+  const isWorldwide = countrySlug?.trim().toLowerCase() === "worldwide";
 
   if (failed) {
     return (
@@ -70,10 +71,14 @@ export function CountryLeaderboardClient({
               {t("leaderboard.header.eyebrow")}
             </p>
             <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              {t("leaderboard.country.title", { title })}
+              {isWorldwide
+                ? t("leaderboard.worldwide.title")
+                : t("leaderboard.country.title", { title })}
             </h1>
             <p className="text-sm leading-7 text-muted-foreground sm:text-base">
-              {t("leaderboard.country.description", { title })}
+              {isWorldwide
+                ? t("leaderboard.worldwide.description")
+                : t("leaderboard.country.description", { title })}
             </p>
           </div>
         </section>

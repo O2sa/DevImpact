@@ -38,8 +38,11 @@ function getCountryInfo(country: string): CountryInfo {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { country } = await params;
   const countryInfo = getCountryInfo(country);
+  const isWorldwide = country === "worldwide";
   const pageTitle = `${countryInfo.title} Developer Leaderboard`;
-  const description = `Explore the ${countryInfo.title} GitHub developer leaderboard on DevImpact. Compare repository impact, merged pull request strength, and community contribution signals in one country ranking.`;
+  const description = isWorldwide
+    ? "Explore the worldwide GitHub developer leaderboard on DevImpact. Compare repository impact, merged pull request strength, and community contribution signals across all countries."
+    : `Explore the ${countryInfo.title} GitHub developer leaderboard on DevImpact. Compare repository impact, merged pull request strength, and community contribution signals in one country ranking.`;
   const keywords = [
     `${countryInfo.title} developer leaderboard`,
     `${countryInfo.title} GitHub developers`,

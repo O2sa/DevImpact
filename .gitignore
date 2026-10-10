@@ -82,6 +82,7 @@ out
 .nuxt
 dist
 next-env.d.ts
+.DS_Store
 
 # Gatsby files
 .cache/

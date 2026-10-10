@@ -1,6 +1,7 @@
 import { createCacheStore, getCacheConfigFromEnv } from "@/lib/cache";
 import { getDatabaseStore } from "@/lib/db";
 import type { LeaderboardResult, ScoredLeaderboardEntry } from "../types";
+import { getDisplayLimit, isWorldwideSlug } from "./display-limit";
 
 export type { LeaderboardResult, ScoredLeaderboardEntry };
 
@@ -8,11 +9,8 @@ function buildLeaderboardCacheKey(country: string, namespace: string): string {
   return `${namespace}:leaderboard:${country.trim().toLowerCase()}`;
 }
 
-function getDisplayLimit(): number {
-  const raw = process.env.LEADERBOARD_DISPLAY_LIMIT?.trim();
-  if (!raw) return 500;
-  const parsed = Number.parseInt(raw, 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 500;
+function getLeaderboardTitle(country: string): string {
+  return isWorldwideSlug(country) ? "Worldwide" : country;
 }
 
 function getCachedLeaderboard(
@@ -30,7 +28,8 @@ function getCachedLeaderboard(
 }
 
 export async function getLeaderboardResult(country: string): Promise<LeaderboardResult> {
-  const displayLimit = getDisplayLimit();
+  const displayLimit = getDisplayLimit(country);
+  const title = getLeaderboardTitle(country);
   const cacheConfig = getCacheConfigFromEnv();
   const cacheStore = createCacheStore(cacheConfig);
 
@@ -57,7 +56,7 @@ export async function getLeaderboardResult(country: string): Promise<Leaderboard
 
     if (rows.length === 0) {
       return {
-        title: country,
+        title,
         totalFromSource: 0,
         scored: [],
         errors: [],
@@ -81,7 +80,7 @@ export async function getLeaderboardResult(country: string): Promise<Leaderboard
     });
 
     const result: LeaderboardResult = {
-      title: country,
+      title,
       totalFromSource: totalCount,
       scored,
       errors: [],
@@ -100,7 +99,7 @@ export async function getLeaderboardResult(country: string): Promise<Leaderboard
   } catch (err: unknown) {
     console.warn("Leaderboard database query error:", err);
     return {
-      title: country,
+      title,
       totalFromSource: 0,
       scored: [],
       errors: [err instanceof Error ? err.message : "Database unavailable"],

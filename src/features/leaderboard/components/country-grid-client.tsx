@@ -19,13 +19,16 @@ export function CountryGridClient({ countries }: Props) {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
 
+  const worldwide = useMemo(() => countries.find((c) => c.slug === "worldwide"), [countries]);
+  const countryList = useMemo(() => countries.filter((c) => c.slug !== "worldwide"), [countries]);
+
   const filtered = useMemo(() => {
-    if (!search.trim()) return countries;
+    if (!search.trim()) return countryList;
     const q = search.trim().toLowerCase();
-    return countries.filter(
+    return countryList.filter(
       (c) => c.slug.toLowerCase().includes(q) || c.title.toLowerCase().includes(q),
     );
-  }, [countries, search]);
+  }, [countryList, search]);
 
   return (
     <Card className="border-0 p-6 shadow-lg backdrop-blur-sm">
@@ -37,7 +40,24 @@ export function CountryGridClient({ countries }: Props) {
         <CardDescription>{t("leaderboard.header.description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {countries.length > 10 && (
+        {worldwide && (
+          <Link
+            href={"/leaderboard/worldwide" as Route}
+            className="group flex items-center gap-4 rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-background to-background px-5 py-4 transition-colors hover:border-primary/60"
+          >
+            <Globe className="h-8 w-8 shrink-0 text-primary" />
+            <span className="flex flex-col">
+              <span className="text-base font-semibold text-foreground group-hover:text-primary">
+                {t("leaderboard.worldwide.cta.title")}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {t("leaderboard.worldwide.cta.description")}
+              </span>
+            </span>
+          </Link>
+        )}
+
+        {countryList.length > 10 && (
           <div className="relative max-w-sm">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
