@@ -232,18 +232,49 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
       {/* ── Header Profile Hero Section ────────────────────────────── */}
       <section className="rounded-3xl border border-border/60 bg-gradient-to-br from-primary/10 via-background to-background p-6 shadow-sm sm:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex min-w-0 items-start gap-4 sm:items-center">
-            <Avatar
-              src={user.avatarUrl}
-              alt={t("comparison.avatarAlt", { name: displayName })}
-              size={84}
-              className="shadow-sm ring-4 ring-primary/20"
-            />
+          <div className="flex min-w-0 flex-col items-center gap-5 text-center sm:flex-row sm:items-center sm:gap-6 sm:text-left">
+            {/* Interactive Avatar with Ambient Glow & Floating Score Badge */}
+            <a
+              href={githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative shrink-0 rounded-full transition-transform duration-300 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              aria-label={t("profile.viewOnGithub")}
+            >
+              {/* Ambient Glow */}
+              <div
+                aria-hidden="true"
+                className="absolute -inset-1.5 rounded-full bg-gradient-to-tr from-primary/30 via-primary/50 to-primary/20 opacity-70 blur-md transition-opacity duration-300 group-hover:opacity-100 dark:from-primary/25 dark:via-primary/45 dark:to-primary/15"
+              />
+
+              {/* Gradient Halo Ring */}
+              <div className="relative rounded-full bg-gradient-to-tr from-primary/40 via-primary/80 to-primary/30 p-1 shadow-lg shadow-primary/10 transition-all duration-300 group-hover:from-primary/60 group-hover:via-primary group-hover:to-primary/50">
+                <div className="relative h-20 w-20 overflow-hidden rounded-full bg-background sm:h-24 sm:w-24 md:h-28 md:w-28">
+                  <Avatar
+                    src={user.avatarUrl}
+                    alt={t("comparison.avatarAlt", { name: displayName })}
+                    size={112}
+                    priority={true}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+              </div>
+
+              {/* Floating Score Badge on Corner */}
+              <div
+                className="absolute -bottom-1 -right-1 flex items-center gap-1 rounded-full border border-background bg-card px-2 py-0.5 text-[11px] font-bold text-foreground shadow-md ring-2 ring-primary/20 sm:bottom-0 sm:right-0"
+                title={`${t("comparison.final.score")}: ${Math.round(user.normalizedFinalScore ?? user.finalScore)}`}
+              >
+                <Trophy className="h-3 w-3 text-primary" />
+                <span>{Math.round(user.normalizedFinalScore ?? user.finalScore)}</span>
+              </div>
+            </a>
+
             <div className="space-y-1.5">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary/80">
                 {t("profile.header.eyebrow")}
               </p>
-              <div className="flex flex-wrap items-center gap-2.5">
+              <div className="flex flex-wrap items-center justify-center gap-2.5 sm:justify-start">
                 <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl lg:text-4xl">
                   {displayName}
                 </h1>
@@ -253,7 +284,7 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
               </div>
 
               {location ? (
-                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <div className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground sm:justify-start">
                   {flagCode ? (
                     <span
                       className={`fi fi-${flagCode} fis inline-block h-3.5 w-3.5 rounded-sm`}
@@ -266,7 +297,7 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
                 </div>
               ) : null}
 
-              <div className="flex items-center gap-3 pt-1 text-xs text-muted-foreground">
+              <div className="flex flex-wrap items-center justify-center gap-3 pt-1 text-xs text-muted-foreground sm:justify-start">
                 <a
                   href={githubUrl}
                   target="_blank"

@@ -8,9 +8,9 @@ export function UserProfileSkeleton() {
       <Card className="border-2 border-primary/20 bg-gradient-to-br from-card via-card to-muted/20">
         <CardContent className="p-6 sm:p-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-4">
-              <Skeleton className="h-20 w-20 rounded-full" />
-              <div className="space-y-2">
+            <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:gap-6">
+              <Skeleton className="h-20 w-20 shrink-0 rounded-full sm:h-24 sm:w-24 md:h-28 md:w-28" />
+              <div className="flex flex-col items-center space-y-2 sm:items-start">
                 <Skeleton className="h-7 w-48 rounded-md" />
                 <Skeleton className="h-4 w-32 rounded-md" />
                 <Skeleton className="h-4 w-28 rounded-md" />

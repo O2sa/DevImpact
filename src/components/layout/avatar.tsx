@@ -6,6 +6,7 @@ type AvatarProps = {
   alt: string;
   size?: number;
   unoptimized?: boolean;
+  priority?: boolean;
   className?: string;
 };
 
@@ -13,7 +14,14 @@ type AvatarProps = {
  * Reusable avatar image component.
  *
  */
-export function Avatar({ src, alt, size = 32, unoptimized = true, className }: AvatarProps) {
+export function Avatar({
+  src,
+  alt,
+  size = 32,
+  unoptimized = true,
+  priority = false,
+  className,
+}: AvatarProps) {
   return (
     <Image
       src={src}
@@ -21,6 +29,7 @@ export function Avatar({ src, alt, size = 32, unoptimized = true, className }: A
       width={size}
       height={size}
       unoptimized={unoptimized}
+      priority={priority}
       className={cn("rounded-full ring-1 ring-border", className)}
     />
   );
