@@ -318,8 +318,9 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
           </div>
 
           {/* Actions */}
-          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center sm:justify-end sm:gap-2.5">
-            <Link href={compareUrl as Route} className="w-full sm:w-auto">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[280px] lg:min-w-[300px]">
+            {/* Primary Action (1) */}
+            <Link href={compareUrl as Route} className="w-full">
               <Button className="flex w-full items-center justify-center gap-1.5 px-3 text-xs shadow-sm sm:px-4 sm:text-sm">
                 <Scale className="h-4 w-4 shrink-0" />
 
@@ -329,47 +330,50 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
               </Button>
             </Link>
 
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={handleCopyLink}
-              className="flex w-full items-center justify-center gap-1.5 px-3 text-xs sm:px-4 sm:text-sm"
-              aria-label={t("profile.copyLink")}
-            >
-              {copied ? (
-                <>
-                  <Check className="h-4 w-4 shrink-0 text-green-500" />
+            {/* Secondary Actions (2) */}
+            <div className="grid w-full grid-cols-2 gap-2">
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={handleCopyLink}
+                className="flex w-full items-center justify-center gap-1.5 px-2.5 text-xs sm:px-3 sm:text-sm"
+                aria-label={t("profile.copyLink")}
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-4 w-4 shrink-0 text-green-500" />
 
-                  <span className="truncate text-green-500 sm:hidden">
-                    {t("profile.copiedShort")}
-                  </span>
+                    <span className="truncate text-green-500 sm:hidden">
+                      {t("profile.copiedShort")}
+                    </span>
 
-                  <span className="hidden truncate text-green-500 sm:inline">
-                    {t("profile.copied")}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <Copy className="h-4 w-4 shrink-0" />
+                    <span className="hidden truncate text-green-500 sm:inline">
+                      {t("profile.copied")}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4 shrink-0" />
 
-                  <span className="truncate sm:hidden">{t("profile.shareShort")}</span>
+                    <span className="truncate sm:hidden">{t("profile.shareShort")}</span>
 
-                  <span className="hidden truncate sm:inline">{t("profile.copyLink")}</span>
-                </>
-              )}
-            </Button>
+                    <span className="hidden truncate sm:inline">{t("profile.copyLink")}</span>
+                  </>
+                )}
+              </Button>
 
-            {/* Get README Badge */}
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={() => setBadgeDialogOpen(true)}
-              className="col-span-2 flex w-full items-center justify-center gap-1.5 whitespace-nowrap px-3 text-xs sm:col-span-1 sm:w-auto sm:px-4 sm:text-sm"
-              aria-label={t("profile.getBadge")}
-            >
-              <BadgeCheck className="h-4 w-4 shrink-0" />
-              <span className="truncate">{t("profile.getBadge")}</span>
-            </Button>
+              {/* Get README Badge */}
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => setBadgeDialogOpen(true)}
+                className="flex w-full items-center justify-center gap-1.5 whitespace-nowrap px-2.5 text-xs sm:px-3 sm:text-sm"
+                aria-label={t("profile.getBadge")}
+              >
+                <BadgeCheck className="h-4 w-4 shrink-0" />
+                <span className="truncate">{t("profile.getBadge")}</span>
+              </Button>
+            </div>
           </div>
         </div>
       </section>

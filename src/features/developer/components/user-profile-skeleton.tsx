@@ -16,9 +16,12 @@ export function UserProfileSkeleton() {
                 <Skeleton className="h-4 w-28 rounded-md" />
               </div>
             </div>
-            <div className="flex flex-wrap gap-2 sm:justify-end">
-              <Skeleton className="h-9 w-32 rounded-lg" />
-              <Skeleton className="h-9 w-28 rounded-lg" />
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[280px] lg:min-w-[300px]">
+              <Skeleton className="h-9 w-full rounded-lg" />
+              <div className="grid w-full grid-cols-2 gap-2">
+                <Skeleton className="h-9 w-full rounded-lg" />
+                <Skeleton className="h-9 w-full rounded-lg" />
+              </div>
             </div>
           </div>
         </CardContent>
