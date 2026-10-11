@@ -366,20 +366,45 @@ export function ResultDashboard({
   return (
     <div className="animate-fadeIn space-y-6">
       <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
+        <CardContent className="p-4 sm:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             {overallWinnerUser ? (
               <>
-                <div className="flex items-center gap-4">
-                  <div className="rounded-full bg-primary/20 p-3">
-                    <Trophy className="h-8 w-8 text-primary" />
+                <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+                  {/* Winner Avatar with Corner Trophy Badge */}
+                  <div className="relative shrink-0">
+                    <Link
+                      href={`/user/${overallWinnerUser.username}` as Route}
+                      className="group block"
+                      aria-label={t("a11y.openProfile", {
+                        name: getDisplayName(overallWinnerUser),
+                      })}
+                    >
+                      <Avatar
+                        src={overallWinnerUser.avatarUrl}
+                        alt={t("comparison.avatarAlt", {
+                          name: getDisplayName(overallWinnerUser),
+                        })}
+                        size={56}
+                        className="h-12 w-12 object-cover ring-2 ring-primary/30 transition-transform duration-200 group-hover:scale-105 sm:h-14 sm:w-14"
+                      />
+                    </Link>
+                    <div
+                      className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-white shadow-sm ring-2 ring-background dark:bg-amber-400 dark:text-zinc-950"
+                      title={t("banner.winner")}
+                    >
+                      <Trophy className="h-3.5 w-3.5 fill-current" />
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">{t("banner.winner")}</p>
-                    <div className="flex items-center gap-2">
+
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground sm:text-sm">
+                      {t("banner.winner")}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
                       <Link
                         href={`/user/${overallWinnerUser.username}` as Route}
-                        className="text-3xl font-bold text-primary hover:underline"
+                        className="truncate text-xl font-bold text-foreground transition-colors hover:text-primary hover:underline sm:text-2xl md:text-3xl"
                       >
                         {getDisplayName(overallWinnerUser)}
                       </Link>
@@ -387,26 +412,47 @@ export function ResultDashboard({
                         href={getGithubProfileUrl(overallWinnerUser.username)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center text-muted-foreground transition-colors hover:text-foreground"
+                        className="inline-flex shrink-0 items-center text-muted-foreground transition-colors hover:text-foreground"
                         aria-label={t("a11y.openProfile", {
                           name: getDisplayName(overallWinnerUser),
                         })}
                       >
-                        <ExternalLink className="h-5 w-5" />
+                        <ExternalLink className="h-4 w-4" />
                       </a>
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                        @{overallWinnerUser.username}
+                      </span>
+                    </div>
+
+                    {/* Compact Lead Pill on Mobile */}
+                    <div className="pt-0.5 sm:hidden">
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                        <span className="text-muted-foreground">{t("banner.leadby")}:</span>
+                        <span>{winnerLeadValue}</span>
+                      </span>
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground">{t("banner.leadby")}</p>
-                  <p className="text-2xl font-bold text-primary">{winnerLeadValue}</p>
+
+                {/* Bold Stat Block on Desktop */}
+                <div className="hidden shrink-0 text-right sm:block">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground sm:text-sm">
+                    {t("banner.leadby")}
+                  </p>
+                  <p className="text-2xl font-bold text-primary md:text-3xl">{winnerLeadValue}</p>
                 </div>
               </>
             ) : (
-              <>
-                <p className="text-sm text-muted-foreground">{t("banner.metric")}</p>
-                <h2 className="text-xl font-semibold">{t("banner.tie")}</h2>
-              </>
+              <div className="flex w-full flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground sm:text-sm">
+                    {t("banner.metric")}
+                  </p>
+                  <h2 className="text-xl font-bold text-foreground sm:text-2xl">
+                    {t("banner.tie")}
+                  </h2>
+                </div>
+              </div>
             )}
           </div>
           {scoreVersion ? (
