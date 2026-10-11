@@ -534,28 +534,28 @@ export function ResultDashboard({
         </Card>
       ) : null}
 
-      <div className="flex flex-wrap justify-end gap-2">
+      <div className="grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto sm:justify-end sm:gap-2">
         <Button
           variant="secondary"
           size="sm"
           onClick={handleShare}
-          className="flex items-center gap-2"
+          className="flex w-full items-center justify-center gap-1.5 px-2 text-xs sm:w-auto sm:px-3 sm:text-sm"
           aria-label={t("results.shareAria")}
         >
           {shareState === "success" ? (
             <>
-              <Check className="h-4 w-4 text-green-500" />
-              <span className="text-green-500">{t("results.shareSuccess")}</span>
+              <Check className="h-3.5 w-3.5 shrink-0 text-green-500 sm:h-4 sm:w-4" />
+              <span className="truncate text-green-500">{t("results.shareSuccess")}</span>
             </>
           ) : shareState === "error" ? (
             <>
-              <XCircle className="h-4 w-4 text-destructive" />
-              <span className="text-destructive">{t("results.shareError")}</span>
+              <XCircle className="h-3.5 w-3.5 shrink-0 text-destructive sm:h-4 sm:w-4" />
+              <span className="truncate text-destructive">{t("results.shareError")}</span>
             </>
           ) : (
             <>
-              <Share2 className="h-4 w-4" />
-              {t("results.share")}
+              <Share2 className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+              <span className="truncate">{t("results.share")}</span>
             </>
           )}
         </Button>
@@ -563,18 +563,18 @@ export function ResultDashboard({
           variant="secondary"
           size="sm"
           onClick={handleCopy}
-          className="flex items-center gap-2"
+          className="flex w-full items-center justify-center gap-1.5 px-2 text-xs sm:w-auto sm:px-3 sm:text-sm"
           aria-label={t("results.copyAria")}
         >
           {copied ? (
             <>
-              <Check className="h-4 w-4 text-green-500" />
-              <span className="text-green-500">{t("results.copied")}</span>
+              <Check className="h-3.5 w-3.5 shrink-0 text-green-500 sm:h-4 sm:w-4" />
+              <span className="truncate text-green-500">{t("results.copied")}</span>
             </>
           ) : (
             <>
-              <Copy className="h-4 w-4" />
-              {t("results.copy")}
+              <Copy className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+              <span className="truncate">{t("results.copy")}</span>
             </>
           )}
         </Button>
@@ -582,18 +582,18 @@ export function ResultDashboard({
           variant="secondary"
           size="sm"
           onClick={handleCopyMarkdown}
-          className="flex items-center gap-2"
+          className="flex w-full items-center justify-center gap-1.5 px-2 text-xs sm:w-auto sm:px-3 sm:text-sm"
           aria-label={t("results.copyMarkdownAria")}
         >
           {markdownCopied ? (
             <>
-              <Check className="h-4 w-4 text-green-500" />
-              <span className="text-green-500">{t("results.copied")}</span>
+              <Check className="h-3.5 w-3.5 shrink-0 text-green-500 sm:h-4 sm:w-4" />
+              <span className="truncate text-green-500">{t("results.copied")}</span>
             </>
           ) : (
             <>
-              <Copy className="h-4 w-4" />
-              {t("results.copyMarkdown")}
+              <Copy className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+              <span className="truncate">{t("results.copyMarkdown")}</span>
             </>
           )}
         </Button>
