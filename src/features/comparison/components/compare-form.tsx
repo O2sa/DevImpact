@@ -256,12 +256,14 @@ export function CompareForm({
                 variant="secondary"
                 disabled={isEmpty || Boolean(loading)}
                 title={t("form.swap")}
+                aria-label={t("form.swap")}
               >
                 <ArrowLeftRight className="h-4 w-4" />
               </Button>
               <Button
                 onClick={reset}
                 title={t("form.reset")}
+                aria-label={t("form.reset")}
                 disabled={isEmpty || Boolean(loading)}
                 type="button"
                 variant="secondary"
