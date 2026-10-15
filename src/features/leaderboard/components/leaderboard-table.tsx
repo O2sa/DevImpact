@@ -3,14 +3,15 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import type { Route } from "next";
-import { Search, AlertTriangle, ExternalLink, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { AlertTriangle, ExternalLink, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Avatar } from "@/components/layout/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/components/providers/language-provider";
 import { cn } from "@/utils/cn";
 import type { ScoredLeaderboardEntry as LeaderboardEntry } from "../types";
+import { SearchField } from "./search-field";
+
 type Props = {
   users: LeaderboardEntry[];
   failedUsers: string[];
@@ -127,15 +128,12 @@ export function LeaderboardTable({
             )}
           </div>
           {users.length > 0 && (
-            <div className="relative mt-2 max-w-sm">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                className="h-9 pl-9"
-                placeholder={t("leaderboard.search")}
-                value={search}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
-              />
-            </div>
+            <SearchField
+              className="mt-2"
+              value={search}
+              onChange={setSearch}
+              placeholder={t("leaderboard.search")}
+            />
           )}
         </CardHeader>
         <CardContent>

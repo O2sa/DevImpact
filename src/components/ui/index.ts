@@ -5,3 +5,4 @@ export * from "./input";
 export * from "./progress";
 export * from "./skeleton";
 export * from "./tooltip";
+export * from "./kbd";

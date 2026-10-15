@@ -207,3 +207,73 @@ describe("LeaderboardTable sorting", () => {
     expect(repoHeader?.getAttribute("aria-sort")).toBe("ascending");
   });
 });
+
+describe("LeaderboardTable keyboard shortcuts", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  const users = [
+    {
+      username: "alice",
+      name: "Alice",
+      avatarUrl: "",
+      impactRank: 1,
+      finalScore: 80,
+      repoScore: 30,
+      prScore: 20,
+      contributionScore: 40,
+    },
+    {
+      username: "bob",
+      name: "Bob",
+      avatarUrl: "",
+      impactRank: 2,
+      finalScore: 70,
+      repoScore: 90,
+      prScore: 10,
+      contributionScore: 30,
+    },
+  ];
+
+  const renderLeaderboard = () =>
+    render(
+      <LeaderboardTable
+        users={users}
+        failedUsers={[]}
+        title="Global"
+        totalFromSource={2}
+        usersProcessed={2}
+      />,
+    );
+
+  test("pressing / focuses the search input", async () => {
+    const user = userEvent.setup();
+    renderLeaderboard();
+
+    const search = screen.getByPlaceholderText("Search");
+    expect(document.activeElement).not.toBe(search);
+
+    await user.keyboard("/");
+
+    expect(document.activeElement).toBe(search);
+    expect((search as HTMLInputElement).value).toBe("");
+  });
+
+  test("Escape clears the search first, then leaves the input", async () => {
+    const user = userEvent.setup();
+    renderLeaderboard();
+
+    const search = screen.getByPlaceholderText("Search") as HTMLInputElement;
+    await user.type(search, "bob");
+    expect(screen.getAllByRole("row")).toHaveLength(2);
+
+    await user.keyboard("{Escape}");
+    expect(search.value).toBe("");
+    expect(document.activeElement).toBe(search);
+    expect(screen.getAllByRole("row")).toHaveLength(3);
+
+    await user.keyboard("{Escape}");
+    expect(document.activeElement).not.toBe(search);
+  });
+});

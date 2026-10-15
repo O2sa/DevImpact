@@ -4,8 +4,10 @@ import { useEffect, useRef } from "react";
 import { ArrowLeftRight, RefreshCw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Kbd } from "@/components/ui/kbd";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/components/providers/language-provider";
+import { handleEscapeToClear, matchesHotkey, useHotkeys, useIsApplePlatform } from "@/hooks";
 import { cn } from "@/utils/cn";
 
 const LANGUAGE_OPTIONS = [
@@ -64,10 +66,20 @@ export function CompareForm({
 }: CompareFormProps) {
   const { t } = useTranslation();
   const firstInputRef = useRef<HTMLInputElement>(null);
+  const secondInputRef = useRef<HTMLInputElement>(null);
+  const isApple = useIsApplePlatform();
+  const submitShortcutLabel = isApple ? "⌘ ↵" : "Ctrl ↵";
+
+  // "/" jumps to the first empty field, falling back to the first one when both are filled.
+  const slashTargetsSecond = Boolean(username1.trim()) && !username2.trim();
 
   useEffect(() => {
     firstInputRef.current?.focus();
   }, []);
+
+  useHotkeys({
+    "/": () => (slashTargetsSecond ? secondInputRef : firstInputRef).current?.focus(),
+  });
 
   const normalized1 = username1.trim().toLowerCase();
   const normalized2 = username2.trim().toLowerCase();
@@ -101,16 +113,41 @@ export function CompareForm({
     setSelectedLanguages([]);
   };
 
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitComparison = () => {
     if (!canSubmit) return;
     onSubmit(username1.trim(), username2.trim(), {
       selectedLanguages,
     });
   };
 
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    submitComparison();
+  };
+
+  const handleFormKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (!matchesHotkey(e, "mod+enter")) return;
+    e.preventDefault();
+    submitComparison();
+  };
+
+  const handleInputEscape =
+    (value: string, setValue: (value: string) => void) =>
+    (e: React.KeyboardEvent<HTMLInputElement>) =>
+      handleEscapeToClear(e, value, setValue);
+
+  const focusShortcutBadge = (
+    <Kbd
+      aria-hidden="true"
+      title={t("shortcut.focusInput")}
+      className="absolute end-3 top-1/2 hidden -translate-y-1/2 peer-focus:hidden sm:inline-flex"
+    >
+      /
+    </Kbd>
+  );
+
   return (
-    <form onSubmit={submit}>
+    <form onSubmit={submit} onKeyDown={handleFormKeyDown}>
       <Card className="border-0 p-6 shadow-lg backdrop-blur-sm">
         <CardHeader className="pb-4">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary/80">
@@ -125,17 +162,24 @@ export function CompareForm({
               <label htmlFor="username1" className="text-xs font-semibold text-muted-foreground">
                 {t("form.username1.label")}
               </label>
-              <Input
-                id="username1"
-                className="h-11"
-                ref={firstInputRef}
-                placeholder={t("form.username1")}
-                value={username1}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername1(e.target.value)}
-                aria-label={t("form.username1.label")}
-                aria-invalid={Boolean(username1Error)}
-                aria-describedby={username1Error ? "username1-error" : undefined}
-              />
+              <div className="relative">
+                <Input
+                  id="username1"
+                  className="peer h-11 pe-10"
+                  ref={firstInputRef}
+                  placeholder={t("form.username1")}
+                  value={username1}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setUsername1(e.target.value)
+                  }
+                  onKeyDown={handleInputEscape(username1, setUsername1)}
+                  aria-label={t("form.username1.label")}
+                  aria-invalid={Boolean(username1Error)}
+                  aria-describedby={username1Error ? "username1-error" : undefined}
+                  aria-keyshortcuts={slashTargetsSecond ? undefined : "/"}
+                />
+                {slashTargetsSecond ? null : focusShortcutBadge}
+              </div>
               {username1Error ? (
                 <p id="username1-error" className="text-xs font-medium text-destructive">
                   {username1Error}
@@ -146,16 +190,24 @@ export function CompareForm({
               <label htmlFor="username2" className="text-xs font-semibold text-muted-foreground">
                 {t("form.username2.label")}
               </label>
-              <Input
-                id="username2"
-                className="h-11"
-                placeholder={t("form.username2")}
-                value={username2}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername2(e.target.value)}
-                aria-label={t("form.username2.label")}
-                aria-invalid={Boolean(username2Error)}
-                aria-describedby={username2Error ? "username2-error" : undefined}
-              />
+              <div className="relative">
+                <Input
+                  id="username2"
+                  className="peer h-11 pe-10"
+                  ref={secondInputRef}
+                  placeholder={t("form.username2")}
+                  value={username2}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setUsername2(e.target.value)
+                  }
+                  onKeyDown={handleInputEscape(username2, setUsername2)}
+                  aria-label={t("form.username2.label")}
+                  aria-invalid={Boolean(username2Error)}
+                  aria-describedby={username2Error ? "username2-error" : undefined}
+                  aria-keyshortcuts={slashTargetsSecond ? "/" : undefined}
+                />
+                {slashTargetsSecond ? focusShortcutBadge : null}
+              </div>
               {username2Error ? (
                 <p id="username2-error" className="text-xs font-medium text-destructive">
                   {username2Error}
@@ -247,8 +299,16 @@ export function CompareForm({
                 type="submit"
                 disabled={!canSubmit}
                 className="min-w-[160px] shadow-sm transition-transform hover:-translate-y-0.5"
+                aria-keyshortcuts="Control+Enter Meta+Enter"
+                title={t("shortcut.submit", { keys: submitShortcutLabel })}
               >
                 {loading ? t("form.compare.ing") : t("form.compare")}
+                <Kbd
+                  aria-hidden="true"
+                  className="ms-2 hidden border-primary-foreground/30 bg-primary-foreground/15 text-primary-foreground sm:inline-flex"
+                >
+                  {submitShortcutLabel}
+                </Kbd>
               </Button>
               <Button
                 onClick={swapUsers}

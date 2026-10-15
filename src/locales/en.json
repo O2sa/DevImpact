@@ -305,5 +305,7 @@
   "profile.scoreColor": "Score Color",
   "profile.transparencyTitle": "Scoring Transparency Signals",
   "profile.viewFullStats": "View developer profile",
-  "profile.viewOnGithub": "View GitHub Profile"
+  "profile.viewOnGithub": "View GitHub Profile",
+  "shortcut.focusInput": "Press / to jump here",
+  "shortcut.submit": "Press {keys} to compare"
 }

@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Globe, Search, Users } from "lucide-react";
+import { Globe, Users } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/components/providers/language-provider";
 import { getCountryCode } from "@/lib/geo";
 import type { CountryInfo } from "../types";
 import type { Route } from "next";
+import { SearchField } from "./search-field";
 
 type Props = {
   countries: CountryInfo[];
@@ -58,15 +58,11 @@ export function CountryGridClient({ countries }: Props) {
         )}
 
         {countryList.length > 10 && (
-          <div className="relative max-w-sm">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              className="h-9 pl-9"
-              placeholder={t("leaderboard.searchCountry")}
-              value={search}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
-            />
-          </div>
+          <SearchField
+            value={search}
+            onChange={setSearch}
+            placeholder={t("leaderboard.searchCountry")}
+          />
         )}
 
         {filtered.length === 0 && (

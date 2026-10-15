@@ -305,5 +305,7 @@
   "profile.scoreColor": "لون النتيجة",
   "profile.transparencyTitle": "إشارات شفافية التقييم",
   "profile.viewFullStats": "عرض الملف الشخصي للمطور",
-  "profile.viewOnGithub": "عرض الملف الشخصي على GitHub"
+  "profile.viewOnGithub": "عرض الملف الشخصي على GitHub",
+  "shortcut.focusInput": "اضغط / للانتقال هنا",
+  "shortcut.submit": "اضغط {keys} للمقارنة"
 }
