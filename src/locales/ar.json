@@ -258,6 +258,8 @@
   "leaderboard.empty.title": "لم يتم العثور على دول",
   "leaderboard.empty.description": "ستظهر الدول المتاحة هنا.",
   "leaderboard.noCountriesSearch": "لا توجد دول تطابق بحثك.",
+  "leaderboard.noDevelopersSearch": "لم يتم العثور على مطورين يطابقون \"{query}\".",
+  "leaderboard.clearSearch": "مسح البحث",
   "leaderboard.noDevelopersFor": "لم يتم حساب قائمة المتصدرين في هذه الدولة بعد.",
   "leaderboard.error.retry": "حاول مرة أخرى",
   "leaderboard.viewCountry": "عرض لوحة المتصدرين",

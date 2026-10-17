@@ -7,6 +7,7 @@ import { AlertTriangle, ExternalLink, ArrowUpDown, ArrowUp, ArrowDown } from "lu
 import { Avatar } from "@/components/layout/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/components/providers/language-provider";
 import { cn } from "@/utils/cn";
 import type { ScoredLeaderboardEntry as LeaderboardEntry } from "../types";
@@ -266,86 +267,108 @@ export function LeaderboardTable({
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((user) => (
-                  <tr
-                    key={user.username}
-                    className={cn(
-                      "border-b border-border/50 transition-colors hover:bg-muted/30",
-                      user.impactRank <= 3 && "bg-primary/5",
-                    )}
-                  >
-                    <td className="px-3 py-3">
-                      <span
-                        className={cn(
-                          "inline-flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold",
-                          user.impactRank === 1
-                            ? "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
-                            : user.impactRank === 2
-                              ? "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                              : user.impactRank === 3
-                                ? "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300"
-                                : "bg-muted text-muted-foreground",
-                        )}
-                      >
-                        {user.impactRank}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3">
-                      {(() => {
-                        const profileUrl = (
-                          countrySlug
-                            ? `/user/${user.username}?country=${encodeURIComponent(countrySlug)}`
-                            : `/user/${user.username}`
-                        ) as Route;
-
-                        return (
-                          <div className="flex items-center gap-2">
-                            <Link href={profileUrl}>
-                              <Avatar
-                                src={user.avatarUrl}
-                                alt={user.name || user.username}
-                                size={32}
-                                className="transition-transform hover:scale-105"
-                              />
-                            </Link>
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-1.5">
-                                <Link
-                                  href={profileUrl}
-                                  className="truncate font-semibold text-primary hover:underline"
-                                >
-                                  {user.name || user.username}
-                                </Link>
-                                <a
-                                  href={getGithubProfileUrl(user.username)}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center text-muted-foreground transition-colors hover:text-foreground"
-                                  aria-label={t("a11y.openProfile", {
-                                    name: user.name || user.username,
-                                  })}
-                                >
-                                  <ExternalLink className="h-3 w-3" />
-                                </a>
-                              </div>
-                              <p className="truncate text-xs text-muted-foreground">
-                                @{user.username}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })()}
-                    </td>
-                    <td className="px-3 py-3 text-start">
-                      <span className="font-bold text-primary">{user.finalScore}</span>
-                    </td>
-                    <td className="px-3 py-3 text-start font-mono text-xs">{user.repoScore}</td>
-                    <td className="px-3 py-3 text-start font-mono text-xs">{user.prScore}</td>
-                    <td className="px-3 py-3 text-start font-mono text-xs">
-                      {user.contributionScore}
+                {filtered.length === 0 && search.trim() ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <p>
+                          {t("leaderboard.noDevelopersSearch", {
+                            query: search,
+                          })}
+                        </p>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => setSearch("")}
+                        >
+                          {t("leaderboard.clearSearch")}
+                        </Button>
+                      </div>
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filtered.map((user) => (
+                    <tr
+                      key={user.username}
+                      className={cn(
+                        "border-b border-border/50 transition-colors hover:bg-muted/30",
+                        user.impactRank <= 3 && "bg-primary/5",
+                      )}
+                    >
+                      <td className="px-3 py-3">
+                        <span
+                          className={cn(
+                            "inline-flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold",
+                            user.impactRank === 1
+                              ? "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
+                              : user.impactRank === 2
+                                ? "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                                : user.impactRank === 3
+                                  ? "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300"
+                                  : "bg-muted text-muted-foreground",
+                          )}
+                        >
+                          {user.impactRank}
+                        </span>
+                      </td>
+                      <td className="px-3 py-3">
+                        {(() => {
+                          const profileUrl = (
+                            countrySlug
+                              ? `/user/${user.username}?country=${encodeURIComponent(countrySlug)}`
+                              : `/user/${user.username}`
+                          ) as Route;
+
+                          return (
+                            <div className="flex items-center gap-2">
+                              <Link href={profileUrl}>
+                                <Avatar
+                                  src={user.avatarUrl}
+                                  alt={user.name || user.username}
+                                  size={32}
+                                  className="transition-transform hover:scale-105"
+                                />
+                              </Link>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <Link
+                                    href={profileUrl}
+                                    className="truncate font-semibold text-primary hover:underline"
+                                  >
+                                    {user.name || user.username}
+                                  </Link>
+                                  <a
+                                    href={getGithubProfileUrl(user.username)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center text-muted-foreground transition-colors hover:text-foreground"
+                                    aria-label={t("a11y.openProfile", {
+                                      name: user.name || user.username,
+                                    })}
+                                  >
+                                    <ExternalLink className="h-3 w-3" />
+                                  </a>
+                                </div>
+                                <p className="truncate text-xs text-muted-foreground">
+                                  @{user.username}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </td>
+                      <td className="px-3 py-3 text-start">
+                        <span className="font-bold text-primary">{user.finalScore}</span>
+                      </td>
+                      <td className="px-3 py-3 text-start font-mono text-xs">{user.repoScore}</td>
+                      <td className="px-3 py-3 text-start font-mono text-xs">{user.prScore}</td>
+                      <td className="px-3 py-3 text-start font-mono text-xs">
+                        {user.contributionScore}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

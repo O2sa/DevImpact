@@ -258,6 +258,8 @@
   "leaderboard.empty.title": "No countries found",
   "leaderboard.empty.description": "Available countries will appear here.",
   "leaderboard.noCountriesSearch": "No countries match your search.",
+  "leaderboard.noDevelopersSearch": "No developers found matching \"{query}\".",
+  "leaderboard.clearSearch": "Clear search",
   "leaderboard.noDevelopersFor": "No leaderboard has been calculated for this country yet.",
   "leaderboard.error.retry": "Try again",
   "leaderboard.viewCountry": "View leaderboard",

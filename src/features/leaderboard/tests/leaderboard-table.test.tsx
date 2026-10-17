@@ -17,7 +17,7 @@ vi.mock("next/link", () => ({
 // Mock translations
 vi.mock("@/components/providers/language-provider", () => ({
   useTranslation: () => ({
-    t: (key: string) => {
+    t: (key: string, params?: Record<string, string | number>) => {
       const translations: Record<string, string> = {
         "leaderboard.title": "Leaderboard",
         "leaderboard.description": "Leaderboard description",
@@ -25,6 +25,8 @@ vi.mock("@/components/providers/language-provider", () => ({
         "leaderboard.impactRank": "Impact Rank",
         "leaderboard.search": "Search",
         "leaderboard.partialErrors": "Partial Errors",
+        "leaderboard.noDevelopersSearch": 'No developers found matching "{query}".',
+        "leaderboard.clearSearch": "Clear search",
         "comparison.final.score": "Final Score",
         "comparison.repo.score": "Repo Score",
         "comparison.pr.score": "PR Score",
@@ -32,7 +34,12 @@ vi.mock("@/components/providers/language-provider", () => ({
         "a11y.openProfile": "Open profile",
       };
 
-      return translations[key] ?? key;
+      const template = translations[key] ?? key;
+      if (!params) return template;
+      return Object.keys(params).reduce(
+        (acc, k) => acc.split(`{${k}}`).join(String(params[k])),
+        template,
+      );
     },
   }),
 }));
@@ -275,5 +282,60 @@ describe("LeaderboardTable keyboard shortcuts", () => {
 
     await user.keyboard("{Escape}");
     expect(document.activeElement).not.toBe(search);
+  });
+});
+
+describe("LeaderboardTable empty search state", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  const users = [
+    {
+      username: "alice",
+      name: "Alice",
+      avatarUrl: "https://example.com/alice.png",
+      impactRank: 1,
+      finalScore: 80,
+      repoScore: 30,
+      prScore: 20,
+      contributionScore: 40,
+    },
+  ];
+
+  const renderLeaderboard = () =>
+    render(
+      <LeaderboardTable
+        users={users}
+        failedUsers={[]}
+        title="Global"
+        totalFromSource={1}
+        usersProcessed={1}
+      />,
+    );
+
+  test("shows empty search state when query matches no developers", async () => {
+    const user = userEvent.setup();
+    renderLeaderboard();
+
+    const searchInput = screen.getByPlaceholderText("Search");
+    await user.type(searchInput, "nonexistent");
+
+    expect(screen.getByText('No developers found matching "nonexistent".')).toBeDefined();
+    expect(screen.getByRole("button", { name: /clear search/i })).toBeDefined();
+  });
+
+  test("clicking clear search resets the search input and restores developers", async () => {
+    const user = userEvent.setup();
+    renderLeaderboard();
+
+    const searchInput = screen.getByPlaceholderText("Search") as HTMLInputElement;
+    await user.type(searchInput, "nonexistent");
+
+    const clearButton = screen.getByRole("button", { name: /clear search/i });
+    await user.click(clearButton);
+
+    expect(searchInput.value).toBe("");
+    expect(screen.getByText("Alice")).toBeDefined();
   });
 });
