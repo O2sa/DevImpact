@@ -232,7 +232,7 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
       {/* ── Header Profile Hero Section ────────────────────────────── */}
       <section className="rounded-3xl border border-border/60 bg-gradient-to-br from-primary/10 via-background to-background p-6 shadow-sm sm:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex min-w-0 flex-col items-center gap-5 text-center sm:flex-row sm:items-center sm:gap-6 sm:text-left">
+          <div className="flex min-w-0 flex-col items-center gap-5 text-center sm:flex-row sm:items-center sm:gap-6 sm:text-start">
             {/* Interactive Avatar with Ambient Glow & Floating Score Badge */}
             <a
               href={githubUrl}
@@ -262,7 +262,7 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
 
               {/* Floating Score Badge on Corner */}
               <div
-                className="absolute -bottom-1 -right-1 flex items-center gap-1 rounded-full border border-background bg-card px-2 py-0.5 text-[11px] font-bold text-foreground shadow-md ring-2 ring-primary/20 sm:bottom-0 sm:right-0"
+                className="absolute -bottom-1 -end-1 flex items-center gap-1 rounded-full border border-background bg-card px-2 py-0.5 text-[11px] font-bold text-foreground shadow-md ring-2 ring-primary/20 sm:bottom-0 sm:end-0"
                 title={`${t("comparison.final.score")}: ${Math.round(user.normalizedFinalScore ?? user.finalScore)}`}
               >
                 <Trophy className="h-3 w-3 text-primary" />

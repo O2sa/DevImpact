@@ -95,7 +95,7 @@ export function PullRequestCardItem({
           ) : null}
         </div>
 
-        <div className="shrink-0 rounded-lg border border-primary/25 bg-primary/5 px-2.5 py-1.5 text-right sm:px-3 sm:py-2">
+        <div className="shrink-0 rounded-lg border border-primary/25 bg-primary/5 px-2.5 py-1.5 text-end sm:px-3 sm:py-2">
           <p className="text-lg font-bold text-primary sm:text-xl">{pr.score ?? 0}</p>
           <p className="text-[10px] text-muted-foreground sm:text-[11px]">
             {t("comparison.score")}

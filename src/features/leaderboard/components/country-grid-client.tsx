@@ -89,7 +89,7 @@ export function CountryGridClient({ countries }: Props) {
                 <Link
                   key={c.slug}
                   href={`/leaderboard/${c.slug}` as Route}
-                  className="group flex flex-col items-start gap-0.5 rounded-lg border border-border bg-card px-3 py-2.5 text-left transition-colors hover:border-primary/40 hover:bg-primary/5"
+                  className="group flex flex-col items-start gap-0.5 rounded-lg border border-border bg-card px-3 py-2.5 text-start transition-colors hover:border-primary/40 hover:bg-primary/5"
                 >
                   <span className="flex items-center gap-1.5 text-sm font-medium text-foreground group-hover:text-primary">
                     {code ? (

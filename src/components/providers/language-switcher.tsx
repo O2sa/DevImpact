@@ -95,7 +95,7 @@ export function LanguageSwitcher() {
                   role="option"
                   aria-selected={isSelected}
                   className={cn(
-                    "flex w-full items-center rounded-md px-2 py-1.5 text-left transition-colors",
+                    "flex w-full items-center rounded-md px-2 py-1.5 text-start transition-colors",
                     "hover:bg-accent hover:text-accent-foreground",
                     "focus:outline-none focus:ring-2 focus:ring-primary/40",
                     isSelected && "bg-accent text-accent-foreground",

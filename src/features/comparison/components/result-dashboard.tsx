@@ -390,7 +390,7 @@ export function ResultDashboard({
                       />
                     </Link>
                     <div
-                      className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-white shadow-sm ring-2 ring-background dark:bg-amber-400 dark:text-zinc-950"
+                      className="absolute -bottom-1 -end-1 flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-white shadow-sm ring-2 ring-background dark:bg-amber-400 dark:text-zinc-950"
                       title={t("banner.winner")}
                     >
                       <Trophy className="h-3.5 w-3.5 fill-current" />
@@ -435,7 +435,7 @@ export function ResultDashboard({
                 </div>
 
                 {/* Bold Stat Block on Desktop */}
-                <div className="hidden shrink-0 text-right sm:block">
+                <div className="hidden shrink-0 text-end sm:block">
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground sm:text-sm">
                     {t("banner.leadby")}
                   </p>
