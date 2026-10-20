@@ -10,7 +10,19 @@ vi.mock("@/components/providers/language-provider", () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-function ControlledForm({ initial1 = "", initial2 = "" }) {
+function ControlledForm({
+  initial1 = "",
+  initial2 = "",
+  onSubmit = () => {},
+}: {
+  initial1?: string;
+  initial2?: string;
+  onSubmit?: (
+    username1: string,
+    username2: string,
+    options: { selectedLanguages: string[] },
+  ) => void;
+}) {
   const [username1, setUsername1] = useState(initial1);
   const [username2, setUsername2] = useState(initial2);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
@@ -25,7 +37,7 @@ function ControlledForm({ initial1 = "", initial2 = "" }) {
         setUsername1={setUsername1}
         setUsername2={setUsername2}
         setSelectedLanguages={setSelectedLanguages}
-        onSubmit={() => {}}
+        onSubmit={onSubmit}
       />
     </>
   );
@@ -88,5 +100,21 @@ describe("CompareForm / shortcut", () => {
     expect(screen.getByLabelText("form.username2.label").getAttribute("aria-keyshortcuts")).toBe(
       "/",
     );
+  });
+
+  test("submits cleaned GitHub usernames", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(
+      <ControlledForm
+        initial1=" @octocat "
+        initial2="https://github.com/torvalds/"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "form.compare" }));
+
+    expect(onSubmit).toHaveBeenCalledWith("octocat", "torvalds", { selectedLanguages: [] });
   });
 });

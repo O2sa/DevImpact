@@ -150,6 +150,23 @@ describe("GET /api/user/[username]", () => {
     expect(body.location).toBe("Stockholm, Sweden");
   });
 
+  test("cleans a GitHub profile URL before loading the user", async () => {
+    const rawUser = makeUser("octocat", "The Octocat");
+    mocks.getUserData.mockResolvedValueOnce({
+      data: rawUser,
+      metrics: { duration: 100, errors: [] },
+    });
+    mocks.calculateUserScore.mockReturnValueOnce(makeScore(40));
+
+    const request = new Request("http://localhost/api/user/https%3A%2F%2Fgithub.com%2Foctocat%2F");
+    const response = await GET(request, {
+      params: Promise.resolve({ username: "https://github.com/octocat/" }),
+    });
+
+    expect(response.status).toBe(200);
+    expect(mocks.getUserData).toHaveBeenCalledWith("octocat", expect.any(Object));
+  });
+
   test("returns 404 when user is not found on GitHub", async () => {
     mocks.getUserData.mockRejectedValueOnce(
       new GitHubApiError({

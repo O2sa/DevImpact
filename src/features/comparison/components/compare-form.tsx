@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useTranslation } from "@/components/providers/language-provider";
 import { handleEscapeToClear, matchesHotkey, useHotkeys, useIsApplePlatform } from "@/hooks";
 import { cn } from "@/utils/cn";
+import { cleanGitHubUsername } from "@/utils/github";
 
 const LANGUAGE_OPTIONS = [
   "TypeScript",
@@ -115,7 +116,7 @@ export function CompareForm({
 
   const submitComparison = () => {
     if (!canSubmit) return;
-    onSubmit(username1.trim(), username2.trim(), {
+    onSubmit(cleanGitHubUsername(username1), cleanGitHubUsername(username2), {
       selectedLanguages,
     });
   };

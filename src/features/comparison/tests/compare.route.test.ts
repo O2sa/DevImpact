@@ -216,6 +216,24 @@ describe("GET /api/compare", () => {
     expect(body.winner?.username).toBe("user-a");
   });
 
+  test("cleans GitHub handles and profile URLs before loading users", async () => {
+    mocks.getUserData.mockResolvedValue({
+      data: makeUser("octocat", "The Octocat"),
+      metrics: { duration: 0, errors: [] },
+    });
+    mocks.calculateUserScore.mockReturnValue(makeScore(10));
+
+    const response = await GET(
+      makeRequest({
+        username: [" @octocat ", "https://github.com/torvalds/"],
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mocks.getUserData).toHaveBeenNthCalledWith(1, "octocat", expect.any(Object));
+    expect(mocks.getUserData).toHaveBeenNthCalledWith(2, "torvalds", expect.any(Object));
+  });
+
   test("returns null percentage when the losing final score is zero", async () => {
     mocks.getUserData.mockResolvedValueOnce({
       data: makeUser("user-a", "User A"),

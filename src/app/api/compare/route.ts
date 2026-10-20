@@ -6,15 +6,13 @@ import {
   resolveLocale,
 } from "@/features/comparison/services";
 import { formatApiErrorResponse, parseSelectedLanguagesFromSearchParams } from "@/lib/api";
+import { cleanGitHubUsername } from "@/utils/github";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const usernames = searchParams
-    .getAll("username")
-    .map((username) => username.trim())
-    .filter(Boolean);
+  const usernames = searchParams.getAll("username").map(cleanGitHubUsername).filter(Boolean);
 
   if (usernames.length !== 2) {
     return NextResponse.json(

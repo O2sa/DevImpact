@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { getUserProfile } from "@/features/developer/services";
 import { formatApiErrorResponse, parseSelectedLanguagesFromSearchParams } from "@/lib/api";
+import { cleanGitHubUsername } from "@/utils/github";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request, { params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
-  const trimmed = username?.trim();
+  const trimmed = cleanGitHubUsername(username ?? "");
 
   if (!trimmed) {
     return NextResponse.json(
