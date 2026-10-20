@@ -560,7 +560,7 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
                 {t("community.title")}
               </CardTitle>
 
-              <CardDescription>{t("community.comments")}</CardDescription>
+              <CardDescription>{t("community.desc")}</CardDescription>
             </CardHeader>
 
             <CardContent className="flex-1 space-y-3">
