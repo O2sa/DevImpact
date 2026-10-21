@@ -32,6 +32,7 @@ import { useTranslation } from "@/components/providers/language-provider";
 import { getCountryCode, detectCountry } from "@/lib/geo";
 import countriesData from "@/data/countries.json";
 import type { UserResult } from "../types";
+import { getSignalMetricEntries } from "../signal-metrics";
 
 type CountryInfo = {
   slug: string;
@@ -121,47 +122,7 @@ export function UserProfileClient({ user, location, countryParam }: Props) {
   const handleCopyLink = () => copy(window.location.href);
 
   // Signal stats entries for transparency
-  const signalEntries = user.signals
-    ? [
-        { label: t("signals.reposAnalyzed"), value: user.signals.reposAnalyzed ?? "-" },
-        {
-          label: t("signals.pullRequestsAnalyzed"),
-          value: user.signals.pullRequestsAnalyzed ?? "-",
-        },
-        {
-          label: t("signals.mergedExternalPRs"),
-          value: user.signals.mergedExternalPRs ?? "-",
-        },
-        {
-          label: t("signals.ownRepoPRsIgnored"),
-          value: user.signals.ownRepoPRsIgnored ?? "-",
-        },
-        {
-          label: t("signals.unmergedPRsIgnored"),
-          value: user.signals.unmergedPRsIgnored ?? "-",
-        },
-        {
-          label: t("signals.uniqueExternalPRRepos"),
-          value: user.signals.uniqueExternalPRRepos ?? "-",
-        },
-        {
-          label: t("signals.issuesAnalyzed"),
-          value: user.signals.issuesAnalyzed ?? "-",
-        },
-        {
-          label: t("signals.externalIssuesCounted"),
-          value: user.signals.externalIssuesCounted ?? "-",
-        },
-        {
-          label: t("signals.discussionsAnalyzed"),
-          value: user.signals.discussionsAnalyzed ?? "-",
-        },
-        {
-          label: t("signals.externalDiscussionsCounted"),
-          value: user.signals.externalDiscussionsCounted ?? "-",
-        },
-      ]
-    : [];
+  const signalEntries = getSignalMetricEntries(user.signals, t);
 
   const totalRawSum = Math.max(
     1,

@@ -13,7 +13,7 @@ import { InsightsList } from "./insights-list";
 import { ScoreCard } from "@/components/cards";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { UserResult } from "@/features/developer";
+import { getSignalMetricEntries, type UserResult } from "@/features/developer";
 import { useTranslation } from "@/components/providers/language-provider";
 import { formatComparisonToMarkdown } from "../format-comparison-to-markdown";
 import type { CompareInsights, CompareWinner } from "../types";
@@ -274,31 +274,7 @@ export function ResultDashboard({
     if (!user.signals) return null;
 
     const signalEntries: Array<{ label: string; value: string | number }> = [
-      { label: t("signals.reposAnalyzed"), value: user.signals.reposAnalyzed ?? "-" },
-      {
-        label: t("signals.pullRequestsAnalyzed"),
-        value: user.signals.pullRequestsAnalyzed ?? "-",
-      },
-      { label: t("signals.mergedExternalPRs"), value: user.signals.mergedExternalPRs ?? "-" },
-      { label: t("signals.ownRepoPRsIgnored"), value: user.signals.ownRepoPRsIgnored ?? "-" },
-      { label: t("signals.unmergedPRsIgnored"), value: user.signals.unmergedPRsIgnored ?? "-" },
-      {
-        label: t("signals.uniqueExternalPRRepos"),
-        value: user.signals.uniqueExternalPRRepos ?? "-",
-      },
-      { label: t("signals.issuesAnalyzed"), value: user.signals.issuesAnalyzed ?? "-" },
-      {
-        label: t("signals.externalIssuesCounted"),
-        value: user.signals.externalIssuesCounted ?? "-",
-      },
-      {
-        label: t("signals.discussionsAnalyzed"),
-        value: user.signals.discussionsAnalyzed ?? "-",
-      },
-      {
-        label: t("signals.externalDiscussionsCounted"),
-        value: user.signals.externalDiscussionsCounted ?? "-",
-      },
+      ...getSignalMetricEntries(user.signals, t),
       {
         label: t("signals.reposWithLanguageData"),
         value: user.signals.reposWithLanguageData ?? "-",
