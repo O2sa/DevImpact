@@ -93,7 +93,7 @@ export function ResultDashboard({
     }
   };
 
-  const methodologyHref = useMemo(() => {
+  const methodologyHref = useMemo<Route>(() => {
     const query = searchParams.toString();
     return query ? `/scoring-methodology?${query}` : "/scoring-methodology";
   }, [searchParams]);
@@ -640,12 +640,12 @@ export function ResultDashboard({
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">{t("methodology.cta.description")}</p>
-          <a
+          <Link
             href={methodologyHref}
-            className="inline-flex items-center rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className="inline-flex items-center rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             {t("methodology.cta.button")}
-          </a>
+          </Link>
         </CardContent>
       </Card>
     </div>
