@@ -25,6 +25,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     })),
     {
+      // "worldwide" is not an entry in countries.json, so it has to be added
+      // explicitly or /leaderboard/worldwide never reaches sitemap.xml.
+      url: `${baseUrl}/leaderboard/worldwide`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
       url: `${baseUrl}/leaderboard`,
       lastModified: now,
       changeFrequency: "weekly",
