@@ -1,6 +1,7 @@
 "use client";
 
-import Image from "next/image";
+// import Image from "next/image";
+import { Avatar } from "@/components/layout/avatar";
 import type { UserResult } from "@/features/developer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/components/providers/language-provider";
@@ -25,15 +26,14 @@ export function ComparisonTable({ user1, user2 }: ComparisonTableProps) {
           >
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Image
-                  src={user.avatarUrl}
-                  alt={t("comparison.avatarAlt", {
-                    name: user.name || user.username,
-                  })}
-                  width={40}
-                  height={40}
-                  className="rounded-full ring-2 ring-border"
-                />
+                <Avatar
+                    src={user.avatarUrl}
+                    alt={t("comparison.avatarAlt", {
+                      name: user.name || user.username,
+                    })}
+                    size={40}
+                    className="ring-2 ring-border"
+                  />
                 <span>{user.name || user.username}</span>
               </div>
               {user.isWinner && (
