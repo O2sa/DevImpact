@@ -1,6 +1,5 @@
 "use client";
 
-// import Image from "next/image";
 import { Avatar } from "@/components/layout/avatar";
 import type { UserResult } from "@/features/developer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
