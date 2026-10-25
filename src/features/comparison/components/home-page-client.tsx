@@ -13,6 +13,7 @@ import { cn } from "@/utils/cn";
 import { useComparisonController } from "../hooks";
 import { type ComparisonPreset } from "../config/comparison-presets";
 import { PresetPills } from "./preset-pills";
+import { Button } from "@/components/ui/button";
 
 export function HomePageClient() {
   const { t } = useTranslation();
@@ -129,12 +130,21 @@ export function HomePageClient() {
                   className="h-28 w-28"
                 />
               </div>
+
               <p className="text-xl font-semibold tracking-tight text-foreground">
                 {t("error.comparisonFailed")}
               </p>
+
               <p className="max-w-xl text-sm leading-7 text-muted-foreground md:text-base">
                 {generalError}
               </p>
+
+              <Button
+                type="button"
+                onClick={() => handleCompare(username1, username2, { selectedLanguages })}
+              >
+                {t("leaderboard.error.retry")}
+              </Button>
             </div>
           ) : null}
         </div>
