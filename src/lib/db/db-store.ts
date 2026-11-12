@@ -160,6 +160,9 @@ export class DatabaseStore {
         error_message      TEXT,
         updated_at         TIMESTAMPTZ DEFAULT NOW()
       );
+
+      CREATE INDEX IF NOT EXISTS idx_leaderboard_calc_status
+        ON leaderboard_calculation(status, last_calculated_at ASC NULLS FIRST);
     `);
   }
 
@@ -190,10 +193,19 @@ export class DatabaseStore {
     );
 
     const result = await client.query(
-      `SELECT country_slug, country_title FROM leaderboard_calculation
-       WHERE status != 'running'
-       ORDER BY last_calculated_at ASC NULLS FIRST
-       LIMIT 1`,
+      `WITH next_country AS (
+         SELECT country_slug
+         FROM leaderboard_calculation
+         WHERE status != 'running'
+         ORDER BY last_calculated_at ASC NULLS FIRST
+         LIMIT 1
+         FOR UPDATE SKIP LOCKED
+       )
+       UPDATE leaderboard_calculation lc
+       SET status = 'running', updated_at = NOW()
+       FROM next_country
+       WHERE lc.country_slug = next_country.country_slug
+       RETURNING lc.country_slug, lc.country_title`,
     );
     if (result.rows.length === 0) return null;
     return { slug: result.rows[0].country_slug, title: result.rows[0].country_title };
