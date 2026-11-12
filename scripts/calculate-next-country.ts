@@ -43,12 +43,16 @@ async function main() {
   logger.info(`DB:      ${(process.env.DATABASE_URL ?? "").slice(0, 40)}...`);
 
   const db = getDatabaseStore();
-  await db.initializeSchema();
-  await db.seedCalculationCountries();
 
-  // 1. Pick the next country to calculate
+  // 1. Pick and atomically claim the next country to calculate
   logger.info("Picking next country to calculate...");
-  const next = await db.getNextCountryToCalculate();
+  let next = await db.getNextCountryToCalculate();
+  if (!next) {
+    // Attempt one-time seed if the calculation table is unseeded
+    await db.seedCalculationCountries();
+    next = await db.getNextCountryToCalculate();
+  }
+
   if (!next) {
     logger.info("No countries to calculate. All are up-to-date or running.");
     process.exit(0);
@@ -56,11 +60,7 @@ async function main() {
 
   activeCountrySlug = next.slug;
 
-  logger.info(`Selected: ${next.title} (${next.slug})`);
-
-  // 2. Mark as running
-  await db.startCalculation(next.slug);
-  logger.info(`Marked '${next.slug}' as running.`);
+  logger.info(`Selected and claimed: ${next.title} (${next.slug})`);
 
   try {
     // 3. Run the calculation (same function used by the API endpoint)

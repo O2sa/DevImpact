@@ -31,6 +31,10 @@ async function main() {
   await store.initializeSchema();
   console.log("  ✓ Schema created (github_users table + indexes)");
 
+  // Seed calculation countries
+  await store.seedCalculationCountries();
+  console.log("  ✓ Seeded calculation countries");
+
   console.log("\nDone. Database is ready.");
   process.exit(0);
 }

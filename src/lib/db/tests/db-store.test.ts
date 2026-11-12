@@ -58,3 +58,39 @@ describe("DatabaseStore.getExistingUsernames", () => {
     expect(result.has("charlie")).toBe(false);
   });
 });
+
+describe("DatabaseStore.getNextCountryToCalculate", () => {
+  let store: DatabaseStore;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    store = new DatabaseStore();
+  });
+
+  test("returns null when no rows match", async () => {
+    // 1st query: auto-recover timed out calculations
+    mockQuery.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    // 2nd query: atomic CTE claim
+    mockQuery.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+
+    const result = await store.getNextCountryToCalculate();
+    expect(result).toBeNull();
+    expect(mockQuery).toHaveBeenCalledTimes(2);
+    expect(mockQuery.mock.calls[1][0]).toContain("FOR UPDATE SKIP LOCKED");
+  });
+
+  test("atomically claims next country and returns slug and title", async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    mockQuery.mockResolvedValueOnce({
+      rows: [{ country_slug: "egypt", country_title: "Egypt" }],
+      rowCount: 1,
+    });
+
+    const result = await store.getNextCountryToCalculate();
+    expect(result).toEqual({ slug: "egypt", title: "Egypt" });
+    expect(mockQuery).toHaveBeenCalledTimes(2);
+    const claimQuery = mockQuery.mock.calls[1][0];
+    expect(claimQuery).toContain("FOR UPDATE SKIP LOCKED");
+    expect(claimQuery).toContain("SET status = 'running'");
+  });
+});
