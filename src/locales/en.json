@@ -251,6 +251,8 @@
   "leaderboard.partialErrors": "{count} developers could not be scored",
   "leaderboard.search": "Search developer...",
   "leaderboard.pagination": "Showing {from}–{to} of {total}",
+  "leaderboard.previous": "Previous",
+  "leaderboard.next": "Next",
   "leaderboard.back": "All countries",
   "leaderboard.loading": "Scoring developers…",
   "leaderboard.scoringHint": "This may take a moment on first load. Results are cached for subsequent visits.",
