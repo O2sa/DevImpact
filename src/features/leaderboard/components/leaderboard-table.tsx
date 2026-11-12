@@ -3,7 +3,15 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import type { Route } from "next";
-import { AlertTriangle, ExternalLink, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import {
+  AlertTriangle,
+  ExternalLink,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { Avatar } from "@/components/layout/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -50,6 +58,8 @@ function getGithubProfileUrl(username: string): string {
   return `https://github.com/${username}`;
 }
 
+const PAGE_SIZE = 50;
+
 export function LeaderboardTable({
   users,
   failedUsers,
@@ -60,16 +70,23 @@ export function LeaderboardTable({
 }: Props) {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [sortField, setSortField] = useState<SortField>("impactRank");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   const handleSort = (field: SortField) => {
+    setPage(1);
     if (sortField === field) {
       setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
       return;
     }
     setSortField(field);
     setSortDirection(field === "impactRank" ? "asc" : "desc");
+  };
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    setPage(1);
   };
 
   const filtered = useMemo(() => {
@@ -95,6 +112,13 @@ export function LeaderboardTable({
       return result !== 0 ? result * dir : a.impactRank - b.impactRank;
     });
   }, [users, search, sortField, sortDirection]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filtered.slice(start, start + PAGE_SIZE);
+  }, [filtered, currentPage]);
 
   if (users.length === 0) return null;
 
@@ -132,7 +156,7 @@ export function LeaderboardTable({
             <SearchField
               className="mt-2"
               value={search}
-              onChange={setSearch}
+              onChange={handleSearch}
               placeholder={t("leaderboard.search")}
             />
           )}
@@ -280,7 +304,10 @@ export function LeaderboardTable({
                           type="button"
                           variant="secondary"
                           size="sm"
-                          onClick={() => setSearch("")}
+                          onClick={() => {
+                            setSearch("");
+                            setPage(1);
+                          }}
                         >
                           {t("leaderboard.clearSearch")}
                         </Button>
@@ -288,7 +315,7 @@ export function LeaderboardTable({
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((user) => (
+                  paginatedUsers.map((user) => (
                     <tr
                       key={user.username}
                       className={cn(
@@ -372,6 +399,44 @@ export function LeaderboardTable({
               </tbody>
             </table>
           </div>
+          {filtered.length > PAGE_SIZE && (
+            <div className="flex flex-col items-center justify-between gap-4 border-t border-border px-2 pt-4 sm:flex-row">
+              <p className="text-xs text-muted-foreground">
+                {t("leaderboard.pagination", {
+                  from: (currentPage - 1) * PAGE_SIZE + 1,
+                  to: Math.min(currentPage * PAGE_SIZE, filtered.length),
+                  total: filtered.length,
+                })}
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  className="h-8 px-2.5 text-xs"
+                >
+                  <ChevronLeft className="mr-1 h-3.5 w-3.5 rtl:rotate-180" />
+                  {t("leaderboard.previous")}
+                </Button>
+                <span className="px-2 text-xs font-medium text-muted-foreground">
+                  {currentPage} / {totalPages}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage >= totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  className="h-8 px-2.5 text-xs"
+                >
+                  {t("leaderboard.next")}
+                  <ChevronRight className="ml-1 h-3.5 w-3.5 rtl:rotate-180" />
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

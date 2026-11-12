@@ -27,6 +27,9 @@ vi.mock("@/components/providers/language-provider", () => ({
         "leaderboard.partialErrors": "Partial Errors",
         "leaderboard.noDevelopersSearch": 'No developers found matching "{query}".',
         "leaderboard.clearSearch": "Clear search",
+        "leaderboard.pagination": "Showing {from}–{to} of {total}",
+        "leaderboard.previous": "Previous",
+        "leaderboard.next": "Next",
         "comparison.final.score": "Final Score",
         "comparison.repo.score": "Repo Score",
         "comparison.pr.score": "PR Score",
@@ -337,5 +340,79 @@ describe("LeaderboardTable empty search state", () => {
 
     expect(searchInput.value).toBe("");
     expect(screen.getByText("Alice")).toBeDefined();
+  });
+});
+
+describe("LeaderboardTable pagination", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  const manyUsers = Array.from({ length: 75 }, (_, i) => ({
+    username: `user${i + 1}`,
+    name: `User ${i + 1}`,
+    avatarUrl: `https://example.com/user${i + 1}.png`,
+    impactRank: i + 1,
+    finalScore: 100 - i,
+    repoScore: 50,
+    prScore: 30,
+    contributionScore: 20,
+  }));
+
+  const renderMany = () =>
+    render(
+      <LeaderboardTable
+        users={manyUsers}
+        failedUsers={[]}
+        title="Global"
+        totalFromSource={75}
+        usersProcessed={75}
+      />,
+    );
+
+  test("renders 50 rows on page 1 and shows pagination controls", () => {
+    renderMany();
+
+    const rows = screen.getAllByRole("row").slice(1);
+    expect(rows).toHaveLength(50);
+    expect(screen.getByText("Showing 1–50 of 75")).toBeDefined();
+    expect(screen.getByText("1 / 2")).toBeDefined();
+  });
+
+  test("navigates to next page and back to previous page", async () => {
+    const user = userEvent.setup();
+    renderMany();
+
+    const nextBtn = screen.getByRole("button", { name: /next/i });
+    const prevBtn = screen.getByRole("button", { name: /previous/i });
+
+    expect(prevBtn.hasAttribute("disabled")).toBe(true);
+
+    await user.click(nextBtn);
+
+    const rowsPage2 = screen.getAllByRole("row").slice(1);
+    expect(rowsPage2).toHaveLength(25);
+    expect(screen.getByText("Showing 51–75 of 75")).toBeDefined();
+    expect(screen.getByText("2 / 2")).toBeDefined();
+    expect(nextBtn.hasAttribute("disabled")).toBe(true);
+
+    await user.click(prevBtn);
+
+    const rowsPage1 = screen.getAllByRole("row").slice(1);
+    expect(rowsPage1).toHaveLength(50);
+    expect(screen.getByText("Showing 1–50 of 75")).toBeDefined();
+  });
+
+  test("resets to page 1 when search query changes", async () => {
+    const user = userEvent.setup();
+    renderMany();
+
+    await user.click(screen.getByRole("button", { name: /next/i }));
+    expect(screen.getByText("2 / 2")).toBeDefined();
+
+    const searchInput = screen.getByPlaceholderText("Search");
+    await user.type(searchInput, "user");
+
+    expect(screen.getByText("Showing 1–50 of 75")).toBeDefined();
   });
 });

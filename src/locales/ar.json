@@ -251,6 +251,8 @@
   "leaderboard.partialErrors": "لم يمكن حساب درجة {count} مطورين",
   "leaderboard.search": "البحث عن مطور...",
   "leaderboard.pagination": "عرض {from}–{to} من {total}",
+  "leaderboard.previous": "السابق",
+  "leaderboard.next": "التالي",
   "leaderboard.back": "جميع الدول",
   "leaderboard.loading": "جاري حساب درجات المطورين...",
   "leaderboard.scoringHint": "قد يستغرق هذا لحظة عند التحميل الأول. يتم تخزين النتائج مؤقتًا للزيارات اللاحقة.",
