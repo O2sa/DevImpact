@@ -6,8 +6,18 @@ import type { Route } from "next";
 import { Check, Copy, ExternalLink, Trophy, Share2, XCircle } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useClipboardCopy } from "@/hooks";
+import dynamic from "next/dynamic";
 import { Avatar } from "@/components/layout/avatar";
-import { ComparisonChart } from "./comparison-chart";
+
+const ComparisonChart = dynamic(
+  () => import("./comparison-chart").then((mod) => mod.ComparisonChart),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-64 animate-pulse rounded-2xl border border-border bg-card/40" />
+    ),
+  },
+);
 import { TopList } from "./top-list";
 import { InsightsList } from "./insights-list";
 import { ScoreCard } from "@/components/cards";
