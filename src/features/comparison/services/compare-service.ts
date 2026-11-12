@@ -255,36 +255,45 @@ export async function compareUsers(
   usernames: string[],
   selectedLanguages: string[],
 ): Promise<ComparedUserResult[]> {
+  const settled = await Promise.allSettled(
+    usernames.map(async (username) => {
+      try {
+        const { user } = await getUserProfile(username, selectedLanguages);
+        return {
+          username: user.username,
+          name: user.name,
+          avatarUrl: user.avatarUrl,
+          repoScore: user.repoScore,
+          prScore: user.prScore,
+          contributionScore: user.contributionScore,
+          finalScore: user.finalScore,
+          normalizedRepoScore: user.normalizedRepoScore ?? user.repoScore,
+          normalizedPRScore: user.normalizedPRScore ?? user.prScore,
+          normalizedContributionScore: user.normalizedContributionScore ?? user.contributionScore,
+          normalizedFinalScore: user.normalizedFinalScore ?? user.finalScore,
+          topRepos: user.topRepos as ComparedUserResult["topRepos"],
+          topPullRequests: user.topPullRequests as ComparedUserResult["topPullRequests"],
+          topCommunityContributions: (user.topCommunityContributions ??
+            []) as ComparedUserResult["topCommunityContributions"],
+          languageScores: user.languageScores as ComparedUserResult["languageScores"],
+          signals: user.signals,
+          explanations: user.explanations,
+        } as unknown as ComparedUserResult;
+      } catch (error: unknown) {
+        throw new CompareUserFetchError(
+          username,
+          error instanceof UserFetchError ? error.causeError : error,
+        );
+      }
+    }),
+  );
+
   const results: ComparedUserResult[] = [];
-  for (const username of usernames) {
-    try {
-      const { user } = await getUserProfile(username, selectedLanguages);
-      results.push({
-        username: user.username,
-        name: user.name,
-        avatarUrl: user.avatarUrl,
-        repoScore: user.repoScore,
-        prScore: user.prScore,
-        contributionScore: user.contributionScore,
-        finalScore: user.finalScore,
-        normalizedRepoScore: user.normalizedRepoScore ?? user.repoScore,
-        normalizedPRScore: user.normalizedPRScore ?? user.prScore,
-        normalizedContributionScore: user.normalizedContributionScore ?? user.contributionScore,
-        normalizedFinalScore: user.normalizedFinalScore ?? user.finalScore,
-        topRepos: user.topRepos as ComparedUserResult["topRepos"],
-        topPullRequests: user.topPullRequests as ComparedUserResult["topPullRequests"],
-        topCommunityContributions: (user.topCommunityContributions ??
-          []) as ComparedUserResult["topCommunityContributions"],
-        languageScores: user.languageScores as ComparedUserResult["languageScores"],
-        signals: user.signals,
-        explanations: user.explanations,
-      } as unknown as ComparedUserResult);
-    } catch (error: unknown) {
-      throw new CompareUserFetchError(
-        username,
-        error instanceof UserFetchError ? error.causeError : error,
-      );
+  for (const item of settled) {
+    if (item.status === "rejected") {
+      throw item.reason;
     }
+    results.push(item.value);
   }
   return results;
 }
