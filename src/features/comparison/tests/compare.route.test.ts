@@ -121,21 +121,24 @@ describe("GET /api/compare", () => {
   });
 
   test("returns structured friendly error when GitHub rate limit is hit", async () => {
-    mocks.getUserData.mockRejectedValueOnce(
-      new GitHubApiError({
-        message: "API rate limit exceeded for user.",
-        kind: "PRIMARY_RATE_LIMIT",
-        status: 200,
-        rateLimit: {
-          limit: 5000,
-          remaining: 0,
-          used: 5000,
-          resetAt: Math.floor(Date.now() / 1000) + 60,
-          resource: "graphql",
-        },
-        retryAfterMs: 60_000,
-      }),
-    );
+    mocks.getUserData.mockImplementation(async (login: string) => {
+      if (login === "user-a") {
+        throw new GitHubApiError({
+          message: "API rate limit exceeded for user.",
+          kind: "PRIMARY_RATE_LIMIT",
+          status: 200,
+          rateLimit: {
+            limit: 5000,
+            remaining: 0,
+            used: 5000,
+            resetAt: Math.floor(Date.now() / 1000) + 60,
+            resource: "graphql",
+          },
+          retryAfterMs: 60_000,
+        });
+      }
+      return { data: makeUser(login, login), metrics: { duration: 0, errors: [] } };
+    });
 
     const response = await GET(
       makeRequest({
@@ -155,20 +158,23 @@ describe("GET /api/compare", () => {
   });
 
   test("returns resource-limit errors instead of masking them as not found", async () => {
-    mocks.getUserData.mockRejectedValueOnce(
-      new GitHubApiError({
-        message: "Resource limits for this query exceeded.",
-        kind: "RESOURCE_LIMIT",
-        status: 200,
-        rateLimit: {
-          limit: 5000,
-          remaining: 4993,
-          used: 7,
-          resetAt: Math.floor(Date.now() / 1000) + 60,
-          resource: "graphql",
-        },
-      }),
-    );
+    mocks.getUserData.mockImplementation(async (login: string) => {
+      if (login === "petebacondarwin") {
+        throw new GitHubApiError({
+          message: "Resource limits for this query exceeded.",
+          kind: "RESOURCE_LIMIT",
+          status: 200,
+          rateLimit: {
+            limit: 5000,
+            remaining: 4993,
+            used: 7,
+            resetAt: Math.floor(Date.now() / 1000) + 60,
+            resource: "graphql",
+          },
+        });
+      }
+      return { data: makeUser(login, login), metrics: { duration: 0, errors: [] } };
+    });
 
     const response = await GET(
       makeRequest({
@@ -306,7 +312,12 @@ describe("GET /api/compare", () => {
   });
 
   test("returns targeted username for not-found errors", async () => {
-    mocks.getUserData.mockRejectedValueOnce(new Error("User not found"));
+    mocks.getUserData.mockImplementation(async (login: string) => {
+      if (login === "missing-user") {
+        throw new Error("User not found");
+      }
+      return { data: makeUser(login, login), metrics: { duration: 0, errors: [] } };
+    });
 
     const response = await GET(
       makeRequest({

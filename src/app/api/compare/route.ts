@@ -27,7 +27,14 @@ export async function GET(request: Request) {
     const users = await compareUsers(usernames, selectedLanguages);
     const winnerData = calculateWinner(users);
     const insights = createComparisonInsights(users, locale);
-    return NextResponse.json({ success: true, users, ...winnerData, insights });
+    return NextResponse.json(
+      { success: true, users, ...winnerData, insights },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=86400",
+        },
+      },
+    );
   } catch (error: unknown) {
     console.error("GitHub score error:", error);
     return formatApiErrorResponse(error);
