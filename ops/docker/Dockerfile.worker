@@ -5,6 +5,11 @@ WORKDIR /app
 # Enable pnpm via corepack
 RUN corepack enable
 
+# Install Supercronic cron runner (cached layer)
+RUN wget -O /usr/local/bin/supercronic \
+  https://github.com/aptible/supercronic/releases/download/v0.2.29/supercronic-linux-amd64 \
+  && chmod +x /usr/local/bin/supercronic
+
 # Copy dependency manifests first for layer caching
 COPY package.json pnpm-lock.yaml ./
 
@@ -14,18 +19,13 @@ RUN printf "packages:\n  - '.'\n\nallowBuilds:\n  esbuild: true\n  sharp: true\n
 # Install dependencies using frozen lockfile
 RUN pnpm install --frozen-lockfile
 
-# Copy application source code
-COPY . .
-
-# Install Supercronic cron runner
-RUN wget -O /usr/local/bin/supercronic \
-  https://github.com/aptible/supercronic/releases/download/v0.2.29/supercronic-linux-amd64 \
-  && chmod +x /usr/local/bin/supercronic
-
 # Copy entrypoint script and initial leaderboard cron job definition
 COPY ops/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY ops/cron/leaderboard.cron /etc/leaderboard.cron
 RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Copy application source code
+COPY . .
 
 # Build-time argument for version identification
 ARG GIT_COMMIT_SHA=development

@@ -1,11 +1,16 @@
-FROM node:24-alpine
+FROM node:24-alpine AS base
 
+# Install libc6-compat for Alpine compatibility
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Enable pnpm via corepack
 RUN corepack enable
 
-# Copy dependency manifests first for layer caching
+# ─── 1. Dependencies Stage ─────────────────────────────────────
+FROM base AS deps
+
+# Copy dependency manifests
 COPY package.json pnpm-lock.yaml ./
 
 # Configure workspace policy for native dependencies if required
@@ -14,15 +19,46 @@ RUN printf "packages:\n  - '.'\n\nallowBuilds:\n  esbuild: true\n  sharp: true\n
 # Install dependencies using frozen lockfile
 RUN pnpm install --frozen-lockfile
 
-# Copy application source code
+# ─── 2. Build Stage ───────────────────────────────────────────
+FROM base AS builder
+
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build Next.js application
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
+# Build Next.js application with standalone output
 RUN pnpm build
+
+# ─── 3. Production Runner Stage ───────────────────────────────
+FROM node:24-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+# Create a non-root system user for security
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Copy static assets and public directory
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+
+# Set correct permission for prerender cache
+RUN mkdir .next && chown nextjs:nodejs .next
+
+# Automatically leverage output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
 
 EXPOSE 3000
 
-ENV PORT=3000
-ENV NODE_ENV=production
+CMD ["node", "server.js"]
 
-CMD ["pnpm", "start"]
