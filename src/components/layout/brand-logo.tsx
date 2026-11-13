@@ -14,7 +14,7 @@ const sizeClasses = {
   xl: "h-24 w-24 sm:h-32 sm:w-32",
 } as const;
 
-export function BrandLogo({ size = "md", className, priority = true }: BrandLogoProps) {
+export function BrandLogo({ size = "md", className, priority = false }: BrandLogoProps) {
   return (
     <span
       className={cn(

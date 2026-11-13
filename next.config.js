@@ -2,7 +2,6 @@
 const nextConfig = {
   output: "standalone",
   reactStrictMode: true,
-  typedRoutes: true,
   images: {
     unoptimized: true,
     remotePatterns: [

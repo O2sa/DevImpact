@@ -1,19 +1,11 @@
-import "./globals.css";
+import "@/app/globals.css";
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
-import { cookies, headers } from "next/headers";
-import {
-  DEFAULT_LOCALE,
-  LOCALE_COOKIE,
-  getLocaleDir,
-  isSupportedLocale,
-  parseAcceptLanguage,
-  supportedLocales,
-} from "@/lib/i18n/core";
+import { DEFAULT_LOCALE, getLocaleDir, isSupportedLocale, supportedLocales } from "@/lib/i18n/core";
 import { getMetadataBase, toAbsoluteUrl } from "@/lib/seo";
 import { AppHeader } from "@/components/layout/app-header";
 import { AppFooter } from "@/components/layout/app-footer";
-import Providers from "./providers";
+import Providers from "@/app/providers";
 
 const themeInitScript = `
   try {
@@ -96,21 +88,34 @@ export const metadata: Metadata = {
     shortcut: "/logo.svg",
     apple: "/logo.svg",
   },
+  other: {
+    "darkreader-lock": "",
+  },
 };
 
-export default async function RootLayout({ children }: { children: ReactNode }) {
-  const cookieStore = await cookies();
-  const headerStore = await headers();
-  const cookieLocale = cookieStore.get(LOCALE_COOKIE)?.value || headerStore.get("x-locale");
-  const initialLocale = isSupportedLocale(cookieLocale)
-    ? cookieLocale
-    : parseAcceptLanguage(headerStore.get("accept-language"), supportedLocales, DEFAULT_LOCALE);
+export function generateStaticParams() {
+  return supportedLocales.map((locale) => ({ locale }));
+}
+
+export default async function RootLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const initialLocale = isSupportedLocale(locale) ? locale : DEFAULT_LOCALE;
   const dir = getLocaleDir(initialLocale);
 
   return (
     <html lang={initialLocale} dir={dir} suppressHydrationWarning>
       <head>
-        <script id="theme-init" dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script
+          id="theme-init"
+          dangerouslySetInnerHTML={{ __html: themeInitScript }}
+          suppressHydrationWarning
+        />
       </head>
       <body>
         <Providers initialLocale={initialLocale}>
