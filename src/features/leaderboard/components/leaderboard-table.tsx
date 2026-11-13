@@ -58,7 +58,7 @@ function getGithubProfileUrl(username: string): string {
   return `https://github.com/${username}`;
 }
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 100;
 
 export function LeaderboardTable({
   users,
