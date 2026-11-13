@@ -23,7 +23,7 @@ export const revalidate = 1800; // Cache user profile on Edge CDN for 30 minutes
 export const dynamicParams = true;
 
 type Props = {
-  params: Promise<{ username: string }>;
+  params: Promise<{ locale?: string; username: string }>;
   searchParams?: Promise<{ country?: string }>;
 };
 

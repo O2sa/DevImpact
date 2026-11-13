@@ -62,7 +62,14 @@ describe("scoring methodology localization", () => {
   });
 
   test("methodology route file exists", () => {
-    const routePath = resolve(process.cwd(), "src", "app", "scoring-methodology", "page.tsx");
+    const routePath = resolve(
+      process.cwd(),
+      "src",
+      "app",
+      "[locale]",
+      "scoring-methodology",
+      "page.tsx",
+    );
     const source = readFileSync(routePath, "utf8");
     expect(source.includes("ScoringMethodologyPage")).toBe(true);
   });

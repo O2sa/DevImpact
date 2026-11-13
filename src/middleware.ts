@@ -9,38 +9,53 @@ import {
 } from "@/lib/i18n/core";
 
 export function middleware(request: NextRequest) {
-  const requestHeaders = new Headers(request.headers);
+  const { pathname } = request.nextUrl;
+
+  // Bypass APIs, metadata files, and static assets
+  if (
+    pathname.startsWith("/api") ||
+    pathname === "/manifest.webmanifest" ||
+    pathname === "/robots.txt" ||
+    pathname === "/sitemap.xml" ||
+    pathname === "/favicon.ico" ||
+    /\.[a-zA-Z0-9]+$/.test(pathname)
+  ) {
+    return NextResponse.next();
+  }
+
+  // Check if pathname already starts with a supported locale (e.g. /en or /ar)
+  const pathnameLocale = supportedLocales.find(
+    (loc) => pathname === `/${loc}` || pathname.startsWith(`/${loc}/`),
+  );
+
+  // If already localized, pass through
+  if (pathnameLocale) {
+    return NextResponse.next();
+  }
+
+  // Determine target locale from cookie, then accept-language, then default
   const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value;
+  const hasValidCookie = isSupportedLocale(cookieLocale);
+  const locale = hasValidCookie
+    ? cookieLocale
+    : parseAcceptLanguage(request.headers.get("accept-language"), supportedLocales, DEFAULT_LOCALE);
 
-  if (!isSupportedLocale(cookieLocale)) {
-    const locale = parseAcceptLanguage(
-      request.headers.get("accept-language"),
-      supportedLocales,
-      DEFAULT_LOCALE,
-    );
-    requestHeaders.set("x-locale", locale);
+  // Rewrite /path to /[locale]/path transparently
+  const rewriteUrl = request.nextUrl.clone();
+  rewriteUrl.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
 
-    const response = NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    });
+  const response = NextResponse.rewrite(rewriteUrl);
 
+  // If cookie wasn't set or was invalid, set it now for persistence
+  if (!hasValidCookie) {
     response.cookies.set(LOCALE_COOKIE, locale, {
       path: "/",
       maxAge: 60 * 60 * 24 * 365,
       sameSite: "lax",
     });
-
-    return response;
   }
 
-  requestHeaders.set("x-locale", cookieLocale);
-  return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  return response;
 }
 
 // Run only on routes that produce HTML or read the cookie. Skip Next.js
@@ -49,6 +64,6 @@ export function middleware(request: NextRequest) {
 // to stay cacheable.
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|api|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|woff|woff2|ttf|otf)$).*)",
+    "/((?!_next/static|_next/image|api|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|woff|woff2|ttf|otf|webmanifest)$).*)",
   ],
 };

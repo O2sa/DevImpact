@@ -12,7 +12,7 @@ type CountryInfo = {
 };
 
 type Props = {
-  params: Promise<{ country: string }>;
+  params: Promise<{ locale?: string; country: string }>;
 };
 
 const countries = countriesData as CountryInfo[];
@@ -98,9 +98,9 @@ export const revalidate = 3600; // Cache on Vercel Edge CDN for 1 hour via ISR
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  // Pre-render the top 20 most visited countries at build time.
-  // Other countries are generated on-demand upon first visit and cached by ISR.
-  return countries.slice(0, 20).map((country) => ({ country: country.slug }));
+  // Countries are generated on-demand upon first visit and cached by ISR for 1 hour.
+  // Returning an empty list avoids build-time DB/Redis connection timeouts in CI/Docker environments.
+  return [];
 }
 
 export default async function CountryLeaderboardPage({ params }: Props) {

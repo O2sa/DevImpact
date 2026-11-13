@@ -16,7 +16,7 @@ export function AppHeader() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container m-auto flex h-20 max-w-7xl items-center justify-between gap-3 px-4 sm:h-24">
         <Link href="/" className="shrink-0" aria-label="DevImpact home">
-          <BrandLogo priority size="md" />
+          <BrandLogo size="md" />
         </Link>
 
         <nav className="flex min-w-0 items-center gap-1.5 sm:gap-2">
