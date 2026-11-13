@@ -11,6 +11,8 @@ import {
   supportedLocales,
 } from "@/lib/i18n/core";
 import { getMetadataBase, toAbsoluteUrl } from "@/lib/seo";
+import { AppHeader } from "@/components/layout/app-header";
+import { AppFooter } from "@/components/layout/app-footer";
 import Providers from "./providers";
 
 const themeInitScript = `
@@ -111,7 +113,13 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <script id="theme-init" dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body>
-        <Providers initialLocale={initialLocale}>{children}</Providers>
+        <Providers initialLocale={initialLocale}>
+          <div className="flex min-h-screen flex-col">
+            <AppHeader />
+            <main className="flex flex-1 flex-col">{children}</main>
+            <AppFooter />
+          </div>
+        </Providers>
       </body>
     </html>
   );
