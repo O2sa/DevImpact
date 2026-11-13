@@ -3,8 +3,6 @@ import type { Metadata } from "next";
 import { JsonLd } from "@/components/seo/json-ld";
 import { UserProfileClient, UserNotFoundCard } from "@/features/developer";
 import { getUserProfile } from "@/features/developer/services";
-import { AppHeader } from "@/components/layout/app-header";
-import { AppFooter } from "@/components/layout/app-footer";
 import { toAbsoluteUrl } from "@/lib/seo";
 
 import countriesData from "@/data/countries.json";
@@ -111,13 +109,9 @@ export default async function UserProfilePage({ params, searchParams }: Props) {
 
   if (!profileData || fetchErrorMessage) {
     return (
-      <main className="flex min-h-screen flex-col">
-        <AppHeader />
-        <div className="mx-auto w-full max-w-4xl flex-1 px-4 py-16">
-          <UserNotFoundCard username={cleanUsername} />
-        </div>
-        <AppFooter />
-      </main>
+      <div className="mx-auto w-full max-w-4xl flex-1 px-4 py-16">
+        <UserNotFoundCard username={cleanUsername} />
+      </div>
     );
   }
 
@@ -201,15 +195,11 @@ export default async function UserProfilePage({ params, searchParams }: Props) {
   };
 
   return (
-    <main className="flex min-h-screen flex-col">
-      <AppHeader />
-      <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
-        <JsonLd data={profilePageSchema} />
-        <JsonLd data={breadcrumbSchema} />
+    <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+      <JsonLd data={profilePageSchema} />
+      <JsonLd data={breadcrumbSchema} />
 
-        <UserProfileClient user={user} location={location} countryParam={countryParam} />
-      </div>
-      <AppFooter />
-    </main>
+      <UserProfileClient user={user} location={location} countryParam={countryParam} />
+    </div>
   );
 }

@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { AppHeader } from "@/components/layout/app-header";
-import { AppFooter } from "@/components/layout/app-footer";
 import { JsonLd } from "@/components/seo/json-ld";
 import { toAbsoluteUrl } from "@/lib/seo";
 import countriesData from "@/data/countries.json";
@@ -103,17 +101,13 @@ export default function LeaderboardPage() {
   return (
     <>
       <JsonLd data={[collectionPageSchema, breadcrumbSchema, itemListSchema]} />
-      <main className="flex min-h-screen flex-col">
-        <AppHeader />
-        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-10">
-          <LeaderboardHero
-            countryCount={countries.filter((country) => country.slug !== "worldwide").length}
-          />
+      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-10">
+        <LeaderboardHero
+          countryCount={countries.filter((country) => country.slug !== "worldwide").length}
+        />
 
-          <CountryGridClient countries={countries} />
-        </div>
-        <AppFooter />
-      </main>
+        <CountryGridClient countries={countries} />
+      </div>
     </>
   );
 }
