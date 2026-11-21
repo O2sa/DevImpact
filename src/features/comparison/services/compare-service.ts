@@ -1,36 +1,8 @@
-import { normalizeSelectedLanguages } from "@/features/scoring";
 import { getUserProfile, UserFetchError } from "@/features/developer/services";
-import {
-  DEFAULT_LOCALE,
-  LOCALE_COOKIE,
-  isSupportedLocale,
-  parseAcceptLanguage,
-  type Locale,
-} from "@/lib/i18n/core";
+import { resolveRequestLocale, type Locale } from "@/lib/i18n/core";
 import type { ComparedUserResult, CompareInsights, CompareWinner, LanguageWinner } from "../types";
 
-export class CompareUserFetchError extends Error {
-  readonly username: string;
-  readonly causeError: unknown;
-
-  constructor(username: string, causeError: unknown) {
-    super(`Failed to fetch GitHub data for ${username}`);
-    this.name = "CompareUserFetchError";
-    this.username = username;
-    this.causeError = causeError;
-  }
-}
-
-export function parseSelectedLanguagesFromSearchParams(searchParams: URLSearchParams): string[] {
-  const fromRepeated = searchParams.getAll("selectedLanguage");
-  const fromCsv = searchParams
-    .get("selectedLanguages")
-    ?.split(",")
-    .map((language) => language.trim())
-    .filter(Boolean);
-
-  return normalizeSelectedLanguages([...(fromRepeated ?? []), ...(fromCsv ?? [])]);
-}
+export { resolveRequestLocale as resolveLocale, UserFetchError };
 
 function calculatePercentageDifference(difference: number, baseline: number): number | null {
   if (baseline <= 0) {
@@ -236,55 +208,33 @@ export function createComparisonInsights(
   };
 }
 
-export function resolveLocale(request: Request): Locale {
-  const cookieHeader = request.headers.get("cookie");
-  const localeFromCookie = cookieHeader
-    ?.split(";")
-    .map((value) => value.trim())
-    .find((value) => value.startsWith(`${LOCALE_COOKIE}=`))
-    ?.split("=")[1];
-
-  if (isSupportedLocale(localeFromCookie)) {
-    return localeFromCookie;
-  }
-
-  return parseAcceptLanguage(request.headers.get("accept-language"), ["en", "ar"], DEFAULT_LOCALE);
-}
-
 export async function compareUsers(
   usernames: string[],
   selectedLanguages: string[],
 ): Promise<ComparedUserResult[]> {
   const settled = await Promise.allSettled(
     usernames.map(async (username) => {
-      try {
-        const { user } = await getUserProfile(username, selectedLanguages);
-        return {
-          username: user.username,
-          name: user.name,
-          avatarUrl: user.avatarUrl,
-          repoScore: user.repoScore,
-          prScore: user.prScore,
-          contributionScore: user.contributionScore,
-          finalScore: user.finalScore,
-          normalizedRepoScore: user.normalizedRepoScore ?? user.repoScore,
-          normalizedPRScore: user.normalizedPRScore ?? user.prScore,
-          normalizedContributionScore: user.normalizedContributionScore ?? user.contributionScore,
-          normalizedFinalScore: user.normalizedFinalScore ?? user.finalScore,
-          topRepos: user.topRepos as ComparedUserResult["topRepos"],
-          topPullRequests: user.topPullRequests as ComparedUserResult["topPullRequests"],
-          topCommunityContributions: (user.topCommunityContributions ??
-            []) as ComparedUserResult["topCommunityContributions"],
-          languageScores: user.languageScores as ComparedUserResult["languageScores"],
-          signals: user.signals,
-          explanations: user.explanations,
-        } as unknown as ComparedUserResult;
-      } catch (error: unknown) {
-        throw new CompareUserFetchError(
-          username,
-          error instanceof UserFetchError ? error.causeError : error,
-        );
-      }
+      const { user } = await getUserProfile(username, selectedLanguages);
+      return {
+        username: user.username,
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+        repoScore: user.repoScore,
+        prScore: user.prScore,
+        contributionScore: user.contributionScore,
+        finalScore: user.finalScore,
+        normalizedRepoScore: user.normalizedRepoScore ?? user.repoScore,
+        normalizedPRScore: user.normalizedPRScore ?? user.prScore,
+        normalizedContributionScore: user.normalizedContributionScore ?? user.contributionScore,
+        normalizedFinalScore: user.normalizedFinalScore ?? user.finalScore,
+        topRepos: user.topRepos as ComparedUserResult["topRepos"],
+        topPullRequests: user.topPullRequests as ComparedUserResult["topPullRequests"],
+        topCommunityContributions: (user.topCommunityContributions ??
+          []) as ComparedUserResult["topCommunityContributions"],
+        languageScores: user.languageScores as ComparedUserResult["languageScores"],
+        signals: user.signals,
+        explanations: user.explanations,
+      } as unknown as ComparedUserResult;
     }),
   );
 

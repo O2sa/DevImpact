@@ -1,10 +1,9 @@
 import type { RepoLanguages } from "@/lib/github";
+import { normalizeLanguageName } from "@/lib/languages";
+
+export { normalizeLanguageName };
 
 const MAX_SELECTED_LANGUAGES = 5;
-
-export function normalizeLanguageName(language: string): string {
-  return language.trim().toLowerCase();
-}
 
 export function normalizeSelectedLanguages(languages?: string[]): string[] {
   if (!languages || languages.length === 0) {

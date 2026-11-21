@@ -2,12 +2,9 @@ import { createCacheStore, getCacheConfigFromEnv } from "@/lib/cache";
 import { getDatabaseStore } from "@/lib/db";
 import type { LeaderboardResult, ScoredLeaderboardEntry } from "../types";
 import { getDisplayLimit, isWorldwideSlug } from "./display-limit";
+import { buildLeaderboardCacheKey, mapRowsToScoredLeaderboardEntries } from "./leaderboard-helpers";
 
 export type { LeaderboardResult, ScoredLeaderboardEntry };
-
-function buildLeaderboardCacheKey(country: string, namespace: string): string {
-  return `${namespace}:leaderboard:${country.trim().toLowerCase()}`;
-}
 
 function getLeaderboardTitle(country: string): string {
   return isWorldwideSlug(country) ? "Worldwide" : country;
@@ -65,21 +62,7 @@ export async function getLeaderboardResult(country: string): Promise<Leaderboard
       };
     }
 
-    const scored: ScoredLeaderboardEntry[] = rows.map((row) => ({
-      username: row.username,
-      name: row.name,
-      avatarUrl: row.avatar_url,
-      repoScore: row.repo_score,
-      prScore: row.pr_score,
-      contributionScore: row.contribution_score,
-      finalScore: row.final_score,
-      impactRank: 0,
-    }));
-
-    scored.sort((a, b) => b.finalScore - a.finalScore);
-    scored.forEach((user, index) => {
-      user.impactRank = index + 1;
-    });
+    const scored = mapRowsToScoredLeaderboardEntries(rows);
 
     const result: LeaderboardResult = {
       title,

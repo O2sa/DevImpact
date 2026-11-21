@@ -41,28 +41,3 @@ export type ScoringExplanations = {
   overall: string[];
   language?: string[];
 };
-
-export type LanguageScore = {
-  language: string;
-  repoScore: number;
-  prScore: number;
-  contributionScore: number;
-  finalScore: number;
-};
-
-export type ScoreBreakdown = {
-  repoScore: number;
-  prScore: number;
-  contributionScore: number;
-  finalScore: number;
-  normalizedRepoScore: number;
-  normalizedPRScore: number;
-  normalizedContributionScore: number;
-  normalizedFinalScore: number;
-  topRepos: RepoScoreDetail[];
-  topPullRequests: PullRequestScoreDetail[];
-  topCommunityContributions: CommunityContributionDetail[];
-  languageScores: LanguageScore[];
-  signals: ScoringSignals;
-  explanations: ScoringExplanations;
-};
