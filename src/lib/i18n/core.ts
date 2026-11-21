@@ -54,3 +54,22 @@ export function parseAcceptLanguage<T extends string>(
 export function getLocaleDir(locale: Locale) {
   return localeMeta[locale].dir;
 }
+
+export function resolveRequestLocale(request: Request): Locale {
+  const cookieHeader = request.headers.get("cookie");
+  const localeFromCookie = cookieHeader
+    ?.split(";")
+    .map((value) => value.trim())
+    .find((value) => value.startsWith(`${LOCALE_COOKIE}=`))
+    ?.split("=")[1];
+
+  if (isSupportedLocale(localeFromCookie)) {
+    return localeFromCookie;
+  }
+
+  return parseAcceptLanguage(
+    request.headers.get("accept-language"),
+    supportedLocales,
+    DEFAULT_LOCALE,
+  );
+}

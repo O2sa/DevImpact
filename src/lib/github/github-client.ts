@@ -513,101 +513,6 @@ async function fetchUserDataFromGitHub(
   return { data: userData, metrics };
 }
 
-// Wrapper to maintain the old function signature for existing callers
-async function fetchUserDataFromGitHubWrapper(
-  executor: GitHubQueryExecutor,
-  username: string,
-): Promise<GitHubUserData> {
-  const { data } = await fetchUserDataFromGitHub(executor, username);
-  return data;
-}
-
-// ---------------------------------------------------------------------------
-// Fetcher factory (caching + single-flight)
-// ---------------------------------------------------------------------------
-
-export function createGitHubUserDataFetcherWithMetrics(
-  dependencies: GitHubFetcherDependencies,
-): (username: string) => Promise<{ data: GitHubUserData; metrics: UserFetchMetrics }> {
-  const inFlightByCacheKey = new Map<
-    string,
-    Promise<{ data: GitHubUserData; metrics: UserFetchMetrics }>
-  >();
-  const logger = dependencies.logger ?? console;
-
-  return async (username: string): Promise<{ data: GitHubUserData; metrics: UserFetchMetrics }> => {
-    const normalizedUsername = normalizeGitHubUsername(username);
-    if (!normalizedUsername) {
-      throw new Error("Username is required");
-    }
-
-    const cacheKey = buildGitHubUserCacheKey(
-      normalizedUsername,
-      dependencies.cacheConfig.namespace,
-    );
-
-    // Caching logic remains the same, but we now cache the { data, metrics } object
-    if (dependencies.cacheStore.enabled) {
-      try {
-        const cached = await dependencies.cacheStore.get<unknown>(cacheKey);
-        if (cached !== undefined) {
-          // A simple check to see if it's our object.
-          if (
-            isObject(cached) &&
-            "data" in cached &&
-            "metrics" in cached &&
-            isGitHubUserData(cached.data)
-          ) {
-            logger.info("cache-hit", { key: cacheKey });
-            return cached as { data: GitHubUserData; metrics: UserFetchMetrics };
-          }
-          logger.warn("cache-corrupt", { key: cacheKey });
-          await dependencies.cacheStore.del?.(cacheKey);
-        } else {
-          logger.info("cache-miss", { key: cacheKey });
-        }
-      } catch (error: unknown) {
-        logger.warn("cache-read-fail", {
-          key: cacheKey,
-          message: error instanceof Error ? error.message : String(error),
-        });
-      }
-    }
-
-    const inFlight = inFlightByCacheKey.get(cacheKey);
-    if (inFlight) {
-      logger.info("single-flight-join", { key: cacheKey });
-      return inFlight;
-    }
-
-    const request = (async () => {
-      const freshResult = await fetchUserDataFromGitHub(dependencies.executor, normalizedUsername);
-
-      if (dependencies.cacheStore.enabled) {
-        try {
-          await dependencies.cacheStore.set(
-            cacheKey,
-            freshResult,
-            dependencies.cacheConfig.ttlSeconds,
-          );
-        } catch (error: unknown) {
-          logger.warn("cache-set-fail", {
-            key: cacheKey,
-            message: error instanceof Error ? error.message : String(error),
-          });
-        }
-      }
-
-      return freshResult;
-    })().finally(() => {
-      inFlightByCacheKey.delete(cacheKey);
-    });
-
-    inFlightByCacheKey.set(cacheKey, request);
-    return request;
-  };
-}
-
 // ---------------------------------------------------------------------------
 // Fetcher factory (caching + single-flight)
 // ---------------------------------------------------------------------------
@@ -657,11 +562,11 @@ export function createGitHubUserDataFetcher(
     }
 
     const request = (async () => {
-      const fresh = await fetchUserDataFromGitHubWrapper(dependencies.executor, normalizedUsername);
+      const { data } = await fetchUserDataFromGitHub(dependencies.executor, normalizedUsername);
 
       if (dependencies.cacheStore.enabled) {
         try {
-          await dependencies.cacheStore.set(cacheKey, fresh, dependencies.cacheConfig.ttlSeconds);
+          await dependencies.cacheStore.set(cacheKey, data, dependencies.cacheConfig.ttlSeconds);
         } catch (error: unknown) {
           logger.warn("cache-set-fail", {
             key: cacheKey,
@@ -670,7 +575,7 @@ export function createGitHubUserDataFetcher(
         }
       }
 
-      return fresh;
+      return data;
     })().finally(() => {
       inFlightByCacheKey.delete(cacheKey);
     });

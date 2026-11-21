@@ -5,6 +5,7 @@ import { persistUserScores } from "@/features/developer/services";
 import { createCacheStore, getCacheConfigFromEnv } from "@/lib/cache";
 import { getDatabaseStore, type DatabaseStore } from "@/lib/db";
 import { getDisplayLimit } from "./display-limit";
+import { buildLeaderboardCacheKey, mapRowsToScoredLeaderboardEntries } from "./leaderboard-helpers";
 import type {
   CalculateLeaderboardResponse,
   LeaderboardMeta,
@@ -31,10 +32,6 @@ type LeaderboardSourceYaml = {
 export type { CalculateLeaderboardResponse, LeaderboardMeta, LeaderboardResult, ScoredEntry };
 
 // ─── Helpers ────────────────────────────────────────────────────────────
-
-function buildLeaderboardCacheKey(country: string, namespace: string): string {
-  return `${namespace}:leaderboard:${country.trim().toLowerCase()}`;
-}
 
 function getEnvInt(key: string, fallback: number): number {
   const raw = process.env[key]?.trim();
@@ -215,20 +212,7 @@ export async function buildLeaderboardResult(
 ): Promise<{ result: LeaderboardResult; meta: LeaderboardMeta }> {
   const allUsers = await db.getLeaderboard(country, getDisplayLimit(country));
   const totalCount = await db.getLeaderboardCount(country);
-
-  const scored: ScoredEntry[] = allUsers.map((row) => ({
-    username: row.username,
-    name: row.name,
-    avatarUrl: row.avatar_url,
-    repoScore: row.repo_score,
-    prScore: row.pr_score,
-    contributionScore: row.contribution_score,
-    finalScore: row.final_score,
-    impactRank: 0,
-  }));
-
-  scored.sort((a, b) => b.finalScore - a.finalScore);
-  scored.forEach((u, idx) => (u.impactRank = idx + 1));
+  const scored = mapRowsToScoredLeaderboardEntries(allUsers);
 
   const result: LeaderboardResult = {
     title: sourceData.title,

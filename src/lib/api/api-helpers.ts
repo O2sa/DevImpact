@@ -43,7 +43,7 @@ export function parseSelectedLanguagesFromSearchParams(searchParams: URLSearchPa
 
 /**
  * Standardized API error response handler for route handlers.
- * Translates UserFetchError, CompareUserFetchError, and generic exceptions
+ * Translates UserFetchError and generic exceptions
  * into structured ClientSafeError responses with proper HTTP status codes.
  */
 export function formatApiErrorResponse(error: unknown): NextResponse {

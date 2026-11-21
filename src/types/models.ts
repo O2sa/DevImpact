@@ -4,12 +4,3 @@ export interface BaseDeveloper {
   avatarUrl: string;
   location?: string | null;
 }
-
-export interface BaseRepository {
-  name: string;
-  owner: string;
-  url: string;
-  stargazerCount?: number;
-  forkCount?: number;
-  primaryLanguage?: string | null;
-}
