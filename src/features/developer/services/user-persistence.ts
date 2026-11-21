@@ -54,6 +54,9 @@ export async function persistUserScores({
       staleDays: resolvedStaleDays,
     });
   } catch (err: unknown) {
-    console.warn(`Failed to persist user score for ${data.login}:`, err);
+    console.warn("Failed to persist user score:", {
+      username: data.login,
+      error: err,
+    });
   }
 }

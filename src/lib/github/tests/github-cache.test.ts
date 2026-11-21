@@ -485,6 +485,65 @@ describe("GitHub user data caching", () => {
     expect(calls).toHaveLength(4);
   });
 
+  test("throws when pull requests query fails instead of silently returning empty PRs", async () => {
+    const calls: ExecuteCall[] = [];
+    const setCalls: Array<{ key: string; value: unknown }> = [];
+
+    const fetcher = createGitHubUserDataFetcher({
+      executor: {
+        async execute<TData>(params: { operationName: string }): Promise<TData> {
+          calls.push({ operationName: params.operationName });
+
+          if (params.operationName === "FetchUser") {
+            return {
+              user: {
+                name: "User Name",
+                avatarUrl: "https://example.com/avatar.png",
+                repositories: { nodes: [] },
+                contributionsCollection: {
+                  totalCommitContributions: 0,
+                  totalPullRequestContributions: 0,
+                  totalIssueContributions: 0,
+                },
+              },
+            } as unknown as TData;
+          }
+
+          if (params.operationName === "FetchUserPullRequests") {
+            throw new Error("GitHub Search API rate limit exceeded");
+          }
+
+          if (params.operationName === "FetchUserIssues") {
+            return {
+              issues: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } },
+            } as unknown as TData;
+          }
+
+          if (params.operationName === "FetchUserDiscussions") {
+            return {
+              discussions: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } },
+            } as unknown as TData;
+          }
+
+          throw new Error(`Unexpected operation: ${params.operationName}`);
+        },
+      },
+      cacheStore: makeMemoryCache({
+        getImpl: async () => undefined,
+        setImpl: async (key, value) => {
+          setCalls.push({ key, value });
+        },
+      }),
+      cacheConfig: {
+        namespace: "devimpact:v1",
+        ttlSeconds: 604_800,
+      },
+    });
+
+    await expect(fetcher("testuser")).rejects.toThrow("GitHub Search API rate limit exceeded");
+    expect(setCalls).toHaveLength(0);
+  });
+
   test("default cache TTL is seven days", () => {
     const config = getCacheConfigFromEnv({} as NodeJS.ProcessEnv);
     expect(config.ttlSeconds).toBe(DEFAULT_GITHUB_CACHE_TTL_SECONDS);
