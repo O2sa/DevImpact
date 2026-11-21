@@ -831,8 +831,11 @@ export async function getUserData(
   } catch (error: unknown) {
     if (staleFallback) {
       console.warn(
-        `Failed to refresh data for ${normalizedUsername} from GitHub, falling back to existing database record:`,
-        error,
+        "Failed to refresh data from GitHub, falling back to existing database record:",
+        {
+          username: normalizedUsername,
+          error,
+        },
       );
       return withMetrics
         ? {
