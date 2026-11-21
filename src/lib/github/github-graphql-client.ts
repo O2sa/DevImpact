@@ -293,16 +293,6 @@ export class GitHubGraphQLClient {
         const normalizedError = this.normalizeError(error);
         const shouldRetry = normalizedError.retriable && attempt < this.maxRetries;
 
-        console.warn("github_graphql_error", {
-          operationName: params.operationName,
-          attempt: attempt + 1,
-          classification: normalizedError.kind,
-          status: normalizedError.status,
-          retryAfterMs: normalizedError.retryAfterMs,
-          rateLimit: normalizedError.rateLimit,
-          shouldRetry,
-        });
-
         if (!shouldRetry) {
           throw normalizedError;
         }
@@ -371,11 +361,6 @@ export class GitHubGraphQLClient {
         rateLimit,
       });
     }
-
-    console.info("github_graphql_success", {
-      operationName: params.operationName,
-      rateLimit,
-    });
 
     return payload.data;
   }
