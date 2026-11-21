@@ -479,12 +479,16 @@ async function fetchUserDataFromGitHub(
     throw userResult.reason;
   }
 
+  if (prResult.status === "rejected") {
+    throw prResult.reason;
+  }
+
   if (!userResult.value.user) {
     throw new Error("User not found");
   }
 
   const user = userResult.value.user;
-  const pullRequests = prResult.status === "fulfilled" ? prResult.value : [];
+  const pullRequests = prResult.value;
   const issues = issuesResult.status === "fulfilled" ? issuesResult.value : [];
   const discussions = discussionsResult.status === "fulfilled" ? discussionsResult.value : [];
 
@@ -784,6 +788,7 @@ export async function getUserData(
   }
 
   // ── 2. Check PostgreSQL ────────────────────────────────────────────────
+  let staleFallback: GitHubUserData | null = null;
   try {
     const { getDatabaseStore } = await import("@/lib/db");
     const db = getDatabaseStore();
@@ -810,16 +815,42 @@ export async function getUserData(
           ? { data: userData, metrics: { duration: 0, errors: [] } } // No metrics for cached data
           : userData;
       }
+      staleFallback = row.raw_data as GitHubUserData;
     }
   } catch {
     // Non-fatal: DB failure, fall through to GitHub API
   }
 
   // ── 3. Fetch from GitHub API ──────────────────────────────────────────
-  const { data: fresh, metrics } = await fetchUserDataFromGitHub(
-    getDefaultGitHubExecutor(),
-    normalizedUsername,
-  );
+  let fresh: GitHubUserData;
+  let metrics: UserFetchMetrics;
+  try {
+    const result = await fetchUserDataFromGitHub(getDefaultGitHubExecutor(), normalizedUsername);
+    fresh = result.data;
+    metrics = result.metrics;
+  } catch (error: unknown) {
+    if (staleFallback) {
+      console.warn(
+        `Failed to refresh data for ${normalizedUsername} from GitHub, falling back to existing database record:`,
+        error,
+      );
+      return withMetrics
+        ? {
+            data: staleFallback,
+            metrics: {
+              duration: 0,
+              errors: [
+                {
+                  part: "github",
+                  reason: error instanceof Error ? error.message : String(error),
+                },
+              ],
+            },
+          }
+        : staleFallback;
+    }
+    throw error;
+  }
 
   // 4. Handle Redis cache
   if (cacheStoreSingleton.enabled && cacheStoreSingleton.del) {
