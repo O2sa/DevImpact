@@ -1,8 +1,8 @@
 "use client";
 
 import { MessageSquare, Star } from "lucide-react";
-import { useTranslation } from "@/components/providers/language-provider";
-import type { UserResult } from "@/features/developer/types";
+import { useTranslation } from "@/components/providers";
+import type { UserResult } from "@/features/developer";
 import { StatChip } from "./work-card-helpers";
 
 export type CommunityCardItemProps = {

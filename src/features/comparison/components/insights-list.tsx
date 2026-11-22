@@ -1,8 +1,8 @@
 "use client";
 
 import { TrendingUp } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTranslation } from "@/components/providers/language-provider";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
+import { useTranslation } from "@/components/providers";
 import type { CompareInsights } from "../types";
 import type { UserResult } from "@/features/developer";
 

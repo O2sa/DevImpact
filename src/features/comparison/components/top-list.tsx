@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { ExternalLink, GitPullRequest, MessageSquare, Star } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui";
 import type { UserResult } from "@/features/developer";
 import {
   RepoCardItem,
@@ -12,7 +12,7 @@ import {
   findRepoLanguageMeta,
   findPrLanguageMeta,
 } from "@/components/cards";
-import { useTranslation } from "@/components/providers/language-provider";
+import { useTranslation } from "@/components/providers";
 
 type Props = {
   userResults: UserResult[];
