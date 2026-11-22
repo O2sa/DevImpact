@@ -5,14 +5,16 @@ on:
     branches:
       - main
     paths:
-      - "ops/docker/**"
-      - "ops/cron/**"
+      - "ops/**"
       - "package.json"
       - "pnpm-lock.yaml"
       - "scripts/**"
-      - "lib/**"
-      - "app/**"
-      - "types/**"
+      - "src/data/**"
+      - "src/features/developer/**"
+      - "src/features/leaderboard/**"
+      - "src/features/scoring/**"
+      - "src/lib/**"
+      - "src/types/**"
       - ".github/workflows/leaderboard-image.yml"
   workflow_dispatch:
 
