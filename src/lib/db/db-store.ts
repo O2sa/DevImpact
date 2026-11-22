@@ -1,7 +1,7 @@
 import { Pool, PoolConfig } from "pg";
 import countries from "@/data/countries.json";
 import type { GitHubUserData } from "@/lib/github";
-import type { CalculateUserScoreResult } from "@/features/scoring/services";
+import type { CalculateUserScoreResult } from "@/features/scoring";
 
 // ─── Types ─────────────────────────────────────────────────────────────
 

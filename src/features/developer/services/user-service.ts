@@ -1,6 +1,5 @@
 import { getUserData } from "@/lib/github";
-import { calculateUserScore } from "@/features/scoring";
-import type { CalculateUserScoreResult } from "@/features/scoring/services";
+import { calculateUserScore, type CalculateUserScoreResult } from "@/features/scoring";
 import { scheduleBackground } from "@/lib/background";
 import { persistUserScores } from "./user-persistence";
 import { getCachedProfile, setCachedProfile } from "./profile-cache";
