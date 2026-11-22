@@ -1,39 +1,12 @@
 import type { Metadata } from "next";
-import countriesData from "@/data/countries.json";
 import { JsonLd } from "@/components/seo/json-ld";
 import { CountryLeaderboardClient } from "@/features/leaderboard";
-import { getLeaderboardResult } from "@/features/leaderboard/services";
+import { getLeaderboardResult, getCountryInfo } from "@/features/leaderboard/services";
 import { toAbsoluteUrl } from "@/lib/seo";
-
-type CountryInfo = {
-  slug: string;
-  title: string;
-  keywords?: string[];
-};
 
 type Props = {
   params: Promise<{ locale?: string; country: string }>;
 };
-
-const countries = countriesData as CountryInfo[];
-
-function formatCountryTitle(country: string): string {
-  return country
-    .split("_")
-    .filter(Boolean)
-    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
-    .join(" ");
-}
-
-function getCountryInfo(country: string): CountryInfo {
-  return (
-    countries.find((entry) => entry.slug === country) ?? {
-      slug: country,
-      title: formatCountryTitle(country),
-      keywords: [],
-    }
-  );
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { country } = await params;
