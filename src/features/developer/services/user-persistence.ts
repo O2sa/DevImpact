@@ -1,8 +1,7 @@
-import { calculateUserScore } from "@/features/scoring";
+import { calculateUserScore, type CalculateUserScoreResult } from "@/features/scoring";
 import { getDatabaseStore } from "@/lib/db";
 import { detectCountry } from "@/lib/geo";
 import type { GitHubUserData } from "@/lib/github";
-import type { CalculateUserScoreResult } from "@/features/scoring/services";
 
 export type PersistUserOptions = {
   data: GitHubUserData;

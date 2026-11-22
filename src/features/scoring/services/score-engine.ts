@@ -1,5 +1,10 @@
 import type { DiscussionNode, IssueNode, PullRequestNode, RepoNode } from "@/lib/github";
-import type { ScoringExplanations, ScoringSignals } from "../types";
+import type {
+  CalculateUserScoreResult,
+  LanguageScores,
+  ScoringExplanations,
+  ScoringSignals,
+} from "../types";
 import { getTopLanguages, normalizeSelectedLanguages } from "./language-scoring";
 import {
   BASE_SCORING_EXPLANATIONS,
@@ -24,100 +29,15 @@ export * from "./repo-scoring";
 export * from "./pr-scoring";
 export * from "./community-scoring";
 
-export type TopRepo = {
-  name: string;
-  url?: string;
-  stars: number;
-  forks: number;
-  watchers: number;
-  score: number;
-  topLanguages?: {
-    name: string;
-    percentage: number;
-  }[];
-};
-
-export type TopPullRequest = {
-  repo: string;
-  title: string;
-  url?: string;
-  stars: number;
-  score: number;
-  additions: number;
-  deletions: number;
-  topLanguages?: {
-    name: string;
-    percentage: number;
-  }[];
-};
-
-export type TopCommunityContribution = {
-  type: "issue" | "discussion";
-  title: string;
-  url?: string;
-  repo: string;
-  stars: number;
-  comments: number;
-  score: number;
-};
-
-export type TopLanguageRepo = TopRepo & {
-  languageMatch: number;
-  topLanguages: {
-    name: string;
-    percentage: number;
-  }[];
-};
-
-export type TopLanguagePullRequest = TopPullRequest & {
-  languageMatch: number;
-  topLanguages: {
-    name: string;
-    percentage: number;
-  }[];
-};
-
-export type LanguageScores = {
-  selectedLanguages: string[];
-  repoScore: number;
-  prScore: number;
-  contributionScore: number;
-  finalScore: number;
-  normalizedRepoScore: number;
-  normalizedPRScore: number;
-  normalizedContributionScore: number;
-  normalizedFinalScore: number;
-  topRepos: TopLanguageRepo[];
-  topPullRequests: TopLanguagePullRequest[];
-};
-
-export type CalculateUserScoreResult = {
-  username: string;
-  repoScore: number;
-  prScore: number;
-  contributionScore: number;
-  finalScore: number;
-  normalizedRepoScore: number;
-  normalizedPRScore: number;
-  normalizedContributionScore: number;
-  normalizedFinalScore: number;
-  scores: {
-    repoScore: number;
-    prScore: number;
-    contributionScore: number;
-    finalScore: number;
-    normalizedRepoScore: number;
-    normalizedPRScore: number;
-    normalizedContributionScore: number;
-    normalizedFinalScore: number;
-  };
-  topRepos: TopRepo[];
-  topPullRequests: TopPullRequest[];
-  topCommunityContributions: TopCommunityContribution[];
-  languageScores?: LanguageScores;
-  signals: ScoringSignals;
-  explanations: ScoringExplanations;
-};
+export type {
+  TopRepo,
+  TopPullRequest,
+  TopCommunityContribution,
+  TopLanguageRepo,
+  TopLanguagePullRequest,
+  LanguageScores,
+  CalculateUserScoreResult,
+} from "../types";
 
 export function calculateUserScore(
   data: {
