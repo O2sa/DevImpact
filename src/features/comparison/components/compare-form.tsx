@@ -2,14 +2,19 @@
 
 import { useEffect, useRef } from "react";
 import { ArrowLeftRight, RefreshCw, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Kbd } from "@/components/ui/kbd";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTranslation } from "@/components/providers/language-provider";
+import {
+  Button,
+  Input,
+  Kbd,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui";
+import { useTranslation } from "@/components/providers";
 import { handleEscapeToClear, matchesHotkey, useHotkeys, useIsApplePlatform } from "@/hooks";
-import { cn } from "@/utils/cn";
-import { cleanGitHubUsername } from "@/utils/github";
+import { cn, cleanGitHubUsername } from "@/utils";
 
 const LANGUAGE_OPTIONS = [
   "TypeScript",

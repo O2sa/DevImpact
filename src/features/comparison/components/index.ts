@@ -4,4 +4,5 @@ export * from "./result-dashboard";
 export * from "./insights-list";
 export * from "./top-list";
 export * from "./home-page-client";
+export * from "./home-page-fallback";
 export * from "./dashboard-skeleton";

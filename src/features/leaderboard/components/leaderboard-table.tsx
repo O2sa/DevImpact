@@ -12,12 +12,20 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { Avatar } from "@/components/ui";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import {
+  Avatar,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui";
 import { useTranslation } from "@/components/providers/language-provider";
-import { cn } from "@/utils/cn";
+import { cn } from "@/utils";
 import type { ScoredLeaderboardEntry as LeaderboardEntry } from "../types";
 import { SearchField } from "./search-field";
 

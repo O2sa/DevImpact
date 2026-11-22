@@ -18,17 +18,23 @@ import {
   Star,
   Trophy,
 } from "lucide-react";
-import { Avatar } from "@/components/ui";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import {
+  Avatar,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Progress,
+} from "@/components/ui";
 import {
   ScoreCard,
   RepoCardItem,
   PullRequestCardItem,
   CommunityCardItem,
 } from "@/components/cards";
-import { useTranslation } from "@/components/providers/language-provider";
+import { useTranslation } from "@/components/providers";
 import { getCountryCode, detectCountry } from "@/lib/geo";
 import countriesData from "@/data/countries.json";
 import type { UserResult } from "../types";

@@ -6,12 +6,12 @@ import { CompareForm } from "./compare-form";
 import { ResultDashboard } from "./result-dashboard";
 import { DashboardSkeleton } from "./dashboard-skeleton";
 import { BrandLogo } from "@/components/layout/brand-logo";
-import { useTranslation } from "@/components/providers/language-provider";
-import { cn } from "@/utils/cn";
+import { useTranslation } from "@/components/providers";
+import { cn } from "@/utils";
 import { useComparisonController } from "../hooks";
 import { type ComparisonPreset } from "../config/comparison-presets";
 import { PresetPills } from "./preset-pills";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui";
 
 export function HomePageClient() {
   const { t } = useTranslation();
