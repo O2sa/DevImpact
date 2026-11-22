@@ -2,22 +2,16 @@ import { cache } from "react";
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/seo/json-ld";
 import { UserProfileClient, UserNotFoundCard } from "@/features/developer";
-import { getUserProfile } from "@/features/developer/services";
+import {
+  getUserProfile,
+  buildUserProfileSchema,
+  buildUserBreadcrumbSchema,
+} from "@/features/developer/services";
 import { toAbsoluteUrl } from "@/lib/seo";
-
-import countriesData from "@/data/countries.json";
-import { detectCountry } from "@/lib/geo";
 
 const getCachedUserProfile = cache(async (username: string) => {
   return getUserProfile(username);
 });
-
-type CountryInfo = {
-  slug: string;
-  title: string;
-};
-
-const countries = countriesData as CountryInfo[];
 
 export const revalidate = 1800; // Cache user profile on Edge CDN for 30 minutes via ISR
 export const dynamicParams = true;
@@ -116,83 +110,8 @@ export default async function UserProfilePage({ params, searchParams }: Props) {
   }
 
   const { user, location } = profileData;
-  const displayName = user.name?.trim() || user.username;
-
-  const profilePageSchema = {
-    "@context": "https://schema.org",
-    "@type": "ProfilePage",
-    name: `${displayName} Developer Profile`,
-    description: `Open-source impact statistics and scoring for ${displayName} (@${user.username}).`,
-    url: profileUrl,
-    mainEntity: {
-      "@type": "Person",
-      name: displayName,
-      alternateName: user.username,
-      image: user.avatarUrl,
-      url: `https://github.com/${user.username}`,
-      ...(location ? { homeLocation: location } : {}),
-      interactionStatistic: [
-        {
-          "@type": "InteractionCounter",
-          interactionType: "https://schema.org/LikeAction",
-          userInteractionCount: user.finalScore,
-        },
-      ],
-    },
-    isPartOf: {
-      "@type": "WebSite",
-      name: "DevImpact",
-      url: toAbsoluteUrl("/"),
-    },
-  };
-
-  const detectedSlug = (countryParam || detectCountry(location))?.trim().toLowerCase();
-  const countryInfo = detectedSlug
-    ? countries.find((c) => c.slug.toLowerCase() === detectedSlug)
-    : null;
-
-  const breadcrumbElements = [
-    {
-      "@type": "ListItem",
-      position: 1,
-      name: "Home",
-      item: toAbsoluteUrl("/"),
-    },
-    {
-      "@type": "ListItem",
-      position: 2,
-      name: "Leaderboards",
-      item: toAbsoluteUrl("/leaderboard"),
-    },
-  ];
-
-  if (countryInfo) {
-    breadcrumbElements.push({
-      "@type": "ListItem",
-      position: 3,
-      name: countryInfo.title,
-      item: toAbsoluteUrl(`/leaderboard/${countryInfo.slug}`),
-    });
-    breadcrumbElements.push({
-      "@type": "ListItem",
-      position: 4,
-      name: displayName,
-      item: profileUrl,
-    });
-  } else {
-    breadcrumbElements.push({
-      "@type": "ListItem",
-      position: 3,
-      name: displayName,
-      item: profileUrl,
-    });
-  }
-
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: breadcrumbElements,
-  };
+  const profilePageSchema = buildUserProfileSchema(user, location);
+  const breadcrumbSchema = buildUserBreadcrumbSchema(user, location, countryParam);
 
   return (
     <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
