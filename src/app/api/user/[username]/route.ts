@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getUserProfile } from "@/features/developer/services";
 import { formatApiErrorResponse, parseSelectedLanguagesFromSearchParams } from "@/lib/api";
-import { cleanGitHubUsername } from "@/utils/github";
+import { cleanGitHubUsername } from "@/utils";
 
 export const runtime = "nodejs";
 

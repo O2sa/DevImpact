@@ -6,7 +6,7 @@ import {
   resolveLocale,
 } from "@/features/comparison/services";
 import { formatApiErrorResponse, parseSelectedLanguagesFromSearchParams } from "@/lib/api";
-import { cleanGitHubUsername } from "@/utils/github";
+import { cleanGitHubUsername } from "@/utils";
 
 export const runtime = "nodejs";
 

@@ -21,10 +21,9 @@ const ComparisonChart = dynamic(
 import { TopList } from "./top-list";
 import { InsightsList } from "./insights-list";
 import { ScoreCard } from "@/components/cards";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { getSignalMetricEntries, type UserResult } from "@/features/developer";
-import { useTranslation } from "@/components/providers/language-provider";
+import { useTranslation } from "@/components/providers";
 import { formatComparisonToMarkdown } from "../services/format-comparison-to-markdown";
 import type { CompareInsights, CompareWinner } from "../types";
 
