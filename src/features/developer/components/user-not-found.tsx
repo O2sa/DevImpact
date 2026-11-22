@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { ArrowLeft, Search, Trophy } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTranslation } from "@/components/providers/language-provider";
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui";
+import { useTranslation } from "@/components/providers";
 
 type Props = {
   username: string;

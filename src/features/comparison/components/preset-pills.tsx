@@ -1,8 +1,8 @@
 "use client";
 
 import { useId } from "react";
-import { useTranslation } from "@/components/providers/language-provider";
-import { cn } from "@/utils/cn";
+import { useTranslation } from "@/components/providers";
+import { cn } from "@/utils";
 import { COMPARISON_PRESETS } from "../config/comparison-presets";
 
 type Preset = (typeof COMPARISON_PRESETS)[number];

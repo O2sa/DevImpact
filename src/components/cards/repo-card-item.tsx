@@ -1,8 +1,8 @@
 "use client";
 
 import { Eye, GitFork, Star } from "lucide-react";
-import { useTranslation } from "@/components/providers/language-provider";
-import type { UserResult } from "@/features/developer/types";
+import { useTranslation } from "@/components/providers";
+import type { UserResult } from "@/features/developer";
 import {
   formatLanguageMatch,
   LanguageBreakdown,

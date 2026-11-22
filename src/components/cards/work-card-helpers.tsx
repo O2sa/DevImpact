@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import type { UserResult } from "@/features/developer/types";
+import type { UserResult } from "@/features/developer";
 
 export type LanguageEntry = {
   name: string;
