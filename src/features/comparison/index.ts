@@ -1,4 +1,5 @@
 export * from "./types";
 export * from "./components";
-export * from "./services";
+export * from "./services/compare-request";
+export * from "./services/format-comparison-to-markdown";
 export * from "./hooks";
