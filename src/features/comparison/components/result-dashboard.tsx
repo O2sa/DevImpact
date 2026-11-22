@@ -7,7 +7,7 @@ import { Check, Copy, ExternalLink, Trophy, Share2, XCircle } from "lucide-react
 import { useSearchParams } from "next/navigation";
 import { useClipboardCopy } from "@/hooks";
 import dynamic from "next/dynamic";
-import { Avatar } from "@/components/layout/avatar";
+import { Avatar } from "@/components/ui";
 
 const ComparisonChart = dynamic(
   () => import("./comparison-chart").then((mod) => mod.ComparisonChart),
@@ -25,7 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getSignalMetricEntries, type UserResult } from "@/features/developer";
 import { useTranslation } from "@/components/providers/language-provider";
-import { formatComparisonToMarkdown } from "../format-comparison-to-markdown";
+import { formatComparisonToMarkdown } from "../services/format-comparison-to-markdown";
 import type { CompareInsights, CompareWinner } from "../types";
 
 type Props = {

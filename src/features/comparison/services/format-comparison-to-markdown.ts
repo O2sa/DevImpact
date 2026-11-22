@@ -1,5 +1,5 @@
 import type { UserResult } from "@/features/developer";
-import type { CompareWinner } from "./types";
+import type { CompareWinner } from "../types";
 
 type ComparisonMarkdownUser = Pick<
   UserResult,

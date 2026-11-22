@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { formatComparisonToMarkdown } from "@/features/comparison/format-comparison-to-markdown";
+import { formatComparisonToMarkdown } from "@/features/comparison";
 import type { UserResult } from "@/features/developer";
 import type { CompareWinner } from "@/features/comparison/types";
 

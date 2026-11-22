@@ -6,3 +6,4 @@ export * from "./progress";
 export * from "./skeleton";
 export * from "./tooltip";
 export * from "./kbd";
+export * from "./avatar";

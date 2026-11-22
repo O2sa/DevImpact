@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { cn } from "@/utils/cn";
 
-type AvatarProps = {
+export type AvatarProps = {
   src?: string | null;
   alt: string;
   size?: number;
@@ -11,8 +11,7 @@ type AvatarProps = {
 };
 
 /**
- * Reusable avatar image component.
- *
+ * Reusable avatar image component with initial fallback.
  */
 export function Avatar({
   src,
