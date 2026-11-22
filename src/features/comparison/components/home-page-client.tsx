@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import Image from "next/image";
 import { CompareForm } from "./compare-form";
 import { ResultDashboard } from "./result-dashboard";
-import { DashboardSkeleton } from "@/components/layout/skeletons";
+import { DashboardSkeleton } from "./dashboard-skeleton";
 import { BrandLogo } from "@/components/layout/brand-logo";
 import { useTranslation } from "@/components/providers/language-provider";
 import { cn } from "@/utils/cn";

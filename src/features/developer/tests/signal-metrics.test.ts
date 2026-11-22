@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { ScoringSignals } from "@/features/scoring";
 import en from "@/locales/en.json";
 import ar from "@/locales/ar.json";
-import { getSignalMetricEntries } from "../signal-metrics";
+import { getSignalMetricEntries } from "../services/signal-metrics";
 
 const signals: ScoringSignals = {
   reposAnalyzed: 0,

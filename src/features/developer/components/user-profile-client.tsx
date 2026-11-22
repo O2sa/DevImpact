@@ -18,7 +18,7 @@ import {
   Star,
   Trophy,
 } from "lucide-react";
-import { Avatar } from "@/components/layout/avatar";
+import { Avatar } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -32,7 +32,7 @@ import { useTranslation } from "@/components/providers/language-provider";
 import { getCountryCode, detectCountry } from "@/lib/geo";
 import countriesData from "@/data/countries.json";
 import type { UserResult } from "../types";
-import { getSignalMetricEntries } from "../signal-metrics";
+import { getSignalMetricEntries } from "../services/signal-metrics";
 
 type CountryInfo = {
   slug: string;

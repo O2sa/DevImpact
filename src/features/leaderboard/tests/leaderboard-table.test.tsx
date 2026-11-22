@@ -48,9 +48,13 @@ vi.mock("@/components/providers/language-provider", () => ({
 }));
 
 // Mock Avatar
-vi.mock("@/components/layout/avatar", () => ({
-  Avatar: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
-}));
+vi.mock("@/components/ui", async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>();
+  return {
+    ...actual,
+    Avatar: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
+  };
+});
 
 // Mock Tooltip components
 vi.mock("@/components/ui/tooltip", () => ({
