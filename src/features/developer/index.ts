@@ -1,3 +1,3 @@
 export * from "./types";
 export * from "./components";
-export * from "./services";
+export { getSignalMetricEntries } from "./services/signal-metrics";
