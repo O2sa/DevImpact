@@ -45,6 +45,7 @@ export function middleware(request: NextRequest) {
   rewriteUrl.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
 
   const response = NextResponse.rewrite(rewriteUrl);
+  response.headers.set("Vary", "Accept-Language, Cookie");
 
   // If cookie wasn't set or was invalid, set it now for persistence
   if (!hasValidCookie) {

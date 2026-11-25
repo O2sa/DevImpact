@@ -10,6 +10,7 @@ describe("middleware transparent locale rewrite", () => {
 
     expect(res.headers.get("x-middleware-rewrite")).toBe("http://localhost:3000/en");
     expect(res.cookies.get(LOCALE_COOKIE)?.value).toBe("en");
+    expect(res.headers.get("vary")).toBe("Accept-Language, Cookie");
   });
 
   it("rewrites /leaderboard to /ar/leaderboard when app-locale cookie is ar", () => {
