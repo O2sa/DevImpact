@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "./language-provider";
 import { cn } from "@/utils/cn";
 
@@ -8,6 +9,8 @@ export function LanguageSwitcher() {
   const { locale, setLocale, locales, dir } = useTranslation();
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const currentLocale = locales.find((item) => item.value === locale);
 
@@ -36,6 +39,15 @@ export function LanguageSwitcher() {
   function onSelect(nextLocale: (typeof locales)[number]["value"]) {
     setLocale(nextLocale);
     setOpen(false);
+
+    if (pathname) {
+      const cleanPath = pathname.replace(/^\/(?:en|ar)(?=\/|$)/, "") || "/";
+      if (nextLocale === "ar") {
+        router.push(`/ar${cleanPath === "/" ? "" : cleanPath}`);
+      } else {
+        router.push(cleanPath);
+      }
+    }
   }
 
   return (

@@ -10,10 +10,9 @@ describe("middleware transparent locale rewrite", () => {
 
     expect(res.headers.get("x-middleware-rewrite")).toBe("http://localhost:3000/en");
     expect(res.cookies.get(LOCALE_COOKIE)?.value).toBe("en");
-    expect(res.headers.get("vary")).toBe("Accept-Language, Cookie");
   });
 
-  it("rewrites /leaderboard to /ar/leaderboard when app-locale cookie is ar", () => {
+  it("redirects /leaderboard to /ar/leaderboard when app-locale cookie is ar", () => {
     const req = new NextRequest("http://localhost:3000/leaderboard", {
       headers: {
         cookie: `${LOCALE_COOKIE}=ar`,
@@ -21,10 +20,12 @@ describe("middleware transparent locale rewrite", () => {
     });
     const res = middleware(req);
 
-    expect(res.headers.get("x-middleware-rewrite")).toBe("http://localhost:3000/ar/leaderboard");
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toBe("http://localhost:3000/ar/leaderboard");
+    expect(res.headers.get("cache-control")).toContain("no-store");
   });
 
-  it("rewrites / based on Accept-Language when no cookie exists", () => {
+  it("redirects / based on Arabic Accept-Language when no cookie exists", () => {
     const req = new NextRequest("http://localhost:3000/scoring-methodology", {
       headers: {
         "accept-language": "ar-SA,ar;q=0.9,en;q=0.8",
@@ -32,10 +33,23 @@ describe("middleware transparent locale rewrite", () => {
     });
     const res = middleware(req);
 
-    expect(res.headers.get("x-middleware-rewrite")).toBe(
-      "http://localhost:3000/ar/scoring-methodology",
-    );
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toBe("http://localhost:3000/ar/scoring-methodology");
     expect(res.cookies.get(LOCALE_COOKIE)?.value).toBe("ar");
+  });
+
+  it("rewrites / based on English Accept-Language when no cookie exists", () => {
+    const req = new NextRequest("http://localhost:3000/scoring-methodology", {
+      headers: {
+        "accept-language": "en-US,en;q=0.9",
+      },
+    });
+    const res = middleware(req);
+
+    expect(res.headers.get("x-middleware-rewrite")).toBe(
+      "http://localhost:3000/en/scoring-methodology",
+    );
+    expect(res.cookies.get(LOCALE_COOKIE)?.value).toBe("en");
   });
 
   it("passes through without rewrite if path already starts with supported locale", () => {

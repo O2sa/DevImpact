@@ -40,16 +40,39 @@ export function middleware(request: NextRequest) {
     ? cookieLocale
     : parseAcceptLanguage(request.headers.get("accept-language"), supportedLocales, DEFAULT_LOCALE);
 
-  // Rewrite /path to /[locale]/path transparently
+  // Default Locale Unprefixed Strategy:
+  // If target locale is non-default (e.g. Arabic), redirect to /ar/...
+  if (locale !== DEFAULT_LOCALE) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
+
+    const response = NextResponse.redirect(redirectUrl, {
+      status: 307,
+      headers: {
+        "Cache-Control": "private, no-cache, no-store, must-revalidate",
+      },
+    });
+
+    if (!hasValidCookie) {
+      response.cookies.set(LOCALE_COOKIE, locale, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 365,
+        sameSite: "lax",
+      });
+    }
+
+    return response;
+  }
+
+  // Default locale (English): transparent rewrite to /en/... so unprefixed URLs stay canonical
   const rewriteUrl = request.nextUrl.clone();
-  rewriteUrl.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
+  rewriteUrl.pathname = `/${DEFAULT_LOCALE}${pathname === "/" ? "" : pathname}`;
 
   const response = NextResponse.rewrite(rewriteUrl);
-  response.headers.set("Vary", "Accept-Language, Cookie");
 
   // If cookie wasn't set or was invalid, set it now for persistence
   if (!hasValidCookie) {
-    response.cookies.set(LOCALE_COOKIE, locale, {
+    response.cookies.set(LOCALE_COOKIE, DEFAULT_LOCALE, {
       path: "/",
       maxAge: 60 * 60 * 24 * 365,
       sameSite: "lax",
