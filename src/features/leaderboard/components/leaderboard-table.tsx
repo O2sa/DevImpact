@@ -357,7 +357,7 @@ export function LeaderboardTable({
 
                           return (
                             <div className="flex items-center gap-2">
-                              <Link href={profileUrl}>
+                              <Link href={profileUrl} prefetch={false}>
                                 <Avatar
                                   src={user.avatarUrl}
                                   alt={user.name || user.username}
@@ -369,6 +369,7 @@ export function LeaderboardTable({
                                 <div className="flex items-center gap-1.5">
                                   <Link
                                     href={profileUrl}
+                                    prefetch={false}
                                     className="truncate font-semibold text-primary hover:underline"
                                   >
                                     {user.name || user.username}
