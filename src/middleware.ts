@@ -46,40 +46,19 @@ export function middleware(request: NextRequest) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
 
-    const response = NextResponse.redirect(redirectUrl, {
+    return NextResponse.redirect(redirectUrl, {
       status: 307,
       headers: {
         "Cache-Control": "private, no-cache, no-store, must-revalidate",
       },
     });
-
-    if (!hasValidCookie) {
-      response.cookies.set(LOCALE_COOKIE, locale, {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 365,
-        sameSite: "lax",
-      });
-    }
-
-    return response;
   }
 
   // Default locale (English): transparent rewrite to /en/... so unprefixed URLs stay canonical
   const rewriteUrl = request.nextUrl.clone();
   rewriteUrl.pathname = `/${DEFAULT_LOCALE}${pathname === "/" ? "" : pathname}`;
 
-  const response = NextResponse.rewrite(rewriteUrl);
-
-  // If cookie wasn't set or was invalid, set it now for persistence
-  if (!hasValidCookie) {
-    response.cookies.set(LOCALE_COOKIE, DEFAULT_LOCALE, {
-      path: "/",
-      maxAge: 60 * 60 * 24 * 365,
-      sameSite: "lax",
-    });
-  }
-
-  return response;
+  return NextResponse.rewrite(rewriteUrl);
 }
 
 // Run only on routes that produce HTML or read the cookie. Skip Next.js
